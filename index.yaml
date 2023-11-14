@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  akto:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2023-11-14T12:08:18.787142376Z"
+    description: A Helm chart for Kubernetes
+    digest: 216ae3c7ff339029179fab3c0edbff5706f8833a9de733176bfae3ab8d96f99f
+    name: akto
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-0.1.0/akto-0.1.0.tgz
+    version: 0.1.0
+generated: "2023-11-14T12:08:18.787149179Z"
