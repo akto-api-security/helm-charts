@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-context-analyser
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.context_analyser.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-context-analyser
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.context_analyser.ports | toYaml | nindent 2 -}}
