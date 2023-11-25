@@ -1,0 +1,279 @@
+mongo:
+  aktoMongoConn: ""
+
+dashboard:
+  aktoApiSecurityDashboard:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-dashboard
+      tag: latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 8080
+    targetPort: 8080
+  replicas: 1
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local
+runtime:
+  aktoApiSecurityRuntime:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      useHostName: true
+      databaseAbstractorUrl: http://aktoxy-database-abstractor:9000
+      databaseAbstractorToken: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-runtime
+      tag: testim
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 2
+        memory: "4Gi"
+      limits:
+        cpu: 3
+        memory: "8Gi"
+  kafka1:
+    env:
+      kafkaAdvertisedListeners: LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,
+        LISTENER_DOCKER_EXTERNAL_DIFFHOST://akto-runtime.$(MY_POD_NAMESPACE).svc.cluster.local:9092
+      kafkaBrokerId: "1"
+      kafkaCleanupPolicy: delete
+      kafkaCreateTopics: akto.api.logs:3:3
+      kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
+      kafkaListenerSecurityProtocolMap: LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,
+        LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaLogCleanerEnable: "true"
+      kafkaLogRetentionBytes: "10737418240"
+      kafkaLogRetentionCheckIntervalMs: "60000"
+      kafkaLogRetentionHours: "5"
+      kafkaLogSegmentBytes: "104857600"
+      kafkaOffsetsTopicReplicationFactor: "1"
+      kafkaTransactionStateLogMinIsr: "1"
+      kafkaTransactionStateLogReplicationFactor: "1"
+      kafkaZookeeperConnect: 127.0.0.1:2181
+    image:
+      repository: confluentinc/cp-kafka
+      tag: 6.2.11-1-ubi8
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 9092
+    targetPort: 9092
+  replicas: 1
+  type: ClusterIP
+  zoo1:
+    env:
+      kafkaOpts: -Dzookeeper.admin.enableServer=false
+      zookeeperClientPort: "2181"
+      zookeeperServerId: "1"
+      zookeeperServers: zoo1:2888:3888
+    image:
+      repository: confluentinc/cp-zookeeper
+      tag: 6.2.11-1-ubi8
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 2
+        memory: "4Gi"
+context_analyser:
+  aktoApiSecurityContextAnalyser:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      useHostName: true
+      databaseAbstractorUrl: http://aktoxy-database-abstractor:9000
+      databaseAbstractorToken: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-context-analyzer
+      tag: testim
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 2
+        memory: "4Gi"
+      limits:
+        cpu: 3
+        memory: "8Gi"
+  kafka1:
+    env:
+      kafkaAdvertisedListeners: LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,
+        LISTENER_DOCKER_EXTERNAL_DIFFHOST://akto-context-analyser.$(MY_POD_NAMESPACE).svc.cluster.local:9092
+      kafkaBrokerId: "1"
+      kafkaCleanupPolicy: delete
+      kafkaCreateTopics: akto.api.logs:3:3
+      kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
+      kafkaListenerSecurityProtocolMap: LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,
+        LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaLogCleanerEnable: "true"
+      kafkaLogRetentionBytes: "10737418240"
+      kafkaLogRetentionCheckIntervalMs: "60000"
+      kafkaLogRetentionHours: "5"
+      kafkaLogSegmentBytes: "104857600"
+      kafkaOffsetsTopicReplicationFactor: "1"
+      kafkaTransactionStateLogMinIsr: "1"
+      kafkaTransactionStateLogReplicationFactor: "1"
+      kafkaZookeeperConnect: 127.0.0.1:2181
+      aktoCurrentInstanceIp: akto-context-analyser
+    image:
+      repository: confluentinc/cp-kafka
+      tag: 6.2.11-1-ubi8
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 9092
+    targetPort: 9092
+  replicas: 1
+  type: ClusterIP
+  zoo1:
+    env:
+      kafkaOpts: -Dzookeeper.admin.enableServer=false
+      zookeeperClientPort: "2181"
+      zookeeperServerId: "1"
+      zookeeperServers: zoo1:2888:3888
+    image:
+      repository: confluentinc/cp-zookeeper
+      tag: 6.2.11-1-ubi8
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 2
+        memory: "4Gi"
+testing:
+  aktoApiSecurityTesting:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: kafka1:19092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-testing
+      tag: latest
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  replicas: 1
+
+database_abstractor:
+  aktoApiSecurityDatabaseAbstractor:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-database-abstractor
+      tag: testimm
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 9000
+    targetPort: 8080
+  replicas: 1
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local
+
+keel:
+  keel:
+    env:
+      awsAccessKeyId: ""
+      awsRegion: ""
+      awsSecretAccessKey: ""
+      hipchatApprovalsBotName: ""
+      hipchatApprovalsChannel: ""
+      hipchatApprovalsPasswort: ""
+      hipchatApprovalsUserName: ""
+      hipchatChannels: ""
+      hipchatToken: ""
+      insecureRegistry: "true"
+      mattermostEndpoint: ""
+      notificationLevel: info
+      webhookEndpoint: ""
+    image:
+      repository: keelhq/keel
+      tag: latest
+    imagePullPolicy: Always
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  maxUnavailable: 1
+  ports:
+  - name: keel
+    port: 9300
+    protocol: TCP
+    targetPort: 9300
+  replicas: 1
+  serviceAccount:
+    annotations: {}
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local

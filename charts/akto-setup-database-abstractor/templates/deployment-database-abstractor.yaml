@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-database-abstractor
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@every 60m"
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.database_abstractor.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-database-abstractor
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-database-abstractor
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: AKTO_ACCOUNT_NAME
+          value: {{ quote .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.env.aktoAccountName
+            }}
+        - name: IS_KUBERNETES
+          value: "true"
+        - name: AKTO_CONFIG_NAME
+          value: {{ quote .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.env.aktoConfigName
+            }}
+        - name: AKTO_INSTANCE_TYPE
+          value: {{ quote .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.env.aktoInstanceType
+            }}
+        - name: AKTO_MONGO_CONN
+          value: {{ quote .Values.mongo.aktoMongoConn
+            }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.image.repository }}:{{ .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.imagePullPolicy
+          }}
+        name: akto-api-security-database-abstractor
+        ports:
+        - containerPort: 9000
+        resources: {{- toYaml .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.resources |  nindent 10 }}
+      restartPolicy: Always
