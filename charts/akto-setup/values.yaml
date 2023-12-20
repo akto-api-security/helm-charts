@@ -21,11 +21,11 @@ dashboard:
     imagePullPolicy: IfNotPresent
     resources:
       requests:
-        cpu: 1
-        memory: "4Gi"
+        cpu: 0.25
+        memory: "1Gi"
       limits:
-        cpu: 2
-        memory: "8Gi"
+        cpu: 0.25
+        memory: "1Gi"
   ports:
   - port: 8080
     targetPort: 8080
@@ -47,17 +47,18 @@ runtime:
       aktoTrafficBatchTimeSecs: "10"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
+      databaseAbstractorUrl: http://akto-database-abstractor.dev.svc.cluster.local:9000
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-runtime
-      tag: latest
+      tag: a-release-v1-32-18
     imagePullPolicy: IfNotPresent
     resources:
       requests:
         cpu: 2
-        memory: "4Gi"
+        memory: "0.5Gi"
       limits:
-        cpu: 3
-        memory: "8Gi"
+        cpu: 2
+        memory: "0.5Gi"
   kafka1:
     env:
       kafkaAdvertisedListeners: LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,
@@ -82,11 +83,11 @@ runtime:
       tag: 6.2.11-1-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "4Gi"
+        cpu: 0.5
+        memory: "2Gi"
       limits:
-        cpu: 2
-        memory: "8Gi"
+        cpu: 0.5
+        memory: "2Gi"
   ports:
   - port: 9092
     targetPort: 9092
@@ -103,11 +104,11 @@ runtime:
       tag: 6.2.11-1-ubi8
     resources:
       requests:
-        cpu: 1
+        cpu: 0.5
         memory: "2Gi"
       limits:
-        cpu: 2
-        memory: "4Gi"
+        cpu: 0.5
+        memory: "2Gi"
 testing:
   aktoApiSecurityTesting:
     env:
@@ -127,13 +128,12 @@ testing:
       tag: latest
     resources:
       requests:
-        cpu: 1
-        memory: "4Gi"
+        cpu: 0.5
+        memory: "2Gi"
       limits:
-        cpu: 2
-        memory: "8Gi"
+        cpu: 0.5
+        memory: "2Gi"
   replicas: 1
-
 
 keel:
   keel:

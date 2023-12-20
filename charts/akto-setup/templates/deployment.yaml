@@ -197,6 +197,8 @@ spec:
           value: {{ quote .Values.mongo.aktoMongoConn }}
         - name: USE_HOSTNAME
           value: {{ quote .Values.runtime.aktoApiSecurityRuntime.env.useHostName}}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.runtime.aktoApiSecurityRuntime.env.databaseAbstractorUrl}}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.runtime.aktoApiSecurityRuntime.image.repository }}:{{ .Values.runtime.aktoApiSecurityRuntime.image.tag

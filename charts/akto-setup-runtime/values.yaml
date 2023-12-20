@@ -47,7 +47,7 @@ runtime:
       aktoTrafficBatchTimeSecs: "10"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
-      databaseAbstractorUrl: http://aktoxy-database-abstractor:9000
+      databaseAbstractorUrl: http://aktodb-database-abstractor:9000
       databaseAbstractorToken: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-runtime
@@ -125,7 +125,7 @@ context_analyser:
       aktoTrafficBatchTimeSecs: "10"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
-      databaseAbstractorUrl: http://aktoxy-database-abstractor:9000
+      databaseAbstractorUrl: http://aktodb-database-abstractor:9000
       databaseAbstractorToken: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-context-analyzer
