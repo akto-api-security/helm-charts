@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   akto:
   - apiVersion: v2
+    appVersion: 0.1.8
+    created: "2024-03-14T09:09:53.544800706Z"
+    description: Helm chart for installing Akto
+    digest: 29e5032f205a4cb7d16d58427f1033f3c6bc138113f6001450713817b500718e
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-0.1.8/akto-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
     appVersion: 0.1.7
     created: "2024-03-04T11:31:56.662558783Z"
     description: Helm chart for installing Akto
@@ -141,4 +163,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-0.1.0/akto-0.1.0.tgz
     version: 0.1.0
-generated: "2024-03-04T11:31:56.662583669Z"
+generated: "2024-03-14T09:09:53.544837284Z"
