@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-runtime
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.runtime.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-runtime
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.runtime.ports | toYaml | nindent 2 -}}
