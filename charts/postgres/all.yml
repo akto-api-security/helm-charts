@@ -1,0 +1,83 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: azuredisk-premium-delete
+provisioner: kubernetes.io/azure-disk
+reclaimPolicy: Delete   # Retain or Delete
+volumeBindingMode: WaitForFirstConsumer   # WaitForFirstConsumer or Immediate
+allowVolumeExpansion: true    # true or false
+parameters:
+  storageaccounttype: Premium_LRS   # Premium or Standard
+  kind: Managed
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce   # ReadWriteOnce, ReadOnlyMany or ReadWriteMany
+  storageClassName: azuredisk-premium-delete
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: freecodecamp
+  POSTGRES_USER: freecodecamp1
+  POSTGRES_PASSWORD: freecodecamp@
+  PGDATA: /var/lib/postgresql/data/pgdata
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  selector:
+    matchLabels:
+      app: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          imagePullPolicy: "IfNotPresent"
+          ports:
+          - containerPort: 5432
+          envFrom:
+          - configMapRef:
+              name: postgres-config
+          volumeMounts:
+          - name: azure-managed-disk-pvc
+            mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: azure-managed-disk-pvc
+        persistentVolumeClaim:
+          claimName: azure-managed-disk-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  type: LoadBalancer
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      name: https
+      port: 5432
+      targetPort: 5432

@@ -227,6 +227,7 @@ spec:
 {{ end }}
 ---
 
+{{ if .Values.testing.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -296,3 +297,4 @@ spec:
           - containerPort: 3000
         resources: {{- toYaml .Values.testing.aktoApiSecurityPuppeteerReplay.resources |  nindent 10 }}
       restartPolicy: Always
+{{ end }}
