@@ -1,0 +1,5 @@
+apiVersion: v2
+name: akto-nginx
+description: A Helm chart for deploying Nginx with akto module and a sample application
+version: 0.1.0
+appVersion: "1.0"
