@@ -9,7 +9,7 @@ myApp:
 # the dockerfile for this image is also available if you'd like to create your own images.
 nginx:
   name: nginx
-  image: coastaldemigod/nginx-amazon-linux
+  image: aktosecurity/nginx-kafka
   replicas: 1
   containerPort: 80
 
