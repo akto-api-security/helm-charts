@@ -24,4 +24,24 @@ spec:
     - protocol: TCP
       port: {{ .Values.nginx.containerPort }}
       targetPort: {{ .Values.nginx.containerPort }}
-  type: LoadBalancer
+  type: ClusterIP
+  # use type : LoadBalancer if available and skip ingress.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.nginx.name }}-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.nginx.name }}-service
+            port:
+              number: 80
