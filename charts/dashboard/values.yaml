@@ -14,7 +14,7 @@ dashboard:
       aktoKafkaTopicName: akto.api.logs
       aktoTrafficBatchSize: "100"
       aktoTrafficBatchTimeSecs: "10"
-      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      puppeteerReplayServiceUrl: http://localhost:3000
       dashboardMode: "on_prem"
     image:
       repository: aktosecurity/akto-api-security-dashboard
@@ -27,6 +27,18 @@ dashboard:
       limits:
         cpu: 2
         memory: "8Gi"
+  aktoApiSecurityPuppeteerReplay:
+    image:
+      repository: aktosecurity/akto-puppeteer-replay
+      tag: latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 1
+        memory: "4Gi"
   ports:
   - port: 8080
     targetPort: 8080
@@ -46,7 +58,7 @@ testing:
       aktoKafkaTopicName: akto.api.logs
       aktoTrafficBatchSize: "100"
       aktoTrafficBatchTimeSecs: "10"
-      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      puppeteerReplayServiceUrl: http://localhost:3000
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-testing
       tag: latest
@@ -57,6 +69,18 @@ testing:
       limits:
         cpu: 2
         memory: "8Gi"
+  aktoApiSecurityPuppeteerReplay:
+    image:
+      repository: aktosecurity/akto-puppeteer-replay
+      tag: latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 1
+        memory: "4Gi"
   replicas: 1
 
 database_abstractor:
