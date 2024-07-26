@@ -1,0 +1,84 @@
+mongo:
+  aktoMongoConn: ""
+
+dashboard:
+  aktoApiSecurityDashboard:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      dashboardMode: "on_prem"
+    image:
+      repository: aktosecurity/akto-api-security-dashboard
+      tag: latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 8080
+    targetPort: 8080
+  replicas: 1
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local
+testing:
+  aktoApiSecurityTesting:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: kafka1:19092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-testing
+      tag: latest
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  replicas: 1
+
+database_abstractor:
+  aktoApiSecurityDatabaseAbstractor:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-database-abstractor
+      tag: latest
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 9000
+    targetPort: 8080
+  replicas: 1
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local

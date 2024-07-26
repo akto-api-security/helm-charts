@@ -1,0 +1,15 @@
+replicaCount: 3
+
+image:
+  repository: mongo
+  tag: 6.0.1
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 27017
+
+storage:
+  accessMode: ReadWriteOnce
+  storageClass: akto-mongo-storage-class
+  size: 1Gi

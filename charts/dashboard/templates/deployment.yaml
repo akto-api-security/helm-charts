@@ -2,10 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "akto.fullname" . }}-dashboard
-  annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@every 60m"
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 spec:
@@ -28,7 +24,8 @@ spec:
         - name: IS_KUBERNETES
           value: "true"
         - name: DASHBOARD_MODE
-          value: "local_deploy"
+          value: value: {{ quote .Values.dashboard.aktoApiSecurityDashboard.env.dashboardMode
+            }}
         - name: AKTO_CONFIG_NAME
           value: {{ quote .Values.dashboard.aktoApiSecurityDashboard.env.aktoConfigName
             }}
@@ -77,10 +74,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "akto.fullname" . }}-testing
-  annotations:
-    keel.sh/policy: force
-    keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@every 60m"
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 spec:
@@ -138,73 +131,3 @@ spec:
         name: akto-api-security-testing
         resources: {{- toYaml .Values.testing.aktoApiSecurityTesting.resources |  nindent 10 }}
       restartPolicy: Always
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ include "akto.fullname" . }}-keel
-  labels:
-    app: keel
-  {{- include "akto.labels" . | nindent 4 }}
-spec:
-  replicas: {{ .Values.keel.replicas }}
-  selector:
-    matchLabels:
-      app: {{ include "akto.fullname" . }}-keel
-    {{- include "akto.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      labels:
-        app: {{ include "akto.fullname" . }}-keel
-      {{- include "akto.selectorLabels" . | nindent 8 }}
-    spec:
-      containers:
-      - command:
-        - /bin/keel
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: AWS_ACCESS_KEY_ID
-          value: {{ quote .Values.keel.keel.env.awsAccessKeyId }}
-        - name: AWS_SECRET_ACCESS_KEY
-          value: {{ quote .Values.keel.keel.env.awsSecretAccessKey }}
-        - name: AWS_REGION
-          value: {{ quote .Values.keel.keel.env.awsRegion }}
-        - name: WEBHOOK_ENDPOINT
-          value: {{ quote .Values.keel.keel.env.webhookEndpoint }}
-        - name: MATTERMOST_ENDPOINT
-          value: {{ quote .Values.keel.keel.env.mattermostEndpoint }}
-        - name: HIPCHAT_TOKEN
-          value: {{ quote .Values.keel.keel.env.hipchatToken }}
-        - name: HIPCHAT_CHANNELS
-          value: {{ quote .Values.keel.keel.env.hipchatChannels }}
-        - name: HIPCHAT_APPROVALS_CHANNEL
-          value: {{ quote .Values.keel.keel.env.hipchatApprovalsChannel }}
-        - name: HIPCHAT_APPROVALS_BOT_NAME
-          value: {{ quote .Values.keel.keel.env.hipchatApprovalsBotName }}
-        - name: HIPCHAT_APPROVALS_USER_NAME
-          value: {{ quote .Values.keel.keel.env.hipchatApprovalsUserName }}
-        - name: HIPCHAT_APPROVALS_PASSWORT
-          value: {{ quote .Values.keel.keel.env.hipchatApprovalsPasswort }}
-        - name: NOTIFICATION_LEVEL
-          value: {{ quote .Values.keel.keel.env.notificationLevel }}
-        - name: INSECURE_REGISTRY
-          value: {{ quote .Values.keel.keel.env.insecureRegistry }}
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.keel.keel.image.repository }}:{{ .Values.keel.keel.image.tag
-          | default .Chart.AppVersion }}
-        imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 9300
-          initialDelaySeconds: 30
-          timeoutSeconds: 10
-        name: keel
-        ports:
-        - containerPort: 9300
-        resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
-      serviceAccountName: {{ include "akto.fullname" . }}-keel
