@@ -9,7 +9,7 @@ myApp:
 # the dockerfile for this image is also available if you'd like to create your own images.
 nginx:
   name: nginx
-  image: aktosecurity/nginx-kafka
+  image: coastaldemigod/nginx-kafka:lua3
   replicas: 1
   containerPort: 80
 
@@ -24,50 +24,50 @@ nginxConfig:
 
     error_log  /var/log/nginx/error.log notice;
     pid        /var/run/nginx.pid;
-    load_module /etc/nginx/modules/ngx_http_js_module.so;
-    load_module /etc/nginx/modules/ngx_http_kafka_log_module.so;
+    # load_module /etc/nginx/modules/ngx_http_js_module.so;
+    load_module /etc/nginx/modules/ndk_http_module.so;
+    load_module /etc/nginx/modules/ngx_http_lua_module.so;
+    # load_module /etc/nginx/modules/ngx_http_kafka_log_module.so;
 
     events {
         worker_connections  1024;
     }
 
     http {
+      # lua_load_resty_core off;
       include       /etc/nginx/mime.types;
       default_type  application/octet-stream;
-
-      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                        '$status $body_bytes_sent "$http_referer" '
-                        '"$http_user_agent" "$http_x_forwarded_for"';
-
-      access_log  /var/log/nginx/access.log  main;
 
       sendfile        on;
       #tcp_nopush     on;
 
       upstream my_app {
-          server my-app-service.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.myApp.containerPort }};
+          server my-app-service.dev3.svc.cluster.local:3000;
       }
 
-      keepalive_timeout  65;
-      subrequest_output_buffer_size 8k;
-      js_path "/etc/nginx/njs/";
-      js_var $responseBo "{}";
-      js_import main2 from api_log.js;
-      kafka_log_kafka_brokers "{{ .Values.kafkaIP }}:9092";
-      kafka_log_kafka_buffer_max_messages 100000;
+      # keepalive_timeout  65;
+      # subrequest_output_buffer_size 8k;
+      # js_path "/etc/nginx/njs/";
+      # js_var $responseBo "{}";
+      # js_import main2 from api_log.js;
+      # kafka_log_kafka_brokers "{{ .Values.kafkaIP }}:9092";
+      # kafka_log_kafka_buffer_max_messages 100000;
       #gzip  on;
 
       server {
         listen 80;
         location / {
-          js_body_filter main2.to_lower_case;
-          kafka_log kafka:akto.api.logs $responseBo;
+          # js_body_filter main2.to_lower_case;
+          # kafka_log kafka:akto.api.logs $responseBo;
           proxy_pass http://my_app;
-          proxy_set_header Accept-Encoding "";
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
+          header_filter_by_lua_block {
+            ngx.header["X-Custom-Header"] = "YourHeaderValue"
+          }
+          # proxy_set_header Accept-Encoding "";
+          # proxy_set_header Host $host;
+          # proxy_set_header X-Real-IP $remote_addr;
+          # proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          # proxy_set_header X-Forwarded-Proto $scheme;
         }
       }
     }
