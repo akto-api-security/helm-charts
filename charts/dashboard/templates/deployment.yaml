@@ -16,6 +16,9 @@ spec:
         app: {{ include "akto.fullname" . }}-dashboard
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
+      imagePullSecrets: 
+      - name: {{ quote .Values.dashboard.aktoApiSecurityDashboard.image.secret
+            }}
       containers:
       - env:
         - name: AKTO_ACCOUNT_NAME
@@ -95,6 +98,9 @@ spec:
         app: {{ include "akto.fullname" . }}-testing
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
+      imagePullSecrets: 
+      - name: {{ quote .Values.testing.aktoApiSecurityTesting.image.secret
+            }}
       containers:
       - env:
         - name: AKTO_ACCOUNT_NAME

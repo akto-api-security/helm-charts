@@ -16,6 +16,9 @@ spec:
         app: {{ include "akto.fullname" . }}-database-abstractor
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
+      imagePullSecrets: 
+      - name: {{ quote .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.image.secret
+            }}
       containers:
       - env:
         - name: AKTO_ACCOUNT_NAME

@@ -4,6 +4,7 @@ image:
   repository: mongo
   tag: 6.0.1
   pullPolicy: IfNotPresent
+  secret: akto-secret
 
 service:
   type: ClusterIP

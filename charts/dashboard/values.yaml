@@ -19,6 +19,7 @@ dashboard:
     image:
       repository: aktosecurity/akto-api-security-dashboard
       tag: latest
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -31,6 +32,7 @@ dashboard:
     image:
       repository: aktosecurity/akto-puppeteer-replay
       tag: latest
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -62,6 +64,7 @@ testing:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-testing
       tag: latest
+      secret: akto-secret
     resources:
       requests:
         cpu: 1
@@ -73,6 +76,7 @@ testing:
     image:
       repository: aktosecurity/akto-puppeteer-replay
       tag: latest
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -92,6 +96,7 @@ database_abstractor:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-database-abstractor
       tag: latest
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:

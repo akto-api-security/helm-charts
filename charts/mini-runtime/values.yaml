@@ -18,6 +18,7 @@ dashboard:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-dashboard
       tag: latest
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -52,6 +53,7 @@ mini_runtime:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
       tag: testruntime
+      secret: akto-secret
     imagePullPolicy: Always
     resources:
       requests:
@@ -82,6 +84,7 @@ mini_runtime:
     image:
       repository: confluentinc/cp-kafka
       tag: 6.2.11-1-ubi8
+      secret: akto-secret
     resources:
       requests:
         cpu: 1
@@ -103,6 +106,7 @@ mini_runtime:
     image:
       repository: confluentinc/cp-zookeeper
       tag: 6.2.11-1-ubi8
+      secret: akto-secret
     resources:
       requests:
         cpu: 1
@@ -147,6 +151,7 @@ context_analyser:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-context-analyzer
       tag: testim
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:
@@ -199,6 +204,7 @@ context_analyser:
     image:
       repository: confluentinc/cp-zookeeper
       tag: 6.2.11-1-ubi8
+      secret: akto-secret
     resources:
       requests:
         cpu: 1
@@ -223,6 +229,7 @@ testing:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-testing
       tag: latest
+      secret: akto-secret
     resources:
       requests:
         cpu: 1
@@ -241,6 +248,7 @@ database_abstractor:
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-database-abstractor
       tag: testimm
+      secret: akto-secret
     imagePullPolicy: IfNotPresent
     resources:
       requests:

@@ -15,6 +15,9 @@ spec:
       labels:
         app: {{ .Release.Name }}-mongo
     spec:
+      imagePullSecrets: 
+        - name: {{ quote .Values.image.secret
+              }}
       containers:
         - name: mongo
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
