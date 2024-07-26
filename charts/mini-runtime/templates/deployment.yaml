@@ -136,6 +136,17 @@ spec:
         - containerPort: 29092
         - containerPort: 9999
         resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
+      
+      - env:
+        - name: KAFKA_REST_HOST_NAME
+          value: {{ quote .Values.mini_runtime.rest_proxy.env.kafkaRestHostName }}
+        - name: KAFKA_REST_BOOTSTRAP_SERVERS
+          value: {{ quote .Values.mini_runtime.rest_proxy.env.kafkaRestBootstrapServer }}
+        image: {{ .Values.mini_runtime.rest_proxy.image.repository }}:{{ .Values.mini_runtime.rest_proxy.image.tag
+          | default .Chart.AppVersion }}
+        name: kafka-rest-proxy
+        ports:
+        - containerPort: 8082
       restartPolicy: Always
 
 ---

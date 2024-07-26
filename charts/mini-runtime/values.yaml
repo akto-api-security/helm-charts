@@ -110,6 +110,23 @@ mini_runtime:
       limits:
         cpu: 2
         memory: "4Gi"
+  rest_proxy:
+    env:
+      kafkaRestHostName: rest-proxy
+      kafkaRestBootstrapServer: localhost:29092
+    image:
+      repository: confluentinc/cp-kafka-rest
+      tag: 7.6.2
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 8082
+    targetPort: 8082
 context_analyser:
   aktoApiSecurityContextAnalyser:
     env:
