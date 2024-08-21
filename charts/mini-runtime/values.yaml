@@ -96,7 +96,7 @@ mini_runtime:
   - port: 9092
     targetPort: 9092
   replicas: 1
-  type: ClusterIP
+  type: LoadBalancer 
   zoo1:
     env:
       kafkaOpts: -Dzookeeper.admin.enableServer=false
@@ -114,13 +114,16 @@ mini_runtime:
       limits:
         cpu: 2
         memory: "4Gi"
-  rest_proxy:
+  data_ingestion:
     env:
-      kafkaRestHostName: rest-proxy
-      kafkaRestBootstrapServer: localhost:29092
+      dataIngestionBrokerUrl: localhost:29092
+      dataIngestionBatchSize: 100
+      dataIngestionLingerMs: 10
+      dataIngestionTopicName: akto.api.logs
+      dataIngestionGroupIdConfig: asdf 
     image:
-      repository: confluentinc/cp-kafka-rest
-      tag: 7.6.2
+      repository: ayush12493/data-ingestion-service
+      tag: test
     resources:
       requests:
         cpu: 1
@@ -129,8 +132,8 @@ mini_runtime:
         cpu: 2
         memory: "8Gi"
   ports:
-  - port: 8082
-    targetPort: 8082
+  - port: 9091
+    targetPort: 8080
 context_analyser:
   aktoApiSecurityContextAnalyser:
     env:
@@ -194,7 +197,7 @@ context_analyser:
   - port: 9092
     targetPort: 9092
   replicas: 1
-  type: ClusterIP
+  type: LoadBalancer
   zoo1:
     env:
       kafkaOpts: -Dzookeeper.admin.enableServer=false
