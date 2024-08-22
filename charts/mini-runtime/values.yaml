@@ -117,13 +117,13 @@ mini_runtime:
   data_ingestion:
     env:
       dataIngestionBrokerUrl: localhost:29092
-      dataIngestionBatchSize: 100
+      dataIngestionBatchSize: 1000
       dataIngestionLingerMs: 10
       dataIngestionTopicName: akto.api.logs
       dataIngestionGroupIdConfig: asdf 
     image:
-      repository: ayush12493/data-ingestion-service
-      tag: test
+      repository: aktosecurity/data-ingestion-service
+      tag: latest
     resources:
       requests:
         cpu: 1
