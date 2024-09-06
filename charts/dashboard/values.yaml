@@ -1,5 +1,6 @@
 mongo:
-  aktoMongoConn: ""
+  mongoSecretName: akto-mongo-conn-secret
+  mongoSecretKey: password
 
 dashboard:
   aktoApiSecurityDashboard:

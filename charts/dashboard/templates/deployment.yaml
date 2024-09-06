@@ -60,8 +60,10 @@ spec:
           value: {{ quote .Values.dashboard.aktoApiSecurityDashboard.env.puppeteerReplayServiceUrl
             }}
         - name: AKTO_MONGO_CONN
-          value: {{ quote .Values.mongo.aktoMongoConn
-            }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mongo.mongoSecretName }}
+              key: {{ .Values.mongo.mongoSecretKey }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.dashboard.aktoApiSecurityDashboard.image.repository }}:{{ .Values.dashboard.aktoApiSecurityDashboard.image.tag
@@ -136,7 +138,10 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.puppeteerReplayServiceUrl
             }}
         - name: AKTO_MONGO_CONN
-          value: {{ quote .Values.mongo.aktoMongoConn }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mongo.mongoSecretName }}
+              key: {{ .Values.mongo.mongoSecretKey }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.aktoApiSecurityTesting.image.tag

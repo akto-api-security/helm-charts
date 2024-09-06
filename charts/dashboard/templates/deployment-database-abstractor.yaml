@@ -33,8 +33,10 @@ spec:
           value: {{ quote .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.env.aktoInstanceType
             }}
         - name: AKTO_MONGO_CONN
-          value: {{ quote .Values.mongo.aktoMongoConn
-            }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mongo.mongoSecretName }}
+              key: {{ .Values.mongo.mongoSecretKey }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.image.repository }}:{{ .Values.database_abstractor.aktoApiSecurityDatabaseAbstractor.image.tag
