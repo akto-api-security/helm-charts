@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-source-code-analyser
+spec:
+  replicas: {{ .Values.mini_runtime.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-source-code-analyser
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-source-code-analyser
+    spec:
+      containers:
+      - env:
+        - name: BITBUCKET_HOST
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.bitbucketHost }}
+        - name: BITBUCKET_TOKEN
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.bitbucketToken }}
+        - name: GITHUB_ACCESS_TOKEN
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.githubAccessToken }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.databaseAbstractorUrl}}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.databaseAbstractorToken}}
+        - name: SOURCE_CODE_HOST
+          value: {{ quote .Values.source_code_analyser.aktoSourceCodeAnalyser.env.sourceCodeHost}}
+        - name: IS_KUBERNETES
+          value: "true"
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        image: {{ .Values.source_code_analyser.aktoSourceCodeAnalyser.image.repository }}:{{ .Values.source_code_analyser.aktoSourceCodeAnalyser.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.source_code_analyser.aktoSourceCodeAnalyser.imagePullPolicy }}
+        name: akto-source-code-analyser
+        resources: {{- toYaml .Values.source_code_analyser.aktoSourceCodeAnalyser.resources |  nindent 10 }}
+      - env:
+        - name: SOURCE_CODE_ANALYSER
+          value: {{ quote .Values.source_code_analyser.codeAnalysisService.env.sourceCodeAnalyser }}
+        - name: PORT
+          value: {{ quote .Values.source_code_analyser.codeAnalysisService.env.port }}
+        image: {{ .Values.source_code_analyser.codeAnalysisService.image.repository }}:{{ .Values.source_code_analyser.codeAnalysisService.image.tag
+          | default .Chart.AppVersion }}
+        args:
+          - cli
+          - extract
+        name: codeAnalysisService
+      restartPolicy: Always
