@@ -72,12 +72,40 @@ spec:
         ports:
         - containerPort: 8080
         resources: {{- toYaml .Values.dashboard.aktoApiSecurityDashboard.resources |  nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 300
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 300
       - name: akto-api-security-puppeteer-replay
         image: {{ .Values.dashboard.aktoApiSecurityPuppeteerReplay.image.repository }}:{{ .Values.dashboard.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.dashboard.aktoApiSecurityPuppeteerReplay.imagePullPolicy }}
         ports:
           - containerPort: 3000
         resources: {{- toYaml .Values.dashboard.aktoApiSecurityPuppeteerReplay.resources |  nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+
 {{ end }}
 ---
 {{ if .Values.testing.aktoApiSecurityTesting.env.enabled }}
@@ -146,12 +174,42 @@ spec:
           | default .Chart.AppVersion }}
         name: akto-api-security-testing
         resources: {{- toYaml .Values.testing.aktoApiSecurityTesting.resources |  nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
       - name: akto-api-security-puppeteer-replay
         image: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.repository }}:{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.imagePullPolicy }}
         ports:
           - containerPort: 3000
         resources: {{- toYaml .Values.testing.aktoApiSecurityPuppeteerReplay.resources |  nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
       restartPolicy: Always
 {{ end }}
 ---
@@ -224,6 +282,21 @@ spec:
         imagePullPolicy: {{ .Values.runtime.aktoApiSecurityRuntime.imagePullPolicy }}
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
       - env:
         - name: ZOOKEEPER_CLIENT_PORT
           value: {{ quote .Values.runtime.zoo1.env.zookeeperClientPort }}
@@ -241,6 +314,21 @@ spec:
         ports:
         - containerPort: 2181
         resources: {{- toYaml .Values.runtime.zoo1.resources | nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
       - env:
         - name: MY_POD_NAMESPACE
           valueFrom:
@@ -289,6 +377,21 @@ spec:
         - containerPort: 29092
         - containerPort: 9999
         resources: {{- toYaml .Values.runtime.kafka1.resources | nindent 10 }}
+
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /etc/hosts
+          initialDelaySeconds: 30
+          periodSeconds: 300
       restartPolicy: Always
 {{ end }}
 ---
@@ -352,6 +455,12 @@ spec:
           | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
         livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9300
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
           httpGet:
             path: /healthz
             port: 9300
