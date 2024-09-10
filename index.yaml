@@ -497,4 +497,27 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.1.4/akto-mini-runtime-0.1.4.tgz
     version: 0.1.4
-generated: "2024-08-26T11:57:34.885165182Z"
+  akto-protection:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2024-09-10T09:17:42.482679258Z"
+    description: Helm chart for installing Akto
+    digest: dc483a1cb268eb32d871baefaec4ee5c85a0c6600c624046dfbd50f4ac91ea84
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-protection
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-protection
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-protection-0.1.0/akto-protection-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-09-10T09:17:42.482746525Z"
