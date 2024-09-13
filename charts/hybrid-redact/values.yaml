@@ -95,7 +95,7 @@ testing:
       databaseAbstractorUrl: https://cyborg.akto.io
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.41.18_local
+      tag: local
     resources:
       requests:
         cpu: "200m"
