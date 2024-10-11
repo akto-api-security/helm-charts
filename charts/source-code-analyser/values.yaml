@@ -1,0 +1,48 @@
+mongo:
+  aktoMongoConn: ""
+source_code_analyser:
+  aktoSourceCodeAnalyser:
+    env:
+      bitbucketHost: ""
+      bitbucketToken: ""
+      githubAccessToken: ""
+      sourceCodeHost: http://localhost:3000
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      useHostName: true
+      databaseAbstractorUrl: https://cyborg.akto.io
+      databaseAbstractorToken: ""
+    image:
+      repository: aktosecurity/source-code-analyser
+      tag: a-1463-merge
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 2
+        memory: "4Gi"
+      limits:
+        cpu: 3
+        memory: "8Gi"
+  codeAnalysisService:
+    env:
+      sourceCodeAnalyser: "true"
+      port: "3000"
+    image:
+      repository: shivamrawat10/code-analysis
+      tag: code-analysis-service
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
