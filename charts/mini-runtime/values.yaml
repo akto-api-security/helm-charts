@@ -47,7 +47,7 @@ mini_runtime:
       aktoTrafficBatchTimeSecs: "10"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
-      databaseAbstractorUrl: https://aquaman.akto.io
+      databaseAbstractorUrl: https://cyborg.akto.io
       databaseAbstractorToken: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
