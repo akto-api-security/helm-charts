@@ -1,0 +1,16 @@
+{{ if .Values.keel.keel.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-keel
+  labels:
+    app: keel
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.keel.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-keel
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.keel.ports | toYaml | nindent 2 -}}
+{{ end }}
