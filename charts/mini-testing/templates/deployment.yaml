@@ -1,0 +1,142 @@
+{{ if .Values.keel.keel.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-keel
+  labels:
+    app: keel
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.keel.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-keel
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-keel
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /bin/keel
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AWS_ACCESS_KEY_ID
+          value: {{ quote .Values.keel.keel.env.awsAccessKeyId }}
+        - name: AWS_SECRET_ACCESS_KEY
+          value: {{ quote .Values.keel.keel.env.awsSecretAccessKey }}
+        - name: AWS_REGION
+          value: {{ quote .Values.keel.keel.env.awsRegion }}
+        - name: WEBHOOK_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.webhookEndpoint }}
+        - name: MATTERMOST_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.mattermostEndpoint }}
+        - name: HIPCHAT_TOKEN
+          value: {{ quote .Values.keel.keel.env.hipchatToken }}
+        - name: HIPCHAT_CHANNELS
+          value: {{ quote .Values.keel.keel.env.hipchatChannels }}
+        - name: HIPCHAT_APPROVALS_CHANNEL
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsChannel }}
+        - name: HIPCHAT_APPROVALS_BOT_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsBotName }}
+        - name: HIPCHAT_APPROVALS_USER_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsUserName }}
+        - name: HIPCHAT_APPROVALS_PASSWORT
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsPasswort }}
+        - name: NOTIFICATION_LEVEL
+          value: {{ quote .Values.keel.keel.env.notificationLevel }}
+        - name: INSECURE_REGISTRY
+          value: {{ quote .Values.keel.keel.env.insecureRegistry }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.keel.keel.image.repository }}:{{ .Values.keel.keel.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9300
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        name: keel
+        ports:
+        - containerPort: 9300
+        resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
+      serviceAccountName: {{ include "akto.fullname" . }}-keel
+{{ end }}
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-testing
+  {{ if .Values.keel.keel.enabled }}
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/match-tag: "true"
+    keel.sh/pollSchedule: "@every 60m"
+  {{ end }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.testing.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-testing
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-testing
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AKTO_ACCOUNT_NAME
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.aktoAccountName }}
+        - name: IS_KUBERNETES
+          value: "true"
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: AKTO_CONFIG_NAME
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.aktoConfigName }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorUrl}}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: {{ quote .Values.tokens.env.databaseAbstractorToken}}
+        - name: POSTGRES_URL
+          value: {{ quote .Values.tokens.env.postgresUrl}}
+        - name: POSTGRES_USER
+          value: {{ quote .Values.tokens.env.postgresUser}}
+        - name: POSTGRES_PASSWORD
+          value: {{ quote .Values.tokens.env.postgresPassword}}
+        - name: PROXY_URI
+          value: {{ quote .Values.tokens.env.proxyUri}}
+        - name: NO_PROXY
+          value: {{ quote .Values.tokens.env.noProxy}}
+        - name: PUPPETEER_REPLAY_SERVICE_URL
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.puppeteerReplayServiceUrl
+            }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.aktoApiSecurityTesting.image.tag
+          | default .Chart.AppVersion }}
+        name: akto-api-security-testing
+        resources: {{- toYaml .Values.testing.aktoApiSecurityTesting.resources |  nindent 10 }}
+      - name: akto-api-security-puppeteer-replay
+        image: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.repository }}:{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.imagePullPolicy }}
+        ports:
+          - containerPort: 3000
+        resources: {{- toYaml .Values.testing.aktoApiSecurityPuppeteerReplay.resources |  nindent 10 }}
+      restartPolicy: Always
