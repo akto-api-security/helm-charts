@@ -7,7 +7,7 @@ appVersion: "1.41.18"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:
-  - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-mini-testing
+  - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-testing
 keywords:
   - akto
   - api

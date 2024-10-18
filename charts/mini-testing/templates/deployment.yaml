@@ -74,7 +74,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "akto.fullname" . }}-testing
+  name: {{ include "akto.fullname" . }}-core
   {{ if .Values.keel.keel.enabled }}
   annotations:
     keel.sh/policy: force
@@ -88,12 +88,12 @@ spec:
   replicas: {{ .Values.testing.replicas }}
   selector:
     matchLabels:
-      app: {{ include "akto.fullname" . }}-testing
+      app: {{ include "akto.fullname" . }}-core
     {{- include "akto.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app: {{ include "akto.fullname" . }}-testing
+        app: {{ include "akto.fullname" . }}-core
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
       containers:

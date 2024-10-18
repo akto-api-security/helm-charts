@@ -30,4 +30,4 @@ Here are the steps to install Akto via Helm charts -
     --set tokens.env.proxyUri="<PROXY_URI>" \
     --set tokens.env.noProxy="<NO_PROXY_URLS>"
    ```
-3. Run `kubectl get pods -n <NAMESPACE>` and verify you can see 3 pods
+3. Run `kubectl get pods -n <NAMESPACE>` and verify you can see 2 pods
