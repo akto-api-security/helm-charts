@@ -233,6 +233,28 @@ entries:
     version: 0.1.4
   akto-hybrid-redact:
   - apiVersion: v2
+    appVersion: 1.42.1
+    created: "2024-10-23T05:53:54.202972427Z"
+    description: Helm chart for installing Akto
+    digest: 08b3f70c171015ff454bdab536ddbf307d22657b2262e335c5c09a96f163d0dc
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-hybrid-redact
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-hybrid-redact-1.42.1/akto-hybrid-redact-1.42.1.tgz
+    version: 1.42.1
+  - apiVersion: v2
     appVersion: 1.42.0
     created: "2024-09-23T09:00:46.753638303Z"
     description: Helm chart for installing Akto
@@ -586,4 +608,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-protection-0.1.0/akto-protection-0.1.0.tgz
     version: 0.1.0
-generated: "2024-10-11T17:26:03.694423911Z"
+generated: "2024-10-23T05:53:54.203103572Z"
