@@ -1,0 +1,28 @@
+replicaCount: 1
+
+image:
+  aktoPuppeteer: "aktosecurity/akto-puppeteer-replay:doom_latest"
+  eclipseJdtls: "hotavneesh/eclipse-jdtls:latest"
+  sourceCodeAnalyser: "aktosecurity/source-code-analyser:a-feature-source-code-analyser-02"
+
+env:
+  DATABASE_ABSTRACTOR_SERVICE_TOKEN: "token_avneesh"
+  DATABASE_ABSTRACTOR_SERVICE_URL: "https://doom.akto.io"
+  GITHUB_ACCESS_TOKEN: "git_access_key"
+  RUNTIME_MODE: "hybrid"
+  SOURCE_CODE_HOST: "http://localhost:3001"
+  DOCKER_VOLUME: "/data"
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: "/data"
+
+resources:
+  requests:
+    memory: "8Gi"
+    cpu: "2"
+  limits:
+    memory: "16Gi"
+    cpu: "4"

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-shivansh
+  namespace: dell
+spec:
+  selector:
+    app: mongo-shivansh
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-shivansh
+  namespace: dell
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo-shivansh
+  template:
+    metadata:
+      labels:
+        app: mongo-shivansh
+    spec:
+      containers:
+        - image: mongo:7.0.8
+          name: mongo
+          ports:
+            - containerPort: 27017

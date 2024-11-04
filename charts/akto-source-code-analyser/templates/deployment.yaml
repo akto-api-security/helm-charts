@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-akto-services
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      hostNetwork: true  # Enable host network mode for all containers
+      containers:
+        - name: akto-puppeteer
+          image: {{ .Values.image.aktoPuppeteer }}
+          command: ["/bin/sh", "-c", "cli extract --START_JAVA_LSP=true"]
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.persistence.mountPath }}
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+              
+        - name: eclipse-jdtls
+          image: {{ .Values.image.eclipseJdtls }}
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.persistence.mountPath }}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "while ! nc -z localhost 8080; do sleep 1; done"]  # Wait for akto-puppeteer to start
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "0.5"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+
+        - name: akto-puppeteer-with-port
+          image: {{ .Values.image.aktoPuppeteer }}
+          command: ["/bin/sh", "-c", "cli extract --SOURCE_CODE_ANALYSER=true --PORT=3001"]
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.persistence.mountPath }}
+          ports:
+            - containerPort: 3001
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+
+        - name: source-code-analyser
+          image: {{ .Values.image.sourceCodeAnalyser }}
+          env:
+            - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+              value: {{ .Values.env.DATABASE_ABSTRACTOR_SERVICE_TOKEN }}
+            - name: DATABASE_ABSTRACTOR_SERVICE_URL
+              value: {{ .Values.env.DATABASE_ABSTRACTOR_SERVICE_URL }}
+            - name: GITHUB_ACCESS_TOKEN
+              value: {{ .Values.env.GITHUB_ACCESS_TOKEN }}
+            - name: RUNTIME_MODE
+              value: {{ .Values.env.RUNTIME_MODE }}
+            - name: SOURCE_CODE_HOST
+              value: {{ .Values.env.SOURCE_CODE_HOST }}
+            - name: DOCKER_VOLUME
+              value: {{ .Values.persistence.mountPath }}
+          volumeMounts:
+            - name: shared-volume
+              mountPath: {{ .Values.persistence.mountPath }}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "while ! nc -z localhost 3001; do sleep 1; done"]  # Wait for akto-puppeteer-with-port to start
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+            limits:
+              memory: "4Gi"
+              cpu: "2"
+      volumes:
+        - name: shared-volume
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-pvc

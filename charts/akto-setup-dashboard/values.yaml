@@ -1,5 +1,5 @@
 mongo:
-  aktoMongoConn: ""
+  aktoMongoConn: "mongodb://10.0.37.249/admini"
 
 dashboard:
   aktoApiSecurityDashboard:
@@ -17,7 +17,7 @@ dashboard:
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
     image:
       repository: aktosecurity/akto-api-security-dashboard
-      tag: local
+      tag: a-feature-allow-code-analysis-in-dashboard
     imagePullPolicy: IfNotPresent
     resources:
       requests:

@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-pod-2
+spec:
+  hostNetwork: true  # Use host network mode
+  volumes:
+    - name: shared-volume
+      emptyDir: {}  # Temporary shared volume, lives as long as the pod exists
+  containers:
+    - name: akto-puppeteer
+      image: aktosecurity/akto-puppeteer-replay:doom_latest
+      command: ["/bin/sh", "-c", "node build/apps/index.js cli extract --START_JAVA_LSP=true"]
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+
+    - name: eclipse-jdtls
+      image: hotavneesh/eclipse-jdtls:latest
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+
+    - name: akto-puppeteer-with-port
+      image: aktosecurity/akto-puppeteer-replay:doom_latest
+      command: ["/bin/sh", "-c", "node build/apps/index.js cli extract --SOURCE_CODE_ANALYSER=true --PORT=3001"]
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+
+    - name: source-code-analyser
+      image: aktosecurity/source-code-analyser:a-feature-source-code-analyser-02
+      env:
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: "WhSIpn24jxSyIXGYsdApcfuQeRQGPRAgj1EJe6zi"
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: "10.0.92.179:8080"
+        - name: DATABASE_ABSTRACTOR_SERVICE_HEADER_KEY
+          value: "X-API-KEY"
+        - name: GITHUB_ACCESS_TOKEN
+          value: "git_access_key"
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: SOURCE_CODE_HOST
+          value: "http://localhost:3001"
+        - name: DOCKER_VOLUME
+          value: "/data"
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data

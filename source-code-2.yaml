@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared-volume-pod-1
+spec:
+  hostNetwork: true  # Use host network mode
+  volumes:
+    - name: shared-volume
+      emptyDir: {}  # Temporary shared volume, lives as long as the pod exists
+  containers:
+    - name: akto-puppeteer
+      image: aktosecurity/akto-puppeteer-replay:doom_latest
+      command: ["/bin/bash", "-c", "cli extract --START_JAVA_LSP=true"]
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/bash", "-c", "echo akto_puppeteer started"]
+
+    - name: eclipse-jdtls
+      image: hotavneesh/eclipse-jdtls:latest
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/bash", "-c", "while ! nc -z localhost 8080; do echo waiting for akto_puppeteer...; sleep 2; done"]
+
+    - name: akto-puppeteer-with-port
+      image: aktosecurity/akto-puppeteer-replay:doom_latest
+      command: ["/bin/bash", "-c", "cli extract --SOURCE_CODE_ANALYSER=true --PORT=3001"]
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/bash", "-c", "while ! nc -z localhost 8080; do echo waiting for eclipse_jdtls...; sleep 2; done"]
+
+    - name: source-code-analyser
+      image: aktosecurity/source-code-analyser:a-feature-source-code-analyser-02
+      env:
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: "WhSIpn24jxSyIXGYsdApcfuQeRQGPRAgj1EJe6zi"
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: "10.0.92.179:8080"
+        - name: DATABASE_ABSTRACTOR_SERVICE_HEADER_KEY
+          value: "X-API-KEY"
+        - name: GITHUB_ACCESS_TOKEN
+          value: "git_access_key"
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: SOURCE_CODE_HOST
+          value: "http://localhost:3001"
+        - name: DOCKER_VOLUME
+          value: "/data"
+      volumeMounts:
+        - name: shared-volume
+          mountPath: /data
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/bash", "-c", "while ! nc -z localhost 3001; do echo waiting for akto_puppeteer_with_port...; sleep 2; done"]
