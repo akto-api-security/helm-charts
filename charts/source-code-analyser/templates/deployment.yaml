@@ -36,7 +36,7 @@ spec:
       - env:
           - name: SOURCE_CODE_ANALYSER
             value: {{ quote .Values.source_code_analyser.codeAnalysisService.env.sourceCodeAnalyser }}
-          - name: LLM_TOKEN
+          - name: OPENAI_API_KEY
             value: {{ quote .Values.source_code_analyser.codeAnalysisService.env.llmToken }}
           - name: PORT
             value: {{ quote .Values.source_code_analyser.codeAnalysisService.env.port }}

@@ -42,7 +42,7 @@ source_code_analyser:
       llmToken: ""
     image:
       repository: aktosecurity/akto-puppeteer-replay
-      tag: doom_latest
+      tag: php_laravel
     resources:
       requests:
         cpu: 1
@@ -55,7 +55,7 @@ source_code_analyser:
       startJavaLsp: "true"
     image:
       repository: aktosecurity/akto-puppeteer-replay
-      tag: doom_latest
+      tag: php_laravel
     resources:
       requests:
         cpu: 1
