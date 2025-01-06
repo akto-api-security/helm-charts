@@ -13,4 +13,4 @@ service:
 storage:
   accessMode: ReadWriteOnce
   storageClass: akto-mongo-storage-class
-  size: 1Gi
+  size: 20Gi
