@@ -717,6 +717,29 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.1.4/akto-mini-runtime-0.1.4.tgz
     version: 0.1.4
+  akto-mini-testing:
+  - apiVersion: v2
+    appVersion: 1.42.2
+    created: "2025-02-12T11:15:03.605162964Z"
+    description: Helm chart for installing Akto
+    digest: d4901d899c7842791974651f29e667cc854731cb551e4e9ea856f516c20ce410
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.42.2/akto-mini-testing-1.42.2.tgz
+    version: 1.42.2
   akto-mini-testing-kafka:
   - apiVersion: v2
     appVersion: 1.42.1
@@ -809,4 +832,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-source-code-analyser-0.1.5/akto-source-code-analyser-0.1.5.tgz
     version: 0.1.5
-generated: "2025-02-12T09:17:01.043568691Z"
+generated: "2025-02-12T11:15:03.60525773Z"
