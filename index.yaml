@@ -255,6 +255,28 @@ entries:
     version: 0.1.4
   akto-hybrid-redact:
   - apiVersion: v2
+    appVersion: 1.42.12
+    created: "2025-03-27T11:06:10.80330089Z"
+    description: Helm chart for installing Akto
+    digest: 0bdca9b8d38d06338a689ce3f1c991a2cf36bed965c0434cb561514ba46cc7f0
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-hybrid-redact
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-hybrid-redact-1.42.12/akto-hybrid-redact-1.42.12.tgz
+    version: 1.42.12
+  - apiVersion: v2
     appVersion: 1.42.1
     created: "2024-10-23T05:53:54.202972427Z"
     description: Helm chart for installing Akto
@@ -854,4 +876,27 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-source-code-analyser-0.1.5/akto-source-code-analyser-0.1.5.tgz
     version: 0.1.5
-generated: "2025-02-19T06:24:27.440895796Z"
+  akto-testing-db-layer:
+  - apiVersion: v2
+    appVersion: 1.42.12
+    created: "2025-03-27T11:06:10.922363589Z"
+    description: Helm chart for installing Akto
+    digest: 2597ae21db2197de3fbf565008fe1f744f31d6c564317f16d49307a541c05fdc
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-testing-db-layer
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/testing-db-layer
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
+    version: 1.42.12
+generated: "2025-03-27T11:06:10.92254654Z"
