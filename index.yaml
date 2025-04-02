@@ -878,6 +878,28 @@ entries:
     version: 0.1.5
   akto-testing-db-layer:
   - apiVersion: v2
+    appVersion: 1.42.14
+    created: "2025-04-02T15:19:50.402236413Z"
+    description: Helm chart for installing Akto
+    digest: d93e2d8bc4ef696982babf8af8ba06775cf1472259fabf92433b0886eda7f74d
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-testing-db-layer
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/testing-db-layer
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.14/akto-testing-db-layer-1.42.14.tgz
+    version: 1.42.14
+  - apiVersion: v2
     appVersion: 1.42.13
     created: "2025-04-02T07:42:41.686103333Z"
     description: Helm chart for installing Akto
@@ -921,4 +943,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-04-02T07:42:41.686179595Z"
+generated: "2025-04-02T15:19:50.402552564Z"
