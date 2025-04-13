@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-redis
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-redis
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-redis
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: redis
+        image: {{ .Values.redis.image.repository | default "redis" }}:{{ .Values.redis.image.tag | default "7.0" }}
+        imagePullPolicy: {{ .Values.redis.imagePullPolicy | default "IfNotPresent" }}
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+          {{- toYaml .Values.redis.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-redis
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  ports:
+  - port: 6379
+    targetPort: redis
+    protocol: TCP
+    name: redis
+  selector:
+    app: {{ include "akto.fullname" . }}-redis
+  type: ClusterIP
