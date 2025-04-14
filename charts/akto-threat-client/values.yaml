@@ -13,7 +13,7 @@ threat_client:
       aktoInstanceType: DASHBOARD
       aktoKafkaTrafficBrokerUrl: 192.168.1.19:29093
       aktoKafkaBrokerUrl: 127.0.0.1:29092
-      backendToken: eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJBa3RvIiwic3ViIjoiaW52aXRlX3VzZXIiLCJhY2NvdW50SWQiOjE2NjI2ODA0NjMsImlhdCI6MTc0NDQ0MjU2NywiZXhwIjoxNzYwMjUzNzY3fQ.AnGAA45ON0ih0rvOVnL1nE75bxObJXWRQ0nHiqEZC_HDV1DfJxIMC6jB1VdSDVz3SfGwik8WoFqsCk0eYuC_yp1wnNNvxbdvEnjOtMaOCL3TjWeNhQPScmiS3moTKeCE7mF_1ZfOadnd6km9EPeXhf2NoLWbw83UEcfHHRt6dwx91Wh-emESQeJPa5IH7N36qqaFDl8Z92xIpTNt9-D6V0h19EeeCccanpKOjiq9Chj_UBMetkkP0vdtNdlompivLNQ53EIVCHKVkfwg-sA4KT9KdHwlLC2VsnqmDiTH8aThBjieXqgl1HLAiKAgiaNITFJPR2f0V9uI00mw5Dk-hA
+      backendToken: 
       backendUrl: https://tbs.akto.io
       aktoLogLevel: WARN
       useHostName: true
