@@ -2,44 +2,32 @@ mongo:
   aktoMongoConn: ""
 
 kubernetesClusterDomain: cluster.local
-mini_runtime:
-  aktoApiSecurityRuntime:
+threat_client:
+  aktoApiSecurityThreatClient:
     env:
+      postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
+      postgresUser: akto
+      postgresPassword: akto
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
-      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaTrafficBrokerUrl: 192.168.1.19:29093
       aktoKafkaBrokerUrl: 127.0.0.1:29092
-      aktoKafkaGroupIdConfig: asdf
-      aktoKafkaMaxPollRecordsConfig: "100"
-      aktoKafkaTopicName: akto.api.logs
-      aktoTrafficBatchSize: "100"
-      aktoTrafficBatchTimeSecs: "10"
+      backendToken: 
+      backendUrl: https://tbs.akto.io
       aktoLogLevel: WARN
-      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
-      databaseAbstractorUrl: https://aquaman.akto.io
-      # If you want to use secrets to store database abstractor token. default: false
-      useSecretsForDatabaseAbstractorToken: false
-      # If not using secrets, place token here.
-      databaseAbstractorToken: ""
-      # If using secrets, place token here.
-      databaseAbstractorTokenSecrets: 
-        # Name of an existing secret containing the Database Abstractor Token
-        existingSecret: ""
-        # Token to use if existingSecret is not provided
-        token: ""
     image:
-      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: latest
+      repository: aktosecurity/akto-threat-detection
+      tag: 1.0.6
     imagePullPolicy: Always
     resources:
       requests:
         cpu: 2
-        memory: "4Gi"
+        memory: "2Gi"
       limits:
         cpu: 3
-        memory: "8Gi"
+        memory: "4Gi"
   kafka1:
     env:
       # add advertised listeners if you want to override the default listeners
@@ -65,10 +53,10 @@ mini_runtime:
     resources:
       requests:
         cpu: 1
-        memory: "4Gi"
+        memory: "1Gi"
       limits:
         cpu: 2
-        memory: "8Gi"
+        memory: "2Gi"
   ports:
   - port: 9092
     targetPort: 9092
@@ -85,40 +73,28 @@ mini_runtime:
       tag: 7.8.0-3-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "1Gi"
+        cpu: 400m
+        memory: "400Mi"
       limits:
-        cpu: 2
-        memory: "2Gi"
+        cpu: 800m
+        memory: "800Mi"
 
-threat_client:
-  aktoApiSecurityThreatClient:
-    env:
-      postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
-      postgresUser: akto
-      postgresPassword: akto
-      aktoAccountName: Helios
-      aktoConfigName: staging
-      aktoInstanceType: DASHBOARD
-      aktoKafkaTrafficBrokerUrl: 127.0.0.1:29092
-      aktoKafkaBrokerUrl: 127.0.0.1:29092
-      backendToken: 
-      backendUrl: https://tbs.akto.io
-      aktoLogLevel: WARN
-      useHostName: true
-      isTestingContext: false
-      aggregationRulesEnabled: false
-    image:
-      repository: aktosecurity/akto-threat-detection
-      tag: 1.0.8
-    imagePullPolicy: Always
-    resources:
-      requests:
-        cpu: 1
-        memory: "1Gi"
-      limits:
-        cpu: 2
-        memory: "2Gi"
+redis:
+  image:
+    repository: redis
+    tag: "7.0"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "900m"
+      memory: "2Gi"
+  persistence:
+    enabled: true
+    size: "2Gi"
+    storageClass: ""
 
 keel:
   keel:

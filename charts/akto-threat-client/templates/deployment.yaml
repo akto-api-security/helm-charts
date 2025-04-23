@@ -1,0 +1,207 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-threat-client
+  {{ if .Values.keel.keel.enabled }}
+  annotations:
+    keel.sh/policy: force
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@every 60m"
+  {{ end }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.threat_client.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-threat-client
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-threat-client
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - env:  
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: AKTO_THREAT_DETECTION_POSTGRES
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUrl }}
+        - name: AKTO_THREAT_DETECTION_POSTGRES_USER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUser }}
+        - name: AKTO_THREAT_DETECTION_POSTGRES_PASSWORD
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
+            }}
+        - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoKafkaTrafficBrokerUrl
+            }}
+        - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoKafkaBrokerUrl
+            }}
+        - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
+          value: "redis://{{ include "akto.fullname" . }}-redis:6379"
+
+        - name: AKTO_THREAT_PROTECTION_BACKEND_TOKEN
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendToken
+            }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendToken
+            }}
+        - name: AKTO_MONGO_CONN
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.mongoUrl
+            }}
+        - name: AKTO_LOG_LEVEL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoLogLevel }}
+        - name: AKTO_THREAT_PROTECTION_BACKEND_URL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendUrl }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.threat_client.aktoApiSecurityThreatClient.imagePullPolicy }}
+        name: akto-api-security-threat-client
+        resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}
+      - env:
+        - name: ZOOKEEPER_CLIENT_PORT
+          value: {{ quote .Values.threat_client.zoo1.env.zookeeperClientPort }}
+        - name: ZOOKEEPER_SERVERS
+          value: {{ quote .Values.threat_client.zoo1.env.zookeeperServers }}
+        - name: ZOOKEEPER_SERVER_ID
+          value: {{ quote .Values.threat_client.zoo1.env.zookeeperServerId }}
+        - name: KAFKA_OPTS
+          value: {{ quote .Values.threat_client.zoo1.env.kafkaOpts }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.threat_client.zoo1.image.repository }}:{{ .Values.threat_client.zoo1.image.tag
+          | default .Chart.AppVersion }}
+        name: zoo1
+        ports:
+        - containerPort: 2181
+        resources: {{- toYaml .Values.threat_client.zoo1.resources | nindent 10 }}
+      - env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KAFKA_ADVERTISED_LISTENERS
+            {{- if .Values.threat_client.kafka1.env.kafkaAdvertisedListeners }}
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaAdvertisedListeners }}
+            {{- else}}
+          value: "LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092, LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{.Release.Name}}-threat-client.{{.Release.Namespace}}.svc.cluster.local:9092"
+            {{- end }}
+        - name: KAFKA_BROKER_ID
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaBrokerId }}
+        - name: KAFKA_CLEANUP_POLICY
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaCleanupPolicy }}
+        - name: KAFKA_CREATE_TOPICS
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaCreateTopics }}
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaInterBrokerListenerName }}
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaListenerSecurityProtocolMap }}
+        - name: KAFKA_LOG_CLEANER_ENABLE
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaLogCleanerEnable }}
+        - name: KAFKA_LOG_RETENTION_BYTES
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaLogRetentionBytes }}
+        - name: KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaLogRetentionCheckIntervalMs }}
+        - name: KAFKA_LOG_RETENTION_HOURS
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaLogRetentionHours }}
+        - name: KAFKA_LOG_SEGMENT_BYTES
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaLogSegmentBytes }}
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaOffsetsTopicReplicationFactor
+            }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaTransactionStateLogMinIsr }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaTransactionStateLogReplicationFactor
+            }}
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: {{ quote .Values.threat_client.kafka1.env.kafkaZookeeperConnect }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.threat_client.kafka1.image.repository }}:{{ .Values.threat_client.kafka1.image.tag
+          | default .Chart.AppVersion }}
+        name: kafka1
+        ports:
+        - containerPort: 9092
+        - containerPort: 19092
+        - containerPort: 29092
+        - containerPort: 9999
+        resources: {{- toYaml .Values.threat_client.kafka1.resources | nindent 10 }}
+      restartPolicy: Always
+
+---
+{{ if .Values.keel.keel.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-keel
+  labels:
+    app: keel
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.keel.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-keel
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-keel
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - /bin/keel
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AWS_ACCESS_KEY_ID
+          value: {{ quote .Values.keel.keel.env.awsAccessKeyId }}
+        - name: AWS_SECRET_ACCESS_KEY
+          value: {{ quote .Values.keel.keel.env.awsSecretAccessKey }}
+        - name: AWS_REGION
+          value: {{ quote .Values.keel.keel.env.awsRegion }}
+        - name: WEBHOOK_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.webhookEndpoint }}
+        - name: MATTERMOST_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.mattermostEndpoint }}
+        - name: HIPCHAT_TOKEN
+          value: {{ quote .Values.keel.keel.env.hipchatToken }}
+        - name: HIPCHAT_CHANNELS
+          value: {{ quote .Values.keel.keel.env.hipchatChannels }}
+        - name: HIPCHAT_APPROVALS_CHANNEL
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsChannel }}
+        - name: HIPCHAT_APPROVALS_BOT_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsBotName }}
+        - name: HIPCHAT_APPROVALS_USER_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsUserName }}
+        - name: HIPCHAT_APPROVALS_PASSWORT
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsPasswort }}
+        - name: NOTIFICATION_LEVEL
+          value: {{ quote .Values.keel.keel.env.notificationLevel }}
+        - name: INSECURE_REGISTRY
+          value: {{ quote .Values.keel.keel.env.insecureRegistry }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.keel.keel.image.repository }}:{{ .Values.keel.keel.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9300
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        name: keel
+        ports:
+        - containerPort: 9300
+        resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
+      serviceAccountName: {{ include "akto.fullname" . }}-keel
+{{ end }}

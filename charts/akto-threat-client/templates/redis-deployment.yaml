@@ -1,0 +1,80 @@
+{{- if .Values.redis.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "akto.fullname" . }}-redis-pvc
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.redis.persistence.size | quote }}
+  {{- if .Values.redis.persistence.storageClass }}
+  storageClassName: {{ .Values.redis.persistence.storageClass }}
+  {{- end }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-redis
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-redis
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-redis
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: redis
+        image: {{ .Values.redis.image.repository | default "redis" }}:{{ .Values.redis.image.tag | default "7.0" }}
+        imagePullPolicy: {{ .Values.redis.imagePullPolicy | default "IfNotPresent" }}
+        command:
+          - redis-server
+          - --appendonly
+          - "yes"
+          - --save
+          - ""
+          - --dir
+          - /data/
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        {{- if .Values.redis.persistence.enabled }}
+        - name: redis-data
+          mountPath: /data
+        {{- end }}
+        resources:
+          {{- toYaml .Values.redis.resources | nindent 10 }}
+      volumes:
+      {{- if .Values.redis.persistence.enabled }}
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: {{ include "akto.fullname" . }}-redis-pvc
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-redis
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  ports:
+  - port: 6379
+    targetPort: redis
+    protocol: TCP
+    name: redis
+  selector:
+    app: {{ include "akto.fullname" . }}-redis
+  type: ClusterIP

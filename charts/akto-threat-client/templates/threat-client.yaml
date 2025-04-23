@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-threat-client
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.threat_client.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-threat-client
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.threat_client.ports | toYaml | nindent 2 -}}
