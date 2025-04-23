@@ -608,6 +608,28 @@ entries:
     version: 0.1.4
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.2.4
+    created: "2025-04-23T15:26:44.48245957Z"
+    description: Helm chart for installing Akto
+    digest: 77810362912ef00d345e5632bbe6865de271594fdb861009c79249879c869a57
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.2.4/akto-mini-runtime-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
     appVersion: 0.2.3
     created: "2025-04-04T06:17:21.532371911Z"
     description: Helm chart for installing Akto
@@ -806,6 +828,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.1.4/akto-mini-runtime-0.1.4.tgz
     version: 0.1.4
   akto-mini-testing:
+  - apiVersion: v2
+    appVersion: 1.42.5
+    created: "2025-04-23T15:26:44.637943363Z"
+    description: Helm chart for installing Akto
+    digest: 4d16e4eac8b156a048da95bae13599ad6eec99b8e9a272f2748affca8ce8ae89
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.42.5/akto-mini-testing-1.42.5.tgz
+    version: 1.42.5
   - apiVersion: v2
     appVersion: 1.42.4
     created: "2025-04-09T07:55:01.838373008Z"
@@ -1053,4 +1097,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-04-09T07:55:01.838497018Z"
+generated: "2025-04-23T15:26:44.638066371Z"
