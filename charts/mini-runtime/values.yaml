@@ -100,8 +100,8 @@ threat_client:
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
-      aktoKafkaTrafficBrokerUrl: 10.191.56.108:29093
-      aktoKafkaBrokerUrl: 10.191.56.108:29093
+      aktoKafkaTrafficBrokerUrl: 127.0.0.1:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
       backendToken: 
       backendUrl: https://tbs.akto.io
       aktoLogLevel: WARN
