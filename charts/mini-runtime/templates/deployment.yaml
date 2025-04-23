@@ -99,6 +99,39 @@ spec:
         ports:
         - containerPort: 2181
         resources: {{- toYaml .Values.mini_runtime.zoo1.resources | nindent 10 }}
+      
+      - env:  
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoKafkaTrafficBrokerUrl
+            }}
+        - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoKafkaBrokerUrl
+            }}
+        
+        - name: AKTO_THREAT_PROTECTION_BACKEND_TOKEN
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendToken
+            }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendToken
+            }}
+        - name: AKTO_LOG_LEVEL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoLogLevel }}
+        - name: AKTO_THREAT_PROTECTION_BACKEND_URL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendUrl }}
+        - name: IS_TESTING_CONTEXT
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.isTestingContext }}
+        - name: AGGREGATION_RULES_ENABLED
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aggregationRulesEnabled }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.threat_client.aktoApiSecurityThreatClient.imagePullPolicy }}
+        name: akto-api-security-threat-client
+        resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}
+
       - env:
         - name: MY_POD_NAMESPACE
           valueFrom:
