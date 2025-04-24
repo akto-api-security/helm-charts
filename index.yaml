@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   akto:
   - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2025-04-24T13:33:34.17364984Z"
+    description: Helm chart for installing Akto
+    digest: 6f3c1b7f1adfca1c4a997d1315b7e408893dcaf7619e53763d3b94dd588b4e8c
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-0.2.0/akto-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.1.9
     created: "2024-09-12T21:30:42.283358904Z"
     description: Helm chart for installing Akto
@@ -187,6 +209,28 @@ entries:
     version: 0.1.0
   akto-dashboard:
   - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2025-04-24T13:33:34.356744503Z"
+    description: Helm chart for installing Akto
+    digest: 9824d22d01c4f0b1147f7e91af2993fdf30c6a3e5b71c0bb022ba2e4ef407af9
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-dashboard
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup-dashboard
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-dashboard-0.1.5/akto-dashboard-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
     appVersion: 0.1.4
     created: "2024-07-01T09:56:12.280955373Z"
     description: Helm chart for installing Akto
@@ -209,6 +253,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-dashboard-0.1.4/akto-dashboard-0.1.4.tgz
     version: 0.1.4
   akto-dbabs:
+  - apiVersion: v2
+    appVersion: 0.1.6
+    created: "2025-04-24T13:33:34.475650783Z"
+    description: Helm chart for installing Akto
+    digest: 17861806fcad12706ec1fd9713b4f6afe54babc6242bd9a432264979a59a1c62
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-dbabs
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup-database-abstractor
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-dbabs-0.1.6/akto-dbabs-0.1.6.tgz
+    version: 0.1.6
   - apiVersion: v2
     appVersion: 0.1.5
     created: "2024-11-20T12:55:25.755369484Z"
@@ -986,6 +1052,28 @@ entries:
     version: 0.1.0
   akto-runtime:
   - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2025-04-24T13:33:34.614212965Z"
+    description: Helm chart for installing Akto
+    digest: b0549cb3a076dcf72fed574521df84b9315a54efd818ea2785ef8f8c4e0b2867
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-runtime-0.1.5/akto-runtime-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
     appVersion: 0.1.4
     created: "2025-01-22T09:02:47.168929325Z"
     description: Helm chart for installing Akto
@@ -1119,4 +1207,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-04-24T11:30:39.699672816Z"
+generated: "2025-04-24T13:33:34.614367684Z"
