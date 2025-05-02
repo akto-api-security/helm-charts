@@ -65,6 +65,8 @@ spec:
             }}
         - name: USE_HOSTNAME
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.useHostName}}
+        - name: MEMORY_RESTART_THRESHOLD
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.memoryRestartThreshold }}
         - name: DATABASE_ABSTRACTOR_SERVICE_URL
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorUrl}}
         - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN

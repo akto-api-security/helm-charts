@@ -18,6 +18,7 @@ mini_runtime:
       aktoLogLevel: WARN
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
+      memoryRestartThreshold: 95
       databaseAbstractorUrl: https://cyborg.akto.io
       # If you want to use secrets to store database abstractor token. default: false
       useSecretsForDatabaseAbstractorToken: false

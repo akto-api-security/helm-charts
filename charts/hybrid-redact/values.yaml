@@ -21,10 +21,11 @@ mini_runtime:
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
       databaseAbstractorUrl: https://cyborg.akto.io
+      memoryRestartThreshold: 95
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.42.15_local
+      tag: 1.44.3_local
     imagePullPolicy: Always
     resources:
       requests:
