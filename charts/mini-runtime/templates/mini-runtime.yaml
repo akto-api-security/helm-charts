@@ -10,8 +10,12 @@ spec:
     app: {{ include "akto.fullname" . }}-mini-runtime
   {{- include "akto.selectorLabels" . | nindent 4 }}
   ports:
-  {{- if .Values.mini_runtime.kafka1.useTls }}
-  {{- .Values.mini_runtime.ports.tls | toYaml | nindent 4 -}}
+  {{- if and .Values.mini_runtime.kafka1.useTls (not .Values.mini_runtime.data_ingestion.useIngestion) }}
+  {{- .Values.ports.tls | toYaml | nindent 4 -}}
+  {{- else if and .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.data_ingestion.useIngestion }}
+  {{- .Values.ports.dataIngestionWithTls | toYaml | nindent 4 -}}
+  {{- else if .Values.mini_runtime.data_ingestion.useIngestion }}
+  {{- .Values.ports.dataIngestion | toYaml | nindent 4 -}}
   {{- else }}
-  {{- .Values.mini_runtime.ports.default | toYaml | nindent 4 -}}
+  {{- .Values.ports.default | toYaml | nindent 4 -}}
   {{- end }}

@@ -222,6 +222,23 @@ spec:
         - containerPort: 29092
         - containerPort: 9999
         resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
+      
+      - env:
+        - name: AKTO_KAFKA_BROKER_URL
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}
+        - name: AKTO_KAFKA_PRODUCER_BATCH_SIZE
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoTrafficBatchSize }}
+        - name: AKTO_KAFKA_PRODUCER_LINGER_MS
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoTrafficBatchTimeSecs }}
+        - name: AKTO_KAFKA_TOPIC_NAME
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaTopicName }}
+        - name: AKTO_KAFKA_GROUP_ID_CONFIG
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaGroupIdConfig }}
+        image: {{ .Values.mini_runtime.data_ingestion.image.repository }}:{{ .Values.mini_runtime.data_ingestion.image.tag
+          | default .Chart.AppVersion }}
+        name: kafka-data-ingestion
+        ports:
+        - containerPort: 9091
       restartPolicy: Always
       {{- if .Values.mini_runtime.kafka1.useTls }}
       volumes:

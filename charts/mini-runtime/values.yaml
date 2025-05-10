@@ -83,7 +83,6 @@ mini_runtime:
     default:
       - port: 9092
         targetPort: 9092
-    # both ports open for TLS and non-TLS
     tls:
       - name: plaintext
         port: 9092
@@ -91,8 +90,25 @@ mini_runtime:
       - name: ssl
         port: 9093
         targetPort: 9093
+    data_ingestion:
+      - name: plaintext
+        port: 9092
+        targetPort: 9092
+      - name: data_ingestion
+        port: 9091
+        targetPort: 8080
+    data_ingestion_with_tls:
+      - name: plaintext
+        port: 9092
+        targetPort: 9092
+      - name: ssl
+        port: 9093
+        targetPort: 9093
+      - name: data_ingestion
+        port: 9091
+        targetPort: 8080
   replicas: 1
-  type: ClusterIP
+  type: LoadBalancer
   zoo1:
     env:
       kafkaOpts: -Dzookeeper.admin.enableServer=false
@@ -109,6 +125,28 @@ mini_runtime:
       limits:
         cpu: 2
         memory: "2Gi"
+
+  data_ingestion:
+    env:
+      dataIngestionBrokerUrl: localhost:29092
+      dataIngestionBatchSize: 1000
+      dataIngestionLingerMs: 10
+      dataIngestionTopicName: akto.api.logs
+      dataIngestionGroupIdConfig: asdf 
+    useIngestion: false
+    image:
+      repository: aktosecurity/data-ingestion-service
+      tag: latest
+    resources:
+      requests:
+        cpu: 1
+        memory: "1Gi"
+      limits:
+        cpu: 2
+        memory: "2Gi"
+  ports:
+  - port: 9091
+    targetPort: 8080
 
 threat_client:
   aktoApiSecurityThreatClient:
@@ -177,3 +215,32 @@ keel:
   serviceAccount:
     annotations: {}
   type: LoadBalancer
+
+ports:
+  default:
+    - port: 9092
+      targetPort: 9092
+  tls:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+    - name: ssl
+      port: 9093
+      targetPort: 9093
+  dataIngestion:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+    - name: data-ingestion
+      port: 9091
+      targetPort: 8080
+  dataIngestionWithTls:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+    - name: ssl
+      port: 9093
+      targetPort: 9093
+    - name: data-ingestion
+      port: 9091
+      targetPort: 8080
