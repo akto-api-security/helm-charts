@@ -674,6 +674,28 @@ entries:
     version: 0.1.4
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.3.1
+    created: "2025-05-30T17:17:33.017140899Z"
+    description: Helm chart for installing Akto
+    digest: 9b60b6bf5855140ba61385c9162e5d22a8207759651b1f66d57b47e36c4146dc
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.3.1/akto-mini-runtime-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     appVersion: 0.3.0
     created: "2025-05-12T07:31:23.447482599Z"
     description: Helm chart for installing Akto
@@ -1096,6 +1118,28 @@ entries:
     version: 0.1.0
   akto-runtime:
   - apiVersion: v2
+    appVersion: 0.1.6
+    created: "2025-05-30T17:17:33.240915917Z"
+    description: Helm chart for installing Akto
+    digest: b1684fb7a99efaa9f0c6bb955a9a3780963544fab6ccb4ba5fdfc46771bbefd0
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-runtime-0.1.6/akto-runtime-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     appVersion: 0.1.5
     created: "2025-04-24T13:33:34.614212965Z"
     description: Helm chart for installing Akto
@@ -1251,4 +1295,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-05-12T07:31:23.447666894Z"
+generated: "2025-05-30T17:17:33.241106202Z"
