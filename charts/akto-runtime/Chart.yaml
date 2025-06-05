@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-runtime
 description: Helm chart for installing Akto
 type: application
-version: 0.1.6
-appVersion: "0.1.6"
+version: 0.1.7
+appVersion: "0.1.7"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:
