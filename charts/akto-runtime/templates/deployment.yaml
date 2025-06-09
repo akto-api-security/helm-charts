@@ -240,13 +240,6 @@ spec:
           value: "normal"
         - name: AKTO_MONGO_CONN
           value: {{ quote .Values.mongo.aktoMongoConn }}
-        - name: AKTO_THREAT_DETECTION_POSTGRES
-          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUrl }}
-        - name: AKTO_THREAT_DETECTION_POSTGRES_USER
-          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUser }}
-        - name: AKTO_THREAT_DETECTION_POSTGRES_PASSWORD
-          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
-            }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoKafkaTrafficBrokerUrl
             }}
