@@ -6,7 +6,6 @@ metadata:
     keel.sh/policy: force
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@every 60m"
-    keel.sh/monitorContainers: "akto-api-security-dashboard,akto-api-security-testing"
 
   labels:
   {{- include "akto.labels" . | nindent 4 }}

@@ -60,4 +60,3 @@ There are multiple ways to request support from Akto. We are 24X7 available on t
 2. Join our [discord channel](https://www.akto.io/community) for community support.
 3. Contact `help@akto.io` for email support.
 4. Contact us [here](https://www.akto.io/contact-us).
-
