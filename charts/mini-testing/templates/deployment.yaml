@@ -119,6 +119,8 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.kafkaBrokerUrl}} 
         - name: NEW_TESTING_ENABLED
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.newTestingEnabled}}
+        - name: BLOCK_LOGS
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.blockLogs }}
         - name: AKTO_LOG_LEVEL
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.aktoLogLevel }}
         - name: PROXY_URI
@@ -130,9 +132,22 @@ spec:
             }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        - name: AUTO_SCALING_ENABLED
+          value: {{ quote .Values.testing.autoScaling.enabled }}
+        {{ if .Values.testing.autoScaling.enabled }}
+        - name: MINI_TESTING_NAME
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingName }}
+        - name: PROMETHEUS_SERVER_PORT
+          value: {{ quote .Values.testing.prometheusServer.port }}
+        {{ end }}
         image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.aktoApiSecurityTesting.image.tag
           | default .Chart.AppVersion }}
         name: akto-api-security-testing
+        {{ if .Values.testing.autoScaling.enabled }}
+        ports:
+          - containerPort: {{ .Values.testing.prometheusServer.port }}
+            name: {{ quote .Values.testing.prometheusServer.name }}
+        {{ end}}
         imagePullPolicy: {{ .Values.testing.aktoApiSecurityTesting.imagePullPolicy }}
         resources: {{- toYaml .Values.testing.aktoApiSecurityTesting.resources |  nindent 10 }}
       - name: akto-api-security-puppeteer-replay

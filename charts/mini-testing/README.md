@@ -11,6 +11,43 @@ Please ensure you have the following -
 1. A Kubernetes cluster where you have deploy permissions
 2. `helm` command installed. Check [here](https://helm.sh/docs/intro/install/)
 
+## Dependencies
+If you don't need auto-scaling, skip this section.
+
+Otherwise, if auto-scaling needs to be enabled to allow parallel test runs via multiple k8s pods, we need to install few dependencies via helm charts. 
+1. Install `kube-prometheus-stack`
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update prometheus-community
+    
+helm install prometheus prometheus-community/kube-prometheus-stack \
+	--namespace <NAMESPACE> \
+	--create-namespace
+```
+2. Install `keda`
+```
+helm repo add kedacore https://kedacore.github.io/charts  
+helm repo update kedacore
+
+helm install keda kedacore/keda \
+  --namespace <NAMESPACE> \
+  --create-namespace
+```
+3. Upgrade `keda` to set `watchNamespace`
+```
+helm upgrade keda kedacore/keda \
+  --namespace <NAMESPACE> \
+  --set watchNamespace=<NAMESPACE>
+```
+  - This restricts keda to watch/control only specific namespace(s)
+  - Its fine if you get this error - `Error: UPGRADE FAILED: no RoleBinding with the name "keda-operator" found`
+  - As a fix, re-run the helm upgrade command mentioned above, as the first run would create the `keda-operator` deployment in k8s.
+
+4. While installing / upgrading Akto's helm chart (covered in later sections) additionally set the following flag
+```
+--set testing.autoScaling.enabled=true
+```
+
 ## Steps 
 Here are the steps to install Akto mini-testing via Helm charts - 
 
@@ -34,18 +71,26 @@ Here are the steps to install Akto mini-testing via Helm charts -
     --set tokens.env.proxyUri="<PROXY_URI>" \
     --set tokens.env.noProxy="<NO_PROXY_URLS>"
    ```
+   In order to enable auto-scaling, add the following flag
+   ```
+   --set testing.autoScaling.enabled=true
+   ```
 3. Run `kubectl get pods -n <NAMESPACE>` and verify you can see 1 mini-testing pod with 4 containers and 1 keel pod.
 
 ### Upgrading to new version
 
 1. Update helm repo
-   ```helm repo update```
+   ```helm repo update akto```
 2. Check the latest version for mini-testing module
    ```helm show chart akto/akto-mini-testing```
 3. Upgrade
    ```bash
    helm upgrade akto-mini-testing akto/akto-mini-testing -n <namespace> --version <latest-version> \
     --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>
+   ```
+4. In order to enable auto-scaling, add the following flag to upgrade command.
+   ```
+   --set testing.autoScaling.enabled=true
    ```
 
 ## Get Support for your Akto setup

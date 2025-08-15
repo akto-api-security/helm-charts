@@ -131,7 +131,7 @@ keel:
     image:
       repository: keelhq/keel
       tag: latest
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     enabled: true
     resources:
       limits:

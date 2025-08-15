@@ -18,6 +18,7 @@ mini_runtime:
       aktoKafkaGroupIdConfig: asdf
       aktoKafkaMaxPollRecordsConfig: "100"
       aktoKafkaTopicName: akto.api.logs
+      blockLogs: true
       aktoTrafficBatchSize: "100"
       aktoTrafficBatchTimeSecs: "10"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
@@ -26,7 +27,7 @@ mini_runtime:
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.46.9_local
+      tag: 1.48.0_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -96,7 +97,7 @@ testing:
       publicKey: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.46.9_local
+      tag: 1.47.9_local
     resources:
       requests:
         cpu: "200m"

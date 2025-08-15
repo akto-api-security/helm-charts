@@ -1,0 +1,18 @@
+{{ if .Values.testing.autoScaling.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-service
+  labels:
+    app: {{ include "akto.fullname" . }}
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.testing.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}
+  ports:
+    - port: {{ .Values.testing.prometheusServer.port }}
+      targetPort: {{ .Values.testing.prometheusServer.port }}
+      protocol: {{ .Values.testing.prometheusServer.protocol }}
+      name: {{ .Values.testing.prometheusServer.name }}
+{{ end }}

@@ -66,6 +66,8 @@ spec:
             }}
         - name: USE_HOSTNAME
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.useHostName}}
+        - name: BLOCK_LOGS
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.blockLogs}}
         - name: DATABASE_ABSTRACTOR_SERVICE_URL
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorUrl}}
         - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN

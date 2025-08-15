@@ -1,0 +1,19 @@
+{{ if .Values.testing.autoScaling.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "akto.fullname" . }}-service-monitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "akto.fullname" . }}
+    release: "prometheus"
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}
+  endpoints:
+    - port: {{ .Values.testing.prometheusServer.name }}
+      path: {{ .Values.testing.prometheusServer.metricsEndpoint.path }}
+      interval: {{ .Values.testing.kubePrometheus.scrape.interval }}
+      scrapeTimeout: {{ .Values.testing.kubePrometheus.scrape.timeout }}
+{{ end }}

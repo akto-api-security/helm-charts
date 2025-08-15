@@ -13,7 +13,10 @@ testing:
       puppeteerReplayServiceUrl: http://localhost:3000
       databaseAbstractorUrl: https://cyborg.akto.io
       databaseAbstractorToken: ""
+      blockLogs: "false"
       aktoLogLevel: WARN
+      miniTestingName: System-auto-scaled-akto-mini-testing
+
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
       tag: latest
@@ -25,6 +28,37 @@ testing:
       limits:
         cpu: 2
         memory: "8Gi"
+
+  prometheusServer:
+    name: prometheus
+    port: 9400
+    protocol: TCP
+    metricsEndpoint:
+      path: /metrics
+
+  kubePrometheus:
+    serviceName: prometheus-kube-prometheus-prometheus
+    port: 9090
+    scrape:
+      interval: 15s
+      timeout: 10s
+
+  replicas: 1
+  autoScaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    customMetrics:
+      type: prometheus
+      pollingInterval: 30
+      cooldownPeriod: 300
+      isModuleBusy:
+        metricName: is_module_busy
+        trigger:
+          name: is_module_busy_avg
+          target: 0.9
+          type: Value
+
   aktoApiSecurityPuppeteerReplay:
     image:
       repository: aktosecurity/akto-puppeteer-replay
