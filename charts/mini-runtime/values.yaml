@@ -35,11 +35,11 @@ mini_runtime:
     imagePullPolicy: Always
     resources:
       requests:
-        cpu: 2
-        memory: "4Gi"
+        cpu: 1
+        memory: "2Gi"
       limits:
-        cpu: 3
-        memory: "8Gi"
+        cpu: 1.5
+        memory: "4Gi"
   kafka1:
     env:
       # add advertised listeners if you want to override the default listeners
@@ -73,11 +73,11 @@ mini_runtime:
     resources:
       requests:
         cpu: 1
-        memory: "4Gi"
+        memory: "2Gi"
         ephemeral-storage: "500Mi"
       limits:
         cpu: 2
-        memory: "8Gi"
+        memory: "4Gi"
         ephemeral-storage: "11Gi"
   ports:
     default:
@@ -106,11 +106,11 @@ mini_runtime:
       tag: 7.9.1-1-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "1Gi"
+        cpu: 0.5
+        memory: "800Mi"
       limits:
-        cpu: 2
-        memory: "2Gi"
+        cpu: 1
+        memory: "1.5Gi"
 
 keel:
   keel:
@@ -166,7 +166,7 @@ ports:
 threat_client:
   aktoApiSecurityThreatClient:
     env:
-      enabled: false
+      enabled: true
       aggregationRulesEnabled: false
       postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
       postgresUser: akto
@@ -185,11 +185,11 @@ threat_client:
     imagePullPolicy: Always
     resources:
       requests:
+        cpu: 0.5
+        memory: "500Mi"
+      limits:
         cpu: 1
         memory: "1Gi"
-      limits:
-        cpu: 2
-        memory: "2Gi"
 
 redis:
   image:
