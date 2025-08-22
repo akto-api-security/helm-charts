@@ -184,6 +184,9 @@ spec:
         resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
  
       restartPolicy: Always
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
       {{- if .Values.mini_runtime.kafka1.useTls }}
       volumes:
         - name: kafka-certs
@@ -262,6 +265,9 @@ spec:
         - containerPort: 9300
         resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
       serviceAccountName: {{ include "akto.fullname" . }}-keel
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
 {{ end }}
 
 {{ if .Values.threat_client.aktoApiSecurityThreatClient.env.enabled }}
@@ -341,4 +347,7 @@ spec:
         name: akto-api-security-threat-client
         resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}
       restartPolicy: Always
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
 {{ end }}
