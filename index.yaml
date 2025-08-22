@@ -892,6 +892,28 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-hybrid-redact-0.1.4/akto-hybrid-redact-0.1.4.tgz
     version: 0.1.4
+  akto-k8s-agent:
+  - apiVersion: v2
+    appVersion: k8s_agent
+    created: "2025-08-22T09:37:49.660269635Z"
+    description: Akto Kubernetes DaemonSet agent for mirroring API logging
+    digest: c12194c1564d929435425651ba85a427b062b5c6228ebce6f61c1289da48db1f
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - daemonset
+    - logging
+    - k8s
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-k8s-agent
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-k8s-agent-0.1.0/akto-k8s-agent-0.1.0.tgz
+    version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
     appVersion: 0.3.9
@@ -1757,4 +1779,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-08-18T08:39:10.928680007Z"
+generated: "2025-08-22T09:37:49.660497685Z"
