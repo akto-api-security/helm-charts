@@ -1,6 +1,12 @@
 mongo:
   aktoMongoConn: ""
 
+tolerations:
+  - effect: NoSchedule
+    key: nodetype
+    operator: Equal
+    value: default
+
 kubernetesClusterDomain: cluster.local
 mini_runtime:
   aktoApiSecurityRuntime:
