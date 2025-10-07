@@ -895,6 +895,27 @@ entries:
   akto-k8s-agent:
   - apiVersion: v2
     appVersion: k8s_agent
+    created: "2025-10-07T08:34:11.163663149Z"
+    description: Akto Kubernetes DaemonSet agent for mirroring API logging
+    digest: 0c0599293058bc64411453a5f60278886a36b1a2cb0f412d1a8040606c9df1cf
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - daemonset
+    - logging
+    - k8s
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-k8s-agent
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-k8s-agent-0.1.2/akto-k8s-agent-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: k8s_agent
     created: "2025-08-22T09:37:49.660269635Z"
     description: Akto Kubernetes DaemonSet agent for mirroring API logging
     digest: c12194c1564d929435425651ba85a427b062b5c6228ebce6f61c1289da48db1f
@@ -1933,4 +1954,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
-generated: "2025-09-29T05:57:04.397580903Z"
+generated: "2025-10-07T08:34:11.163893671Z"
