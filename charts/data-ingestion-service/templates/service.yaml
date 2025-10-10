@@ -5,7 +5,15 @@ metadata:
   labels:
     {{- include "data-ingestion-service.labels" . | nindent 4 }}
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    {{- if .Values.dataIngestionService.service.internal }}
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    {{- else }}
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    {{- end }}
+    {{- if .Values.dataIngestionService.service.subnets }}
+    service.beta.kubernetes.io/aws-load-balancer-subnets: {{ .Values.dataIngestionService.service.subnets | quote }}
+    {{- end }}
 spec:
   type: {{ .Values.dataIngestionService.service.type }}
   ports:
