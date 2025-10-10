@@ -4,8 +4,10 @@ metadata:
   name: {{ include "data-ingestion-service.fullname" . }}
   labels:
     {{- include "data-ingestion-service.labels" . | nindent 4 }}
+  {{- if .Values.dataIngestionService.service.annotations }}
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    {{- toYaml .Values.dataIngestionService.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.dataIngestionService.service.type }}
   ports:
