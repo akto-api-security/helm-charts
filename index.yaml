@@ -1978,6 +1978,28 @@ entries:
     version: 1.42.12
   data-ingestion-service:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2025-10-13T15:36:50.938169122Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: ab13c0d8bc2fddc720c009738daa4bbf76de50db9dc5c9a681a98bbfae6a9e2c
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.1/data-ingestion-service-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-10-08T15:03:30.895193626Z"
     description: Helm chart for Akto Data Ingestion Service
@@ -1999,4 +2021,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.0/data-ingestion-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-08T15:03:30.895392198Z"
+generated: "2025-10-13T15:36:50.938388341Z"
