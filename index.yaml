@@ -959,6 +959,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.4.7
+    created: "2025-10-21T13:45:23.977217472Z"
+    description: Helm chart for installing Akto
+    digest: 2a58a701ddc3e6aae487e6f445060754b1862b9b092016eb6ef5cc179854365e
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.4.7/akto-mini-runtime-0.4.7.tgz
+    version: 0.4.7
+  - apiVersion: v2
     appVersion: 0.4.6
     created: "2025-10-13T15:38:06.066417137Z"
     description: Helm chart for installing Akto
@@ -2043,4 +2065,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.0/data-ingestion-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-13T15:38:06.066855791Z"
+generated: "2025-10-21T13:45:23.977545728Z"
