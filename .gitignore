@@ -1,2 +1,5 @@
 # Ignore Visual Studio Code settings
 settings.json
+
+.idea/
+Chart.lock

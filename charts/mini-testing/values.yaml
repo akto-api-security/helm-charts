@@ -11,10 +11,10 @@ testing:
       newTestingEnabled: "true"
       kafkaBrokerUrl: localhost:29092
       puppeteerReplayServiceUrl: http://localhost:3000
-      databaseAbstractorUrl: https://cyborg.akto.io
-      databaseAbstractorToken: ""
+      databaseAbstractorUrl: http://host.docker.internal:5678
+      databaseAbstractorToken: "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJBa3RvIiwic3ViIjoiaW52aXRlX3VzZXIiLCJhY2NvdW50SWQiOjE3NTAwMTk5ODksImlhdCI6MTc1Mzg3MjcxNSwiZXhwIjoxNzY5NzcwMzE1fQ.MWketh9JXhIvD63PB4Oz8IXTyA26YadDrZ0S0JslnRTK_qdg9GXIqribnFKfXux0RljZvgR9jK4vWvh40jTmNQgc6Ab_fbCwbaBlaFKrJ_sv1UqtbEleolgk4KEcyGmEvOpmgi06UnlqcVowxf44HVrWfo-VJXuSYXqWn8v8c9JdkZwYA8vUvMpl_6T9Egr6RnoneS2CVMrUnb6kqnxqLLB1FNzG8cH_x9MA8QZdufqu0o0tsIMuN1FKRDE0P54rU9stO8ZVRyIaD5UAOuBYnu56krcTejh12CQbhWrupqHxMmyRQ4SfaVshOshjx8TUOGxj8zhHja99o6U-bIYYNg"
       blockLogs: "false"
-      aktoLogLevel: WARN
+      aktoLogLevel: INFO
       miniTestingName: System-auto-scaled-akto-mini-testing
 
     image:
@@ -24,10 +24,10 @@ testing:
     resources:
       requests:
         cpu: "200m"
-        memory: "500Mi"
+        memory: "400Mi"
       limits:
-        cpu: 2
-        memory: "8Gi"
+        cpu: "1"
+        memory: "2Gi"
 
   prometheusServer:
     name: prometheus
@@ -66,11 +66,11 @@ testing:
     imagePullPolicy: Always
     resources:
       requests:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 200m
+        memory: "500Mi"
       limits:
-        cpu: 1
-        memory: "4Gi"
+        cpu: 200m
+        memory: "1Gi"
 
   kafka1:
     env:
@@ -94,11 +94,11 @@ testing:
       tag: 7.8.0-3-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 200m
+        memory: "500Mi"
       limits:
-        cpu: 2
-        memory: "4Gi"
+        cpu: 1
+        memory: "1Gi"
   ports:
   - port: 9092
     targetPort: 9092
@@ -114,11 +114,11 @@ testing:
       tag: 7.8.0-3-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 200m
+        memory: "500Mi"
       limits:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 200m
+        memory: "500Mi"
 
 keel:
   keel:

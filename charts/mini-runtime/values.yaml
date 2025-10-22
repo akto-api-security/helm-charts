@@ -15,14 +15,14 @@ mini_runtime:
       aktoKafkaTopicName: akto.api.logs
       aktoTrafficBatchSize: "100"
       aktoTrafficBatchTimeSecs: "10"
-      aktoLogLevel: WARN
+      aktoLogLevel: INFO
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
-      databaseAbstractorUrl: https://cyborg.akto.io
+      databaseAbstractorUrl: http://host.docker.internal:5678
       # If you want to use secrets to store database abstractor token. default: false
       useSecretsForDatabaseAbstractorToken: false
       # If not using secrets, place token here.
-      databaseAbstractorToken: ""
+      databaseAbstractorToken: "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJBa3RvIiwic3ViIjoiaW52aXRlX3VzZXIiLCJhY2NvdW50SWQiOjEwMDAwMDAsImlhdCI6MTc1NDY0MjQzNywiZXhwIjoxNzcwNTQwMDM3fQ.mPhnXVfV20a_w-_-8iJMBJ-oTpkGRYo61IuZoGaDnitWz9P2nuOTOBqUHeCOf0K9VEAsNPNdUAFFkus5_Un-LkjJWaQfua6c2iJg1dULO4amnDZhCnkuwWYFOFgQYoLfIvMvzyCeLAaZPOk56NlLhBPJS7RbHZykK4IRs59-rax_aIkr-pZFQg6rNzpcvvV_qbsuXzxFwOwKnm_Zugidj1uJL-18oxyEINY87AdJnIPuX3d9Z7rovlTsPxPeo8LoZv3jhDF6kDZKNz4zXqR2lcWSJ9B2GbPR_iBwhDL9qJHrLwPGkPmPB4rb0ww94XGFK4TwjMu4oloQNqqXAtoF-A"
       # If using secrets, place token here.
       databaseAbstractorTokenSecrets: 
         # Name of an existing secret containing the Database Abstractor Token
@@ -35,11 +35,11 @@ mini_runtime:
     imagePullPolicy: Always
     resources:
       requests:
-        cpu: 2
-        memory: "4Gi"
+        cpu: 200m
+        memory: "400Mi"
       limits:
-        cpu: 2
-        memory: "8Gi"
+        cpu: 1
+        memory: "2Gi"
   kafka1:
     env:
       # add advertised listeners if you want to override the default listeners
@@ -78,13 +78,13 @@ mini_runtime:
       tag: 7.9.4-1-ubi8
     resources:
       requests:
-        cpu: 1.5
-        memory: "4Gi"
-        ephemeral-storage: "500Mi"
+        cpu: 200m
+        memory: "500Mi"
+        ephemeral-storage: "200Mi"
       limits:
-        cpu: 1.5
-        memory: "8Gi"
-        ephemeral-storage: "11Gi"
+        cpu: 1
+        memory: "1Gi"
+        ephemeral-storage: "2Gi"
   ports:
     default:
       - port: 9092
@@ -122,11 +122,11 @@ mini_runtime:
       tag: 7.9.4-1-ubi8
     resources:
       requests:
-        cpu: 1
-        memory: "1Gi"
+        cpu: 200m
+        memory: "500Mi"
       limits:
-        cpu: 1
-        memory: "2Gi"
+        cpu: 200m
+        memory: "500Mi"
 
 keel:
   keel:
@@ -206,11 +206,11 @@ threat_client:
     imagePullPolicy: Always
     resources:
       requests:
-        cpu: 1.5
-        memory: "1Gi"
+        cpu: 200m
+        memory: "400Mi"
       limits:
-        cpu: 1.5
-        memory: "2Gi"
+        cpu: 500m
+        memory: "1Gi"
 
 redis:
   image:
@@ -219,11 +219,11 @@ redis:
     pullPolicy: IfNotPresent
   resources:
     requests:
-      cpu: "500m"
-      memory: "500Mi"
+      cpu: "200m"
+      memory: "200Mi"
     limits:
-      cpu: "900m"
-      memory: "1500Mi"
+      cpu: "400m"
+      memory: "500Mi"
   persistence:
     enabled: false
     size: "2Gi"
