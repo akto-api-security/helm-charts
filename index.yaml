@@ -960,6 +960,30 @@ entries:
   akto-k8s-ebpf:
   - apiVersion: v2
     appVersion: k8s_ebpf
+    created: "2025-10-24T17:07:47.262308202Z"
+    description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API
+      logging
+    digest: 02c421fa892eaeb4f6ad2a6a53b417baa486956023ce10d09445441fedf07e52
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - daemonset
+    - ebpf
+    - logging
+    - k8s
+    - metadata
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-k8s-ebpf
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-k8s-ebpf-0.1.1/akto-k8s-ebpf-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: k8s_ebpf
     created: "2025-10-23T18:50:18.886825578Z"
     description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API
       logging
@@ -2116,4 +2140,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.0/data-ingestion-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-24T05:54:18.116428769Z"
+generated: "2025-10-24T17:07:47.262529063Z"
