@@ -2045,6 +2045,32 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-testing-db-layer-1.42.12/akto-testing-db-layer-1.42.12.tgz
     version: 1.42.12
+  damn-vulnerable-mcp-server:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2025-10-24T05:54:18.116211753Z"
+    description: A Helm chart for Damn Vulnerable Model Context Protocol Server -
+      Educational security testing platform with 10 MCP vulnerability challenges
+    digest: 55a5ea3dd80e69bd3bc1fceb7e5ab6ef8bc6c0d66f811897edad6f107b5f0016
+    home: https://github.com/harishsg993010/damn-vulnerable-MCP-server
+    icon: https://avatars.githubusercontent.com/u/92027393
+    keywords:
+    - security
+    - mcp
+    - vulnerability
+    - educational
+    - testing
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - name: Akto Security
+      url: https://github.com/akto-api-security
+    name: damn-vulnerable-mcp-server
+    sources:
+    - https://github.com/harishsg993010/damn-vulnerable-MCP-server
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/damn-vulnerable-mcp-server-0.1.0/damn-vulnerable-mcp-server-0.1.0.tgz
+    version: 0.1.0
   data-ingestion-service:
   - apiVersion: v2
     appVersion: 0.1.1
@@ -2090,4 +2116,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.0/data-ingestion-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-23T18:50:18.887034209Z"
+generated: "2025-10-24T05:54:18.116428769Z"
