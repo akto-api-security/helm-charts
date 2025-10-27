@@ -45,7 +45,6 @@ mini_runtime:
       kafkaCreateTopics: akto.api.logs:3:3
       kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
       kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
-      # KRaft mode configuration (Kafka 8.x without Zookeeper)
       kafkaProcessRoles: "broker,controller"
       kafkaNodeId: "1"
       kafkaControllerQuorumVoters: "1@localhost:9093"
@@ -59,7 +58,6 @@ mini_runtime:
       kafkaOffsetsTopicReplicationFactor: "1"
       kafkaTransactionStateLogMinIsr: "1"
       kafkaTransactionStateLogReplicationFactor: "1"
-      # KRaft cluster id used by Kafka 8.x
       kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
     image:
       repository: confluentinc/cp-kafka

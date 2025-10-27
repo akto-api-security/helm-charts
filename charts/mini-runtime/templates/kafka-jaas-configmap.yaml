@@ -13,9 +13,4 @@ data:
         password="{{ if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}{{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.password }}{{ else }}{{ .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}"
         user_{{ if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}{{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.username }}{{ else }}{{ .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}="{{ if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}{{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.password }}{{ else }}{{ .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}";
     };
-    Client {
-      org.apache.kafka.common.security.plain.PlainLoginModule required
-        username="{{ .Values.mini_runtime.zoo1.env.saslUsername }}"
-        password="{{ .Values.mini_runtime.zoo1.env.saslPassword }}";
-    };
 {{- end }}

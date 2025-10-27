@@ -48,10 +48,15 @@ mini_runtime:
       kafkaCleanupPolicy: delete
       kafkaCreateTopics: akto.api.logs:3:3
       kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
-      kafkaListenerSecurityProtocolMap: LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT, LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
-      kafkaListenerSecurityProtocolMapSsl: LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT, LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT, LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
-      kafkaListenerSecurityProtocolMapSasl: LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_PLAINTEXT, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT, LISTENER_DOCKER_EXTERNAL_LOCALHOST:SASL_PLAINTEXT, LISTENER_DOCKER_EXTERNAL_DIFFHOST:SASL_PLAINTEXT
-      kafkaListenerSecurityProtocolMapSaslTls: LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_SSL, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT
+      kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaListenerSecurityProtocolMapSsl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
+      kafkaListenerSecurityProtocolMapSasl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:SASL_PLAINTEXT
+      kafkaListenerSecurityProtocolMapSaslTls: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_SSL,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT
+      kafkaProcessRoles: "broker,controller"
+      kafkaNodeId: "1"
+      kafkaControllerQuorumVoters: "1@localhost:9093"
+      kafkaControllerListenerNames: "CONTROLLER"
+      kafkaListeners: "CONTROLLER://0.0.0.0:9093,LISTENER_DOCKER_EXTERNAL_LOCALHOST://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://0.0.0.0:9092"
       kafkaLogCleanerEnable: "true"
       kafkaLogRetentionBytes: "10737418240"
       kafkaLogRetentionCheckIntervalMs: "60000"
@@ -60,7 +65,7 @@ mini_runtime:
       kafkaOffsetsTopicReplicationFactor: "1"
       kafkaTransactionStateLogMinIsr: "1"
       kafkaTransactionStateLogReplicationFactor: "1"
-      kafkaZookeeperConnect: 127.0.0.1:2181
+      kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
       sslKeystoreLocation: "/etc/kafka/ssl/secrets/server.keystore.jks"
       sslKeystorePassword: "password"
       sslKeyPassword: "password"
@@ -75,7 +80,7 @@ mini_runtime:
     useSasl: false
     image:
       repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
-      tag: 7.9.4-1-ubi8
+      tag: 8.1.0
     resources:
       requests:
         cpu: 1.5
@@ -108,25 +113,6 @@ mini_runtime:
   type: ClusterIP
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-  zoo1:
-    env:
-      kafkaOpts: -Dzookeeper.admin.enableServer=false
-      zookeeperClientPort: "2181"
-      zookeeperServerId: "1"
-      zookeeperServers: zoo1:2888:3888
-      # SASL configuration for zookeeper
-      saslUsername: "zookeeper"
-      saslPassword: ""
-    image:
-      repository: public.ecr.aws/aktosecurity/confluentinc-cp-zookeeper
-      tag: 7.9.4-1-ubi8
-    resources:
-      requests:
-        cpu: 1
-        memory: "1Gi"
-      limits:
-        cpu: 1
-        memory: "2Gi"
 
 keel:
   keel:
