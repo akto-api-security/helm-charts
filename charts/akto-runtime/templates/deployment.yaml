@@ -71,23 +71,7 @@ spec:
         imagePullPolicy: {{ .Values.runtime.aktoApiSecurityRuntime.imagePullPolicy }}
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
-      - env:
-        - name: ZOOKEEPER_CLIENT_PORT
-          value: {{ quote .Values.runtime.zoo1.env.zookeeperClientPort }}
-        - name: ZOOKEEPER_SERVERS
-          value: {{ quote .Values.runtime.zoo1.env.zookeeperServers }}
-        - name: ZOOKEEPER_SERVER_ID
-          value: {{ quote .Values.runtime.zoo1.env.zookeeperServerId }}
-        - name: KAFKA_OPTS
-          value: {{ quote .Values.runtime.zoo1.env.kafkaOpts }}
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.runtime.zoo1.image.repository }}:{{ .Values.runtime.zoo1.image.tag
-          | default .Chart.AppVersion }}
-        name: zoo1
-        ports:
-        - containerPort: 2181
-        resources: {{- toYaml .Values.runtime.zoo1.resources | nindent 10 }}
+      
       - env:
         - name: MY_POD_NAMESPACE
           valueFrom:
@@ -105,6 +89,16 @@ spec:
           value: {{ quote .Values.runtime.kafka1.env.kafkaInterBrokerListenerName }}
         - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
           value: {{ quote .Values.runtime.kafka1.env.kafkaListenerSecurityProtocolMap }}
+        - name: KAFKA_PROCESS_ROLES
+          value: {{ quote .Values.runtime.kafka1.env.kafkaProcessRoles }}
+        - name: KAFKA_NODE_ID
+          value: {{ quote .Values.runtime.kafka1.env.kafkaNodeId }}
+        - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+          value: {{ quote .Values.runtime.kafka1.env.kafkaControllerQuorumVoters }}
+        - name: KAFKA_CONTROLLER_LISTENER_NAMES
+          value: {{ quote .Values.runtime.kafka1.env.kafkaControllerListenerNames }}
+        - name: KAFKA_LISTENERS
+          value: {{ quote .Values.runtime.kafka1.env.kafkaListeners }}
         - name: KAFKA_LOG_CLEANER_ENABLE
           value: {{ quote .Values.runtime.kafka1.env.kafkaLogCleanerEnable }}
         - name: KAFKA_LOG_RETENTION_BYTES
@@ -123,8 +117,8 @@ spec:
         - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
           value: {{ quote .Values.runtime.kafka1.env.kafkaTransactionStateLogReplicationFactor
             }}
-        - name: KAFKA_ZOOKEEPER_CONNECT
-          value: {{ quote .Values.runtime.kafka1.env.kafkaZookeeperConnect }}
+        - name: CLUSTER_ID
+          value: {{ quote .Values.runtime.kafka1.env.kafkaClusterId }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.runtime.kafka1.image.repository }}:{{ .Values.runtime.kafka1.image.tag
@@ -134,6 +128,7 @@ spec:
         - containerPort: 9092
         - containerPort: 19092
         - containerPort: 29092
+        - containerPort: 9093
         - containerPort: 9999
         resources: {{- toYaml .Values.runtime.kafka1.resources | nindent 10 }}
       restartPolicy: Always
@@ -291,6 +286,6 @@ spec:
         name: akto-api-security-threat-backend
         ports:
         - containerPort: 9090
-        resources: {{- toYaml .Values.runtime.zoo1.resources | nindent 10 }}
+        resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatBackend.resources | nindent 10 }}
       restartPolicy: Always
 {{ end }}
