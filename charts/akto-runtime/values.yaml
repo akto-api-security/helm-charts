@@ -40,8 +40,12 @@ runtime:
       kafkaCleanupPolicy: delete
       kafkaCreateTopics: akto.api.logs:3:3
       kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
-      kafkaListenerSecurityProtocolMap: LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,
-        LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaProcessRoles: "broker,controller"
+      kafkaNodeId: "1"
+      kafkaControllerQuorumVoters: "1@localhost:9093"
+      kafkaControllerListenerNames: "CONTROLLER"
+      kafkaListeners: "CONTROLLER://0.0.0.0:9093,LISTENER_DOCKER_EXTERNAL_LOCALHOST://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://0.0.0.0:9092"
       kafkaLogCleanerEnable: "true"
       kafkaLogRetentionBytes: "10737418240"
       kafkaLogRetentionCheckIntervalMs: "60000"
@@ -50,10 +54,10 @@ runtime:
       kafkaOffsetsTopicReplicationFactor: "1"
       kafkaTransactionStateLogMinIsr: "1"
       kafkaTransactionStateLogReplicationFactor: "1"
-      kafkaZookeeperConnect: 127.0.0.1:2181
+      kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
     image:
       repository: confluentinc/cp-kafka
-      tag: 6.2.11-1-ubi8
+      tag: 8.1.0
     resources:
       requests:
         cpu: 1
@@ -66,22 +70,6 @@ runtime:
     targetPort: 9092
   replicas: 1
   type: ClusterIP
-  zoo1:
-    env:
-      kafkaOpts: -Dzookeeper.admin.enableServer=false
-      zookeeperClientPort: "2181"
-      zookeeperServerId: "1"
-      zookeeperServers: zoo1:2888:3888
-    image:
-      repository: confluentinc/cp-zookeeper
-      tag: 6.2.11-1-ubi8
-    resources:
-      requests:
-        cpu: 1
-        memory: "2Gi"
-      limits:
-        cpu: 2
-        memory: "4Gi"
 
 keel:
   keel:
