@@ -1713,6 +1713,28 @@ entries:
     version: 0.1.4
   akto-mini-testing:
   - apiVersion: v2
+    appVersion: 1.43.4
+    created: "2025-10-29T09:43:22.741582884Z"
+    description: Helm chart for installing Akto
+    digest: e6ad15763cb495abe13770a83ed3faaa2d5e2ba8938bc602c076ba4731fd6521
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.43.4/akto-mini-testing-1.43.4.tgz
+    version: 1.43.4
+  - apiVersion: v2
     appVersion: 1.43.3
     created: "2025-09-04T08:02:44.576001279Z"
     description: Helm chart for installing Akto
@@ -2206,4 +2228,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.0/data-ingestion-service-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-28T13:39:24.783194025Z"
+generated: "2025-10-29T09:43:22.741814314Z"
