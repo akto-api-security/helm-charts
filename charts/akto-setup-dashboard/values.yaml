@@ -17,7 +17,7 @@ dashboard:
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
     image:
       repository: aktosecurity/akto-api-security-dashboard
-      tag: local
+      tag: latest
     imagePullPolicy: Always
     resources:
       requests:
