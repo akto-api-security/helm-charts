@@ -63,7 +63,7 @@ mini_runtime:
         memory: "4Gi"
       limits:
         cpu: 2
-        memory: "8Gi"
+        memory: "4Gi"
   kafka1:
     env:
       # add advertised listeners if you want to override the default listeners
@@ -112,8 +112,8 @@ mini_runtime:
         ephemeral-storage: "500Mi"
       limits:
         cpu: 1.5
-        memory: "8Gi"
-        ephemeral-storage: "11Gi"
+        memory: "4Gi"
+        ephemeral-storage: "500Mi"
   ports:
     default:
       - port: 9092
@@ -200,7 +200,7 @@ threat_client:
   replicas: 1
   aktoApiSecurityThreatClient:
     env:
-      enabled: true
+      enabled: false
       aggregationRulesEnabled: true
       postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
       postgresUser: akto
