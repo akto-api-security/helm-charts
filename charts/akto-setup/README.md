@@ -48,11 +48,48 @@ Note: Please ensure your K8S cluster has connectivity to Mongo.
 
 ### Install Akto via Helm
 
+#### Option 1: Install from Akto Helm Repository
+
 1. Add Akto repo
-   ```helm repo add  akto https://akto-api-security.github.io/helm-charts```
+   ```bash
+   helm repo add akto https://akto-api-security.github.io/helm-charts
+   ```
 2. Install Akto via helm
-   ```helm install akto akto/akto -n dev --set mongo.aktoMongoConn="<AKTO_CONNECTION_STRING>"```
-3. Run `kubectl get pods -n <NAMESPACE>` and verify you can see 4 pods
+   ```bash
+   helm install akto akto/akto -n akto --create-namespace --set mongo.aktoMongoConn="<AKTO_CONNECTION_STRING>"
+   ```
+
+#### Option 2: Install from Local Chart
+
+1. Basic installation
+   ```bash
+   helm install akto charts/akto-setup \
+     --namespace akto \
+     --create-namespace \
+     --set mongo.aktoMongoConn="<AKTO_CONNECTION_STRING>"
+   ```
+
+2. Installation with custom values file
+   ```bash
+   helm install akto charts/akto-setup \
+     -f charts/akto-setup/client_custom_value.yaml \
+     --namespace akto \
+     --create-namespace
+   ```
+
+3. Installation with specific Keel namespace configuration
+   ```bash
+   helm install akto charts/akto-setup \
+     -f charts/akto-setup/client_custom_value.yaml \
+     --namespace akto \
+     --set keel.keel.env.watchNamespaces="akto" \
+     --create-namespace
+   ```
+
+4. Run `kubectl get pods -n akto` and verify you can see 5 pods (mongo, dashboard, runtime, testing, keel)
+   ```bash
+   kubectl get pods -n akto
+   ```
    <img width="862" alt="Screenshot 2023-11-16 at 10 08 23 AM" src="https://github.com/akto-api-security/Documentation/assets/91221068/3a5a4d26-3305-4eb2-94f9-ae598817252d">
 
 ### Verify Installation and harden security
