@@ -95,6 +95,86 @@ Note: Please ensure your K8S cluster has connectivity to Mongo.
 ### Verify Installation and harden security
 
 1. Run the following to get Akto dashboard url
-   ```kubectl get services/akto-dashboard -n dev | awk -F " " '{print $4;}'```
+   ```bash
+   kubectl get services/akto-dashboard -n akto | awk -F " " '{print $4;}'
+   ```
 2. Open Akto dashboard on port 8080. eg `http://a54b36c1f4asdaasdfbd06a259de2-acf687643f6fe4eb.elb.ap-south-1.amazonaws.com:8080/`
-3. For good security measures, you should enable HTTPS by adding a certificate and put it behind a VPN. If you are on AWS, follow the guide [here](https://docs.akto.io/getting-started/aws-ssl).
+
+3. Verify Keel is running with minimal permissions
+   ```bash
+   # Check Keel logs for errors
+   kubectl logs -n akto -l app=akto-keel --tail=50
+
+   # Verify NAMESPACES configuration
+   kubectl get pod -n akto -l app=akto-keel -o jsonpath='{.items[0].spec.containers[0].env[?(@.name=="NAMESPACES")].value}'
+
+   # Check ClusterRole permissions
+   kubectl describe clusterrole akto-keel
+   ```
+
+4. For good security measures, you should enable HTTPS by adding a certificate and put it behind a VPN. If you are on AWS, follow the guide [here](https://docs.akto.io/getting-started/aws-ssl).
+
+## Keel Configuration
+
+Keel automatically monitors and updates container images when new versions are available.
+
+### Keel Security Features
+
+This chart includes **minimal RBAC permissions** for Keel:
+
+**✅ Allowed:**
+- Read access (`get`, `watch`, `list`) - cluster-wide
+- Update access (`update`, `patch`) - restricted by `NAMESPACES` env var
+- Resources: pods, deployments, statefulsets, daemonsets, cronjobs
+
+**❌ Restricted:**
+- No `delete` permission
+- No `create` permission
+- No namespace listing
+- No port-forward capability
+- No access to replicasets, replicationcontrollers, jobs
+
+### Configure Watched Namespaces
+
+By default, Keel watches only the namespace where it's deployed. You can customize this:
+
+**Watch single namespace:**
+```bash
+helm install akto charts/akto-setup \
+  --set keel.keel.env.watchNamespaces="akto" \
+  --namespace akto
+```
+
+**Watch multiple namespaces:**
+```bash
+helm install akto charts/akto-setup \
+  --set keel.keel.env.watchNamespaces="akto,production,staging" \
+  --namespace akto
+```
+
+**Disable Keel:**
+```bash
+helm install akto charts/akto-setup \
+  --set keel.keel.env.enabled=false \
+  --namespace akto
+```
+
+## Upgrading
+
+```bash
+helm upgrade akto charts/akto-setup \
+  -f charts/akto-setup/client_custom_value.yaml \
+  --namespace akto
+```
+
+## Troubleshooting
+
+### Check Keel Permission Errors
+```bash
+kubectl logs -n akto -l app=akto-keel --tail=100 | grep -i "forbidden\|error"
+```
+
+### Verify All Components
+```bash
+kubectl get all -n akto
+```
