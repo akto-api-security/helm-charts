@@ -13,8 +13,6 @@ rules:
   resources:
   - pods
   - deployments
-  - statefulsets
-  - daemonsets
   verbs:
   - get
   - watch
