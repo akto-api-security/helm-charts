@@ -180,6 +180,8 @@ keel:
       notificationLevel: info
       webhookEndpoint: ""
       enabled: true
+      # Comma-separated list of namespaces to watch. Leave empty to use Release namespace
+      watchNamespaces: ""
     image:
       repository: keelhq/keel
       tag: latest

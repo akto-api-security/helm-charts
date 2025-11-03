@@ -6,48 +6,44 @@ metadata:
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 rules:
+# Minimal permissions for Keel to watch and update workloads (cluster-wide but limited verbs)
+- apiGroups:
+  - ""
+  - apps
+  resources:
+  - pods
+  - deployments
+  - statefulsets
+  - daemonsets
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+# Watch cronjobs for scheduled tasks
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - get
+  - watch
+  - list
+  - update
+# Read configmaps for Keel configuration
 - apiGroups:
   - ""
   resources:
-  - namespaces
+  - configmaps
   verbs:
-  - watch
+  - get
   - list
+# Read secrets only if needed for image pull credentials
 - apiGroups:
   - ""
   resources:
   - secrets
   verbs:
   - get
-  - watch
   - list
-- apiGroups:
-  - ""
-  - extensions
-  - apps
-  - batch
-  resources:
-  - pods
-  - replicasets
-  - replicationcontrollers
-  - statefulsets
-  - deployments
-  - daemonsets
-  - jobs
-  - cronjobs
-  verbs:
-  - get
-  - delete
-  - watch
-  - list
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  - pods/portforward
-  verbs:
-  - get
-  - create
-  - update
 {{ end }}
