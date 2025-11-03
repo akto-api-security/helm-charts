@@ -20,6 +20,7 @@ rules:
   - watch
   - list
   - update
+  - patch
 # Watch cronjobs for scheduled tasks
 - apiGroups:
   - batch
@@ -30,6 +31,7 @@ rules:
   - watch
   - list
   - update
+  - patch
 # Read configmaps for Keel configuration
 - apiGroups:
   - ""
