@@ -117,13 +117,29 @@ spec:
             {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
               {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
             {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") .Values.mini_runtime.loadBalancer.staticIP }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Values.mini_runtime.loadBalancer.staticIP }}:9093, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+              {{- else }}
               LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+              {{- end }}
             {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") .Values.mini_runtime.loadBalancer.staticIP }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Values.mini_runtime.loadBalancer.staticIP }}:9092
+              {{- else }}
               LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              {{- end }}
             {{- else if .Values.mini_runtime.kafka1.useTls }}
+              {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") .Values.mini_runtime.loadBalancer.staticIP }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Values.mini_runtime.loadBalancer.staticIP }}:9092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Values.mini_runtime.loadBalancer.staticIP }}:9093
+              {{- else }}
               LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093
+              {{- end }}
             {{- else }}
+              {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") .Values.mini_runtime.loadBalancer.staticIP }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Values.mini_runtime.loadBalancer.staticIP }}:9092
+              {{- else }}
               LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              {{- end }}
             {{- end }}
         - name: KAFKA_BROKER_ID
           value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}

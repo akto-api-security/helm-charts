@@ -5,11 +5,20 @@ metadata:
   labels:
   {{- include "akto.labels" . | nindent 4 }}
   annotations:
+    {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") }}
+    {{- with .Values.mini_runtime.loadBalancer.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- else }}
     {{- with .Values.mini_runtime.annotations }}
     {{- toYaml . | nindent 4 }}
     {{- end }}
+    {{- end }}
 spec:
   type: {{ .Values.mini_runtime.type }}
+  {{- if and .Values.mini_runtime.loadBalancer.enabled (eq .Values.mini_runtime.type "LoadBalancer") .Values.mini_runtime.loadBalancer.staticIP }}
+  loadBalancerIP: {{ .Values.mini_runtime.loadBalancer.staticIP }}
+  {{- end }}
   selector:
     app: {{ include "akto.fullname" . }}-mini-runtime
   {{- include "akto.selectorLabels" . | nindent 4 }}
