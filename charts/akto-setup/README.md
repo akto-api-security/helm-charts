@@ -125,14 +125,14 @@ This chart includes **minimal RBAC permissions** for Keel:
 **✅ Allowed:**
 - Read access (`get`, `watch`, `list`) - cluster-wide
 - Update access (`update`, `patch`) - restricted by `NAMESPACES` env var
-- Resources: pods, deployments, statefulsets, daemonsets, cronjobs
+- Resources: **pods, deployments only**
 
 **❌ Restricted:**
 - No `delete` permission
 - No `create` permission
 - No namespace listing
 - No port-forward capability
-- No access to replicasets, replicationcontrollers, jobs
+- No access to secrets, configmaps, statefulsets, daemonsets, cronjobs, replicasets, replicationcontrollers, jobs
 
 ### Configure Watched Namespaces
 
