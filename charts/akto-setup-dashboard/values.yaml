@@ -60,6 +60,7 @@ testing:
   replicas: 1
 
 keel:
+  enabled: false
   keel:
     env:
       awsAccessKeyId: ""

@@ -1,0 +1,23 @@
+{{- if and .Values.agentGuardExecutor.enabled .Values.agentGuardExecutor.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "akto-ai-guardrails.fullname" . }}-model-cache
+  labels:
+    {{- include "akto-ai-guardrails.agentGuardExecutor.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.agentGuardExecutor.persistence.accessMode }}
+  {{- if .Values.agentGuardExecutor.persistence.storageClass }}
+  {{- if (eq "-" .Values.agentGuardExecutor.persistence.storageClass) }}
+  storageClassName: ""
+  {{- else }}
+  storageClassName: {{ .Values.agentGuardExecutor.persistence.storageClass | quote }}
+  {{- end }}
+  {{- else if .Values.global.storageClass }}
+  storageClassName: {{ .Values.global.storageClass | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.agentGuardExecutor.persistence.size }}
+{{- end }}
