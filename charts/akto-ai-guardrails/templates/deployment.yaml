@@ -1,0 +1,260 @@
+{{- if .Values.agentGuardExecutor.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto-ai-guardrails.fullname" . }}-executor
+  labels:
+    {{- include "akto-ai-guardrails.agentGuardExecutor.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.agentGuardExecutor.replicas }}
+  selector:
+    matchLabels:
+      {{- include "akto-ai-guardrails.agentGuardExecutor.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "akto-ai-guardrails.agentGuardExecutor.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "akto-ai-guardrails.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: agent-guard-executor
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.agentGuardExecutor.image.repository }}:{{ .Values.agentGuardExecutor.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.agentGuardExecutor.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.agentGuardExecutor.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: {{ quote .Values.agentGuardExecutor.env.pythonUnbuffered }}
+        - name: PORT
+          value: {{ quote .Values.agentGuardExecutor.env.port }}
+        - name: HF_HOME
+          value: {{ quote .Values.agentGuardExecutor.env.hfHome }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if .Values.agentGuardExecutor.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.agentGuardExecutor.livenessProbe.httpGet.path }}
+            port: {{ .Values.agentGuardExecutor.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.agentGuardExecutor.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agentGuardExecutor.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agentGuardExecutor.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agentGuardExecutor.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.agentGuardExecutor.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.agentGuardExecutor.readinessProbe.httpGet.path }}
+            port: {{ .Values.agentGuardExecutor.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.agentGuardExecutor.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agentGuardExecutor.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agentGuardExecutor.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agentGuardExecutor.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.agentGuardExecutor.resources | nindent 10 }}
+        {{- if .Values.agentGuardExecutor.persistence.enabled }}
+        volumeMounts:
+        - name: model-cache
+          mountPath: {{ .Values.agentGuardExecutor.persistence.mountPath }}
+        {{- end }}
+      {{- if .Values.agentGuardExecutor.persistence.enabled }}
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: {{ include "akto-ai-guardrails.fullname" . }}-model-cache
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+---
+{{- if .Values.agentGuardEngine.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto-ai-guardrails.fullname" . }}-engine
+  labels:
+    {{- include "akto-ai-guardrails.agentGuardEngine.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.agentGuardEngine.replicas }}
+  selector:
+    matchLabels:
+      {{- include "akto-ai-guardrails.agentGuardEngine.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "akto-ai-guardrails.agentGuardEngine.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "akto-ai-guardrails.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: agent-guard-engine
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.agentGuardEngine.image.repository }}:{{ .Values.agentGuardEngine.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.agentGuardEngine.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.agentGuardEngine.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: GIN_MODE
+          value: {{ quote .Values.agentGuardEngine.env.ginMode }}
+        - name: PORT
+          value: {{ quote .Values.agentGuardEngine.env.port }}
+        - name: PYTHON_SERVICE_URL
+          value: {{ quote .Values.agentGuardEngine.env.pythonServiceUrl }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if .Values.agentGuardEngine.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.agentGuardEngine.livenessProbe.httpGet.path }}
+            port: {{ .Values.agentGuardEngine.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.agentGuardEngine.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agentGuardEngine.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agentGuardEngine.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agentGuardEngine.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.agentGuardEngine.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.agentGuardEngine.readinessProbe.httpGet.path }}
+            port: {{ .Values.agentGuardEngine.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.agentGuardEngine.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.agentGuardEngine.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.agentGuardEngine.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.agentGuardEngine.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.agentGuardEngine.resources | nindent 10 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+---
+{{- if .Values.guardrailsService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto-ai-guardrails.fullname" . }}-service
+  labels:
+    {{- include "akto-ai-guardrails.guardrailsService.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.guardrailsService.replicas }}
+  selector:
+    matchLabels:
+      {{- include "akto-ai-guardrails.guardrailsService.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "akto-ai-guardrails.guardrailsService.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "akto-ai-guardrails.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: guardrails-service
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        image: "{{ .Values.guardrailsService.image.repository }}:{{ .Values.guardrailsService.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.guardrailsService.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.guardrailsService.service.targetPort }}
+          protocol: TCP
+        env:
+        - name: SERVER_PORT
+          value: {{ quote .Values.guardrailsService.env.serverPort }}
+        - name: AKTO_API_BASE_URL
+          value: {{ quote .Values.guardrailsService.env.aktoApiBaseUrl }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.guardrailsService.env.databaseAbstractorServiceUrl }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          value: {{ quote .Values.guardrailsService.env.databaseAbstractorServiceToken }}
+        - name: AGENT_GUARD_ENGINE_URL
+          value: {{ quote .Values.guardrailsService.env.agentGuardEngineUrl }}
+        - name: THREAT_BACKEND_URL
+          value: {{ quote .Values.guardrailsService.env.threatBackendUrl }}
+        - name: THREAT_BACKEND_TOKEN
+          value: {{ quote .Values.guardrailsService.env.threatBackendToken }}
+        - name: LOG_LEVEL
+          value: {{ quote .Values.guardrailsService.env.logLevel }}
+        - name: GIN_MODE
+          value: {{ quote .Values.guardrailsService.env.ginMode }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if .Values.guardrailsService.livenessProbe.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.guardrailsService.livenessProbe.httpGet.path }}
+            port: {{ .Values.guardrailsService.livenessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.guardrailsService.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.guardrailsService.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.guardrailsService.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.guardrailsService.livenessProbe.failureThreshold }}
+        {{- end }}
+        {{- if .Values.guardrailsService.readinessProbe.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.guardrailsService.readinessProbe.httpGet.path }}
+            port: {{ .Values.guardrailsService.readinessProbe.httpGet.port }}
+          initialDelaySeconds: {{ .Values.guardrailsService.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.guardrailsService.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.guardrailsService.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ .Values.guardrailsService.readinessProbe.failureThreshold }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.guardrailsService.resources | nindent 10 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
