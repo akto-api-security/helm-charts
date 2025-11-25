@@ -2043,6 +2043,29 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-kafka-1.42.1/akto-mini-testing-kafka-1.42.1.tgz
     version: 1.42.1
+  akto-mrs-runtime-combined:
+  - apiVersion: v2
+    appVersion: 0.0.1
+    created: "2025-11-25T13:27:08.574302002Z"
+    description: Helm chart for installing Akto
+    digest: 269f4c522e81208816d9c0eeb2dbf2d8179a49597a61b70d744b16541a103c1a
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mrs-runtime-combined
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-mrs-runtime-combined
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mrs-runtime-combined-0.0.1/akto-mrs-runtime-combined-0.0.1.tgz
+    version: 0.0.1
   akto-protection:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -2357,4 +2380,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-13T11:18:03.946884543Z"
+generated: "2025-11-25T13:27:08.574556949Z"
