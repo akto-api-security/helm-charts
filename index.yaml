@@ -207,6 +207,30 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-0.1.0/akto-0.1.0.tgz
     version: 0.1.0
+  akto-ai-guardrails:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2025-11-25T17:20:52.068805932Z"
+    description: Helm chart for installing Akto AI Guardrails services
+    digest: 4ecfab9adc5c963469fa2caadd30dc6f1f93a1db1c5df0b7863bb43259360390
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - ai
+    - guardrails
+    - security
+    - llm
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-ai-guardrails
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-ai-guardrails
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-0.1.0/akto-ai-guardrails-0.1.0.tgz
+    version: 0.1.0
   akto-dashboard:
   - apiVersion: v2
     appVersion: 0.1.5
@@ -2403,4 +2427,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-25T15:31:09.142599714Z"
+generated: "2025-11-25T17:20:52.069003291Z"
