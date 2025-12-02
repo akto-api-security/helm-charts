@@ -209,6 +209,29 @@ entries:
     version: 0.1.0
   akto-ai-guardrails:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2025-12-02T08:15:49.907161839Z"
+    description: Helm chart for installing Akto AI Guardrails services
+    digest: 09e36ac5e4065a0488fcf670062697ac8ab1c57b99149ad9e46ee9f2cb15a021
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - ai
+    - guardrails
+    - security
+    - llm
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-ai-guardrails
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-ai-guardrails
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-0.1.1/akto-ai-guardrails-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-11-25T17:20:52.068805932Z"
     description: Helm chart for installing Akto AI Guardrails services
@@ -1032,6 +1055,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.5.2
+    created: "2025-12-02T08:15:50.065694657Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: 3a76ed366e64ae5715deaa251b9e5a890bcf68e04091fe98ef435f483b319ee2
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.5.2/akto-mini-runtime-0.5.2.tgz
+    version: 0.5.2
+  - apiVersion: v2
     appVersion: 0.5.1
     created: "2025-11-13T11:18:03.946529007Z"
     description: Helm chart for installing Akto
@@ -1781,6 +1826,28 @@ entries:
     version: 0.1.4
   akto-mini-testing:
   - apiVersion: v2
+    appVersion: 1.43.8
+    created: "2025-12-02T08:15:50.203939112Z"
+    description: Helm chart for installing Akto hybrid testing
+    digest: a490443a53acbe5b193ceea6083ee3141224e51d66aa8aed25ee86920af0dfbe
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-testing
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.43.8/akto-mini-testing-1.43.8.tgz
+    version: 1.43.8
+  - apiVersion: v2
     appVersion: 1.43.7
     created: "2025-11-08T03:32:01.291176247Z"
     description: Helm chart for installing Akto
@@ -2069,6 +2136,28 @@ entries:
     version: 1.42.1
   akto-mrs-runtime-combined:
   - apiVersion: v2
+    appVersion: 0.0.2
+    created: "2025-12-02T08:15:50.44603196Z"
+    description: Helm chart for installing Akto
+    digest: c65a82268523cc96be07187d725238c1463f7fe0856dea54b08d152cdcce49f9
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mrs-runtime-combined
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-mrs-runtime-combined
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mrs-runtime-combined-0.0.2/akto-mrs-runtime-combined-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
     appVersion: 0.0.1
     created: "2025-11-25T13:27:08.574302002Z"
     description: Helm chart for installing Akto
@@ -2316,6 +2405,28 @@ entries:
     version: 1.42.12
   akto-threat-backend:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2025-12-02T08:15:50.594562478Z"
+    description: Helm chart for installing Akto threat backend
+    digest: fb7923cdaef1da57c4ff87a11d61889a841b20ad7bc09340a5a5c3ce57254676
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-threat-backend
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-threat-backend
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.1/akto-threat-backend-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-11-25T15:31:09.142319138Z"
     description: Helm chart for installing Akto
@@ -2427,4 +2538,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-25T17:20:52.069003291Z"
+generated: "2025-12-02T08:15:50.595228925Z"
