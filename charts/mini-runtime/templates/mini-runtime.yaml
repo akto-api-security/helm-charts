@@ -1,4 +1,4 @@
-{{- if not .Values.mini_runtime.useExternalKafka }}
+{{- if and (not .Values.mini_runtime.useExternalKafka) (not .Values.mini_runtime.useSeparateKafkaDeployment) }}
 apiVersion: v1
 kind: Service
 metadata:

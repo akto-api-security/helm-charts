@@ -49,9 +49,23 @@ spec:
         - name: AKTO_INSTANCE_TYPE
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoInstanceType }}
         - name: AKTO_KAFKA_BROKER_MAL
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}{{ end }}
+          value: >-
+            {{- if .Values.mini_runtime.useExternalKafka }}
+              {{ .Values.mini_runtime.externalKafka.brokerUrl }}
+            {{- else if .Values.mini_runtime.useSeparateKafkaDeployment }}
+              {{ include "akto.fullname" . }}-kafka.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- else }}
+              {{ .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}
+            {{- end }}
         - name: AKTO_KAFKA_BROKER_URL
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
+          value: >-
+            {{- if .Values.mini_runtime.useExternalKafka }}
+              {{ .Values.mini_runtime.externalKafka.brokerUrl }}
+            {{- else if .Values.mini_runtime.useSeparateKafkaDeployment }}
+              {{ include "akto.fullname" . }}-kafka.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- else }}
+              {{ .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}
+            {{- end }}
         - name: AKTO_KAFKA_GROUP_ID_CONFIG
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaGroupIdConfig
             }}
@@ -118,7 +132,7 @@ spec:
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
 
-      {{- if not .Values.mini_runtime.useExternalKafka }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) (not .Values.mini_runtime.useSeparateKafkaDeployment) }}
       - env:
         - name: MY_POD_NAMESPACE
           valueFrom:
@@ -258,7 +272,7 @@ spec:
       {{- end }}
 
       restartPolicy: Always
-      {{- if and (not .Values.mini_runtime.useExternalKafka) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) (not .Values.mini_runtime.useSeparateKafkaDeployment) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
       volumes:
         {{- if .Values.mini_runtime.kafka1.useTls }}
         - name: kafka-certs
@@ -407,9 +421,23 @@ spec:
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
             }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: >-
+            {{- if .Values.mini_runtime.useExternalKafka }}
+              {{ .Values.mini_runtime.externalKafka.brokerUrl }}
+            {{- else if .Values.mini_runtime.useSeparateKafkaDeployment }}
+              {{ include "akto.fullname" . }}-kafka.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- else }}
+              {{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- end }}
         - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: >-
+            {{- if .Values.mini_runtime.useExternalKafka }}
+              {{ .Values.mini_runtime.externalKafka.brokerUrl }}
+            {{- else if .Values.mini_runtime.useSeparateKafkaDeployment }}
+              {{ include "akto.fullname" . }}-kafka.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- else }}
+              {{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- end }}
         - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
           value: "redis://{{ include "akto.fullname" . }}-redis:6379"
 
