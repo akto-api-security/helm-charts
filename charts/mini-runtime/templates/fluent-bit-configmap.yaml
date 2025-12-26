@@ -14,18 +14,17 @@ data:
         Flush {{ index .Values "fluent-bit" "flush" }}
         Log_Level {{ index .Values "fluent-bit" "logLevel" }}
         Parsers_File /fluent-bit/etc/parsers.conf
-        Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
         HTTP_Server On
         HTTP_Listen 0.0.0.0
         HTTP_Port {{ index .Values "fluent-bit" "metricsPort" }}
         Health_Check On
-        storage.path          /var/log/flb-storage/
+        storage.path          /var/log/state/flb-storage/
         storage.keep.rejected on
         storage.rejected.path rejected
 
     [INPUT]
         Name tail
-        Path /var/log/containers/akto-mini-runtime-mini-runtime-*_akto-api-security-runtime-*.log
+        Path /var/log/containers/{{ include "akto.fullname" . }}-mini-runtime-*_{{ .Release.Namespace }}_akto-api-security-runtime-*.log
         Alias tail_runtime
         multiline.parser docker, cri
         Tag kube.*
@@ -61,7 +60,29 @@ data:
         Port 443
         URI /logs
         Format json
-        Header Authorization Bearer {{ .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken }}
+        {{- /* compute header into single line to avoid extra indentation/blank lines */ -}}
+        {{- $header := "" -}}
+        {{- if and (index .Values "mini_runtime") (index (index .Values "mini_runtime") "aktoApiSecurityRuntime") -}}
+          {{- $mr := index .Values "mini_runtime" -}}
+          {{- if $mr.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken -}}
+            {{- $secName := $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret -}}
+            {{- if $secName -}}
+              {{- $sec := lookup "v1" "Secret" .Release.Namespace $secName -}}
+              {{- if $sec -}}
+                {{- $header = printf "Header Authorization Bearer %s" (index $sec.data "token" | b64dec) -}}
+              {{- else -}}
+                {{- $header = printf "Header Authorization Bearer %s" (default "" $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.token) -}}
+              {{- end -}}
+            {{- else -}}
+              {{- $header = printf "Header Authorization Bearer %s" (default "" $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.token) -}}
+            {{- end -}}
+          {{- else -}}
+            {{- $header = printf "Header Authorization Bearer %s" $mr.aktoApiSecurityRuntime.env.databaseAbstractorToken -}}
+          {{- end -}}
+        {{- end -}}
+        {{- if ne $header "" }}
+        {{ $header }}
+        {{- end }}
         tls On
         tls.verify On
         net.keepalive on
@@ -73,13 +94,7 @@ data:
         Match kube.*
         Format json_lines
 
-  custom_parsers.conf: |
-    [PARSER]
-        Name docker_no_time
-        Format json
-        Time_Keep Off
-        Time_Key time
-        Time_Format %Y-%m-%dT%H:%M:%S.%L
+
 
   extract_account.lua: |
     function extract_account_id(tag, timestamp, record)

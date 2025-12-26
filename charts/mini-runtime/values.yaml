@@ -254,13 +254,9 @@ fluent-bit:
   rbac:
     create: true
 
-  flush: 1
+  flush: 5
   metricsPort: 2020
-  logLevel: debug
-
-  volumeMounts:
-    - name: config
-      mountPath: /fluent-bit/etc/conf
+  logLevel: info
 
   daemonSetVolumes:
     - name: varlog
