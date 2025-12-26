@@ -89,9 +89,6 @@ data:
         net.keepalive_idle_timeout 30
         retry_limit 3
 
-
-
-
   extract_account.lua: |
     function extract_account_id(tag, timestamp, record)
         local log = record["log"]

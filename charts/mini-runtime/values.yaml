@@ -238,7 +238,7 @@ redis:
     storageClass: ""
 
 fluent-bit:
-  enabled: true
+  enabled: false
   kind: DaemonSet
   
   # Use custom ConfigMap from parent chart that injects the token
