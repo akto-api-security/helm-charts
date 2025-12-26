@@ -89,10 +89,6 @@ data:
         net.keepalive_idle_timeout 30
         retry_limit 3
 
-    [OUTPUT]
-        Name stdout
-        Match kube.*
-        Format json_lines
 
 
 
