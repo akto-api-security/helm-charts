@@ -24,15 +24,16 @@ data:
 
     [INPUT]
         Name tail
-        Path /var/log/containers/{{ include "akto.fullname" . }}-mini-runtime-*_{{ .Release.Namespace }}_akto-api-security-runtime-*.log
+        Path /var/log/containers/{{ include "akto.fullname" . }}-mini-runtime-*_{{ .Release.Namespace }}_akto-api-security-runtime-*.log, /var/log/containers/{{ include "akto.fullname" . }}-threat-client-*_{{ .Release.Namespace }}_*.log
         Alias tail_runtime
         multiline.parser docker, cri
         Tag kube.*
-        Mem_Buf_Limit 5MB
+        Mem_Buf_Limit 10MB
         Skip_Long_Lines On
-        Refresh_Interval 5
+        Refresh_Interval 10
         DB /var/fluent-bit/state/flb_kube.db
         Read_from_Head On
+    
 
     [FILTER]
         Name kubernetes
