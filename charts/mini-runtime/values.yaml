@@ -241,6 +241,9 @@ fluent-bit:
   enabled: true
   kind: DaemonSet
   
+  # Use custom ConfigMap from parent chart that injects the token
+  existingConfigMap: akto-mini-runtime-fluent-bit
+
   image:
     repository: cr.fluentbit.io/fluent/fluent-bit
     pullPolicy: IfNotPresent
@@ -254,6 +257,8 @@ fluent-bit:
   flush: 1
   metricsPort: 2020
   logLevel: debug
+
+  
 
   config:
     service: |
@@ -312,7 +317,7 @@ fluent-bit:
           Port 443
           URI /logs
           Format json
-          Header Authorization Bearer eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJBa3RvIiwic3ViIjoiaW52aXRlX3VzZXIiLCJhY2NvdW50SWQiOjE3NTY4NDQ3MDEsImlhdCI6MTc2NTM3OTUwNywiZXhwIjoxNzgxMTA0MzA3fQ.W61v2oJOg55bXV3Du1df7nBaiPeah31fqtwiJAms6dOqHAk0GQwVBhXXBmdfMwl2ptWUwwbfZ7q1T9kf5wouu60uGLQPFeg_rfnkSXs0IoOVTARqEEYCJ0rEjT_Sw3_L6zu5kTaDJPXivMkcbvVIxf868GZ9Wm0diyGd-5kGE2B8dGat9uhgjFzQJ9dwF0HrSHYZCloCynKzO0WjE8YxW3WRa1ZqBEmmqVwsFysqLFGG0FZIscgp9HfRQP5zVavg-vHgDN5wZNsXGyp3urIs48njiY7AQkdNr_aXYs9_Q-FD8pXGOpbKM1OYP8WrRkVjrNz6b0FB2mFqsafHhtPzpw
+          Header Authorization Bearer {{ .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken }}
           tls On
           tls.verify On
           net.keepalive on
