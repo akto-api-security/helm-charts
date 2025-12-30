@@ -115,14 +115,6 @@ spec:
         image: {{ .Values.mini_runtime.aktoApiSecurityRuntime.image.repository }}:{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.tag
           | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.mini_runtime.aktoApiSecurityRuntime.imagePullPolicy }}
-        {{- if index .Values "fluent-bit" "enabled" }}
-        command: ["/bin/sh"]
-        args:
-          - "-c"
-          - |
-            # Start Java app in background, tee output to log file
-            java -jar /app/*.jar 2>&1 | tee /var/log/app/runtime.log
-        {{- end }}
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
         volumeMounts:
