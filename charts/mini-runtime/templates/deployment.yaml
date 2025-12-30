@@ -296,12 +296,14 @@ spec:
       volumes:
       {{- if index .Values "fluent-bit" "enabled" }}
       - name: log-storage
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: {{ index .Values "fluent-bit" "logStorage" "sizeLimit" | default "2Gi" }}
       - name: fluent-bit-config
         configMap:
           name: {{ include "akto.fullname" . }}-fluent-bit
       - name: fluent-bit-state
-        emptyDir: {}
+        emptyDir:
+          sizeLimit: {{ index .Values "fluent-bit" "stateStorage" "sizeLimit" | default "500Mi" }}
       {{- end }}
       {{- if and (not .Values.mini_runtime.useExternalKafka) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
         {{- if .Values.mini_runtime.kafka1.useTls }}
