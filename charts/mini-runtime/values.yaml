@@ -27,6 +27,12 @@ affinity: {}
   #         - coreservices
 
 mini_runtime:
+  # Kafka Deployment Mode Configuration
+  # useSeparateKafkaDeployment: Set to true to deploy Kafka as a separate StatefulSet (recommended for production)
+  # When true, Kafka will be deployed as an independent, horizontally scalable cluster with FQDN-based communication
+  # When false, Kafka will run as a sidecar container in the mini-runtime pod (legacy mode, localhost communication)
+  useSeparateKafkaDeployment: true
+
   # External Kafka Configuration
   # Set useExternalKafka to true to use an existing Kafka cluster
   # When enabled, the internal Kafka container will not be deployed
@@ -76,12 +82,14 @@ mini_runtime:
         cpu: 2
         memory: "8Gi"
   kafka1:
+    # Number of Kafka replicas (only applies when useSeparateKafkaDeployment is true)
+    replicas: 2
     env:
       # add advertised listeners if you want to override the default listeners
       kafkaAdvertisedListeners: ""
       kafkaBrokerId: "1"
       kafkaCleanupPolicy: delete
-      kafkaCreateTopics: akto.api.logs:3:3
+      kafkaCreateTopics: akto.api.logs:12:2
       kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
       kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
       kafkaListenerSecurityProtocolMapSsl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
@@ -97,9 +105,9 @@ mini_runtime:
       kafkaLogRetentionCheckIntervalMs: "60000"
       kafkaLogRetentionHours: "5"
       kafkaLogSegmentBytes: "104857600"
-      kafkaOffsetsTopicReplicationFactor: "1"
+      kafkaOffsetsTopicReplicationFactor: "2"
       kafkaTransactionStateLogMinIsr: "1"
-      kafkaTransactionStateLogReplicationFactor: "1"
+      kafkaTransactionStateLogReplicationFactor: "2"
       kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
       sslKeystoreLocation: "/etc/kafka/ssl/secrets/server.keystore.jks"
       sslKeystorePassword: "password"
