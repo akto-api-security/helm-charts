@@ -38,6 +38,22 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: POD_NAME
+          {{- if .Values.mini_runtime.aktoApiSecurityRuntime.env.podName }}
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.podName }}
+          {{- else }}
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+          {{- end }}
+        - name: NODE_NAME
+          {{- if .Values.mini_runtime.aktoApiSecurityRuntime.env.nodeName }}
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.nodeName }}
+          {{- else }}
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+          {{- end }}
         - name: AKTO_ACCOUNT_NAME
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoAccountName }}
         - name: IS_KUBERNETES
