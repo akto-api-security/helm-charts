@@ -236,3 +236,23 @@ redis:
     enabled: false
     size: "2Gi"
     storageClass: ""
+
+fluent-bit:
+  enabled: false
+  
+  image:
+    repository: cr.fluentbit.io/fluent/fluent-bit
+    tag: "3.2.2"
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  flush: 5
+  metricsPort: 2020
+  logLevel: info

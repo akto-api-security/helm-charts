@@ -117,6 +117,41 @@ spec:
         imagePullPolicy: {{ .Values.mini_runtime.aktoApiSecurityRuntime.imagePullPolicy }}
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
+        volumeMounts:
+        {{- if index .Values "fluent-bit" "enabled" }}
+        - name: log-storage
+          mountPath: /var/log/app
+        {{- end }}
+      
+      {{- if index .Values "fluent-bit" "enabled" }}
+      - name: fluent-bit
+        image: {{ index .Values "fluent-bit" "image" "repository" }}:{{ index .Values "fluent-bit" "image" "tag" | default "latest" }}
+        imagePullPolicy: {{ index .Values "fluent-bit" "image" "pullPolicy" }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          limits:
+            cpu: {{ index .Values "fluent-bit" "resources" "limits" "cpu" | default "100m" }}
+            memory: {{ index .Values "fluent-bit" "resources" "limits" "memory" | default "128Mi" }}
+          requests:
+            cpu: {{ index .Values "fluent-bit" "resources" "requests" "cpu" | default "50m" }}
+            memory: {{ index .Values "fluent-bit" "resources" "requests" "memory" | default "64Mi" }}
+        volumeMounts:
+        - name: log-storage
+          mountPath: /var/log/app
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+        - name: fluent-bit-state
+          mountPath: /var/fluent-bit/state
+      {{- end }}
 
       {{- if not .Values.mini_runtime.useExternalKafka }}
       - env:
@@ -258,8 +293,19 @@ spec:
       {{- end }}
 
       restartPolicy: Always
-      {{- if and (not .Values.mini_runtime.useExternalKafka) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
       volumes:
+      {{- if index .Values "fluent-bit" "enabled" }}
+      - name: log-storage
+        emptyDir:
+          sizeLimit: {{ index .Values "fluent-bit" "logStorage" "sizeLimit" | default "2Gi" }}
+      - name: fluent-bit-config
+        configMap:
+          name: {{ include "akto.fullname" . }}-fluent-bit
+      - name: fluent-bit-state
+        emptyDir:
+          sizeLimit: {{ index .Values "fluent-bit" "stateStorage" "sizeLimit" | default "500Mi" }}
+      {{- end }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
         {{- if .Values.mini_runtime.kafka1.useTls }}
         - name: kafka-certs
           secret:
