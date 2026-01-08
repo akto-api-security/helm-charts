@@ -241,8 +241,8 @@ fluent-bit:
   enabled: false
   
   image:
-    repository: cr.fluentbit.io/fluent/fluent-bit
-    tag: "3.2.2"
+    repository: public.ecr.aws/aktosecurity/agent-traffic-collector
+    tag: "4.2.2"
     pullPolicy: IfNotPresent
 
   resources:
