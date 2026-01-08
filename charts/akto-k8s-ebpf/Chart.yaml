@@ -2,7 +2,7 @@ apiVersion: v2
 name: akto-k8s-ebpf
 description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API logging
 type: application
-version: 0.1.1
+version: 0.1.2
 appVersion: "k8s_ebpf"
 keywords:
   - akto
