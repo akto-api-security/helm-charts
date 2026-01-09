@@ -258,6 +258,6 @@ fluent-bit:
   logLevel: info
   # default values 
   logStorage:
-    sizeLimit: "2Gi"
+    sizeLimit: "1Gi"
   stateStorage:
     sizeLimit: "500Mi"
