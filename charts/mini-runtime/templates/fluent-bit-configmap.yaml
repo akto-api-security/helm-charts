@@ -1,4 +1,4 @@
-{{- if index .Values "fluent-bit" "enabled" }}
+{{- if .Values.fluent_bit.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -11,11 +11,11 @@ data:
   fluent-bit.conf: |
     [SERVICE]
         Daemon Off
-        Flush {{ index .Values "fluent-bit" "flush" }}
-        Log_Level {{ index .Values "fluent-bit" "logLevel" }}
+        Flush {{ .Values.fluent_bit.flush }}
+        Log_Level {{ .Values.fluent_bit.logLevel }}
         HTTP_Server On
         HTTP_Listen 0.0.0.0
-        HTTP_Port {{ index .Values "fluent-bit" "metricsPort" }}
+        HTTP_Port {{ .Values.fluent_bit.metricsPort }}
         Health_Check On
         storage.path          /var/log/state/flb-storage/
         storage.keep.rejected on
@@ -69,8 +69,8 @@ data:
         Format json
         {{- /* compute header into single line to avoid extra indentation/blank lines */ -}}
         {{- $header := "" -}}
-        {{- if and (index .Values "mini_runtime") (index (index .Values "mini_runtime") "aktoApiSecurityRuntime") -}}
-          {{- $mr := index .Values "mini_runtime" -}}
+        {{- if and .Values.mini_runtime .Values.mini_runtime.aktoApiSecurityRuntime -}}
+          {{- $mr := .Values.mini_runtime -}}
           {{- if $mr.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken -}}
             {{- $secName := $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret -}}
             {{- if $secName -}}
