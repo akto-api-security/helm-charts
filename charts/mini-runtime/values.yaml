@@ -258,6 +258,6 @@ fluent-bit:
   logLevel: info
   # default storage sizes used by the deployment template
   logStorage:
-    sizeLimit: "2Gi"
+    sizeLimit: "1Gi"
   stateStorage:
     sizeLimit: "500Mi"
