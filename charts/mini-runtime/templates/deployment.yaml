@@ -38,6 +38,14 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         - name: AKTO_ACCOUNT_NAME
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoAccountName }}
         - name: IS_KUBERNETES
