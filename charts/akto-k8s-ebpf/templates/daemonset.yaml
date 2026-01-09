@@ -54,21 +54,13 @@ spec:
           - name: AKTO_K8_METADATA_CAPTURE
             value: {{ .Values.env.AKTO_K8_METADATA_CAPTURE | quote }}
           - name: NODE_NAME
-            {{- if .Values.env.nodeName }}
-            value: {{ quote .Values.env.nodeName }}
-            {{- else }}
             valueFrom:
               fieldRef:
                 fieldPath: spec.nodeName
-            {{- end }}
           - name: POD_NAME
-            {{- if .Values.env.podName }}
-            value: {{ quote .Values.env.podName }}
-            {{- else }}
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-            {{- end }}
         {{- with .Values.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}

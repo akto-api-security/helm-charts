@@ -22,10 +22,6 @@ env:
   AKTO_KAFKA_BROKER_MAL: "akto-mini-runtime-mini-runtime:9092"
   AKTO_K8_METADATA_CAPTURE: "true"
   AKTO_THREAT_ENABLED: "true"
-  # Pod and Node name values for environment variables
-  # Leave empty to use Kubernetes metadata (metadata.name and spec.nodeName)
-  podName: ""
-  nodeName: ""
 
 miniRuntimeServiceName: ""
 miniRuntimeReleaseName: "akto-mini-runtime"
