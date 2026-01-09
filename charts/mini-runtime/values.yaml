@@ -40,11 +40,6 @@ mini_runtime:
 
   aktoApiSecurityRuntime:
     env:
-      # Pod and Node name values for environment variables
-      # Leave empty to use Kubernetes metadata (metadata.name and spec.nodeName)
-      # Or provide custom values to override
-      podName: ""
-      nodeName: ""
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
