@@ -54,12 +54,6 @@ data:
         Record kubernetes.deployment_name {{ include "akto.fullname" . }}-mini-runtime
         Record stream stdout
 
-    [FILTER]
-        Name lua
-        Match app.*
-        script /fluent-bit/etc/extract_account.lua
-        call extract_account_id
-
     [OUTPUT]
         Name http
         Match app.*
@@ -96,18 +90,4 @@ data:
         net.keepalive_idle_timeout 30
         retry_limit 3
 
-  extract_account.lua: |
-    function extract_account_id(tag, timestamp, record)
-        local log = record["log"]
-        if log ~= nil then
-            local account_id = string.match(log, "accountId[%s:]+(%d+)")
-            if account_id == nil then
-                account_id = string.match(log, "acc[%s:]+(%d+)")
-            end
-            if account_id ~= nil then
-                record["log_account_id"] = account_id
-            end
-        end
-        return 1, timestamp, record
-    end
 {{- end }}
