@@ -293,20 +293,17 @@ spec:
       {{- end }}
 
       restartPolicy: Always
-      {{- $fluentBit := default dict (index .Values "fluent-bit") }}
-      {{- $logStorage := default dict (get $fluentBit "logStorage") }}
-      {{- $stateStorage := default dict (get $fluentBit "stateStorage") }}
       volumes:
-      {{- if get $fluentBit "enabled" }}
+      {{- if index .Values "fluent-bit" "enabled" }}
       - name: log-storage
         emptyDir:
-          sizeLimit: {{ get $logStorage "sizeLimit" | default "2Gi" }}
+          sizeLimit: {{ index .Values "fluent-bit" "logStorage" "sizeLimit" }}
       - name: fluent-bit-config
         configMap:
           name: {{ include "akto.fullname" . }}-fluent-bit
       - name: fluent-bit-state
         emptyDir:
-          sizeLimit: {{ get $stateStorage "sizeLimit" | default "500Mi" }}
+          sizeLimit: {{ index .Values "fluent-bit" "stateStorage" "sizeLimit" }}
       {{- end }}
       {{- if and (not .Values.mini_runtime.useExternalKafka) (or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl) }}
         {{- if .Values.mini_runtime.kafka1.useTls }}

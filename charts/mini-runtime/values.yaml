@@ -256,3 +256,8 @@ fluent-bit:
   flush: 5
   metricsPort: 2020
   logLevel: info
+  # default values 
+  logStorage:
+    sizeLimit: "2Gi"
+  stateStorage:
+    sizeLimit: "500Mi"
