@@ -256,8 +256,3 @@ fluent-bit:
   flush: 5
   metricsPort: 2020
   logLevel: info
-  # default storage sizes used by the deployment template
-  logStorage:
-    sizeLimit: "1Gi"
-  stateStorage:
-    sizeLimit: "500Mi"
