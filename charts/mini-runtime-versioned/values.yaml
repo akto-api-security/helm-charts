@@ -1,7 +1,7 @@
-# This chart uses the mini-runtime-base chart with versioned image tags
-# Values are passed to the base chart using the chart name prefix
+# This chart uses the mini-runtime chart with all versioned image tags
+# Only overrides the runtime and threat-client images (which are "latest" in base chart)
 
-akto-mini-runtime-base:
+akto-mini-runtime:
   mini_runtime:
     aktoApiSecurityRuntime:
       image:

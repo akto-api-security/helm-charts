@@ -1,6 +1,6 @@
 apiVersion: v2
 name: akto-mini-runtime
-description: Helm chart for installing Akto hybrid runtime with latest image tags
+description: Helm chart for installing Akto hybrid runtime (runtime & threat-client use latest, others versioned)
 type: application
 version: 0.5.9
 appVersion: "0.5.9"
@@ -16,7 +16,3 @@ keywords:
 maintainers:
   - name: Ankush Jain
     email: ankush@akto.io
-dependencies:
-  - name: akto-mini-runtime-base
-    version: 0.5.9
-    repository: file://../mini-runtime-base

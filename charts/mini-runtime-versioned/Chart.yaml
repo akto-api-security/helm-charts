@@ -1,6 +1,6 @@
 apiVersion: v2
 name: akto-mini-runtime-versioned
-description: Helm chart for installing Akto hybrid runtime with versioned image tags
+description: Helm chart for installing Akto hybrid runtime with all versioned image tags
 type: application
 version: 0.5.9
 appVersion: "0.5.9"
@@ -17,6 +17,6 @@ maintainers:
   - name: Ankush Jain
     email: ankush@akto.io
 dependencies:
-  - name: akto-mini-runtime-base
+  - name: akto-mini-runtime
     version: 0.5.9
-    repository: file://../mini-runtime-base
+    repository: file://../mini-runtime
