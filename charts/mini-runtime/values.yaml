@@ -66,7 +66,7 @@ mini_runtime:
         token: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.57.6_local
+      tag: 1.57.8_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -210,7 +210,7 @@ threat_client:
       useHostName: true
     image:
       repository: aktosecurity/akto-threat-detection
-      tag: "1.6.7"
+      tag: "1.8.9"
     imagePullPolicy: Always
     resources:
       requests:
