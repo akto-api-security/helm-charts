@@ -1,0 +1,18 @@
+apiVersion: v2
+name: akto-mini-runtime-base
+description: Base Helm chart for Akto hybrid runtime (not intended for direct installation)
+type: application
+version: 0.5.7
+appVersion: "0.5.7"
+home: https://www.akto.io
+icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+sources:
+  - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime-base
+keywords:
+  - akto
+  - api
+  - api security
+  - dast
+maintainers:
+  - name: Ankush Jain
+    email: ankush@akto.io
