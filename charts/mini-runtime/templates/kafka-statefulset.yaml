@@ -1,0 +1,207 @@
+{{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.useSeparateKafkaDeployment }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "akto.fullname" . }}-kafka
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kafka
+spec:
+  serviceName: {{ include "akto.fullname" . }}-kafka-headless
+  replicas: {{ .Values.mini_runtime.kafka1.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-kafka
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-kafka
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: kafka
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: kafka
+        image: {{ .Values.mini_runtime.kafka1.image.repository }}:{{ .Values.mini_runtime.kafka1.image.tag | default .Chart.AppVersion }}
+        command:
+        - bash
+        - -c
+        - |
+          # Extract pod ordinal from hostname
+          export POD_ORDINAL=${HOSTNAME##*-}
+          export KAFKA_NODE_ID=${POD_ORDINAL}
+          export KAFKA_BROKER_ID=${POD_ORDINAL}
+
+          # Build controller quorum voters list for KRaft
+          QUORUM_VOTERS=""
+          for i in $(seq 0 $(({{ .Values.mini_runtime.kafka1.replicas }} - 1))); do
+            if [ -n "$QUORUM_VOTERS" ]; then
+              QUORUM_VOTERS="${QUORUM_VOTERS},"
+            fi
+            QUORUM_VOTERS="${QUORUM_VOTERS}${i}@{{ include "akto.fullname" . }}-kafka-${i}.{{ include "akto.fullname" . }}-kafka-headless.${MY_POD_NAMESPACE}.svc.{{ .Values.kubernetesClusterDomain }}:9094"
+          done
+          export KAFKA_CONTROLLER_QUORUM_VOTERS=$QUORUM_VOTERS
+
+          echo "Starting Kafka with NODE_ID=${KAFKA_NODE_ID}"
+          echo "Controller Quorum: ${KAFKA_CONTROLLER_QUORUM_VOTERS}"
+
+          # Start Kafka
+          exec /etc/confluent/docker/run
+        ports:
+        - containerPort: 9092
+          name: kafka
+        - containerPort: 9093
+          name: kafka-ssl
+        - containerPort: 9094
+          name: controller
+        - containerPort: 9999
+          name: jmx
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+            {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://$(MY_POD_NAME).{{ include "akto.fullname" . }}-kafka-headless.$(MY_POD_NAMESPACE).svc.{{ .Values.kubernetesClusterDomain }}:9093
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://$(MY_POD_NAME).{{ include "akto.fullname" . }}-kafka-headless.$(MY_POD_NAMESPACE).svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST://$(MY_POD_NAME).{{ include "akto.fullname" . }}-kafka-headless.$(MY_POD_NAMESPACE).svc.{{ .Values.kubernetesClusterDomain }}:9092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://$(MY_POD_NAME).{{ include "akto.fullname" . }}-kafka-headless.$(MY_POD_NAMESPACE).svc.{{ .Values.kubernetesClusterDomain }}:9093
+            {{- else }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST://$(MY_POD_NAME).{{ include "akto.fullname" . }}-kafka-headless.$(MY_POD_NAMESPACE).svc.{{ .Values.kubernetesClusterDomain }}:9092
+            {{- end }}
+        - name: KAFKA_CLEANUP_POLICY
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaCleanupPolicy }}
+        - name: KAFKA_CREATE_TOPICS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaCreateTopics }}
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaInterBrokerListenerName }}
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST
+            {{- else }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST
+            {{- end }}
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: >-
+            {{- if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSaslTls }}
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSasl }}
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSsl }}
+            {{- else }}
+              CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+            {{- end }}
+        - name: KAFKA_PROCESS_ROLES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaProcessRoles }}
+        - name: KAFKA_CONTROLLER_LISTENER_NAMES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaControllerListenerNames }}
+        - name: KAFKA_LISTENERS
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListeners }}
+            {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://0.0.0.0:9093
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://0.0.0.0:9092
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://0.0.0.0:9093
+            {{- else }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_DIFFHOST://0.0.0.0:9092
+            {{- end }}
+        - name: KAFKA_LOG_CLEANER_ENABLE
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogCleanerEnable }}
+        - name: KAFKA_LOG_RETENTION_BYTES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionBytes }}
+        - name: KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionCheckIntervalMs }}
+        - name: KAFKA_LOG_RETENTION_HOURS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionHours }}
+        - name: KAFKA_LOG_SEGMENT_BYTES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogSegmentBytes }}
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaOffsetsTopicReplicationFactor }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaTransactionStateLogMinIsr }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaTransactionStateLogReplicationFactor }}
+        - name: CLUSTER_ID
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaClusterId }}
+        {{- if .Values.mini_runtime.kafka1.useTls }}
+        - name: KAFKA_SSL_KEYSTORE_LOCATION
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeystoreLocation }}
+        - name: KAFKA_SSL_KEYSTORE_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeystorePassword }}
+        - name: KAFKA_SSL_KEY_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeyPassword }}
+        - name: KAFKA_SSL_TRUSTSTORE_LOCATION
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslTruststoreLocation }}
+        - name: KAFKA_SSL_TRUSTSTORE_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslTruststorePassword }}
+        {{- end }}
+        {{- if .Values.mini_runtime.kafka1.useSasl }}
+        - name: KAFKA_OPTS
+          value: "-Djava.security.auth.login.config=/etc/kafka/config/kafka_server_jaas.conf"
+        - name: KAFKA_SASL_ENABLED_MECHANISMS
+          value: "PLAIN"
+        - name: KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL
+          value: "PLAIN"
+        {{- end }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl }}
+        volumeMounts:
+          {{- if .Values.mini_runtime.kafka1.useTls }}
+          - name: kafka-certs
+            mountPath: {{ quote .Values.mini_runtime.kafka1.env.sslBaseMountPath }}
+          {{- end }}
+          {{- if .Values.mini_runtime.kafka1.useSasl }}
+          - name: kafka-jaas-config
+            mountPath: /etc/kafka/config
+            readOnly: true
+          {{- end }}
+        {{- end }}
+        resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
+      restartPolicy: Always
+      {{- if or .Values.mini_runtime.kafka1.useTls .Values.mini_runtime.kafka1.useSasl }}
+      volumes:
+        {{- if .Values.mini_runtime.kafka1.useTls }}
+        - name: kafka-certs
+          secret:
+            secretName: {{ quote .Values.mini_runtime.kafka1.env.sslSecretName }}
+        {{- end }}
+        {{- if .Values.mini_runtime.kafka1.useSasl }}
+        - name: kafka-jaas-config
+          configMap:
+            name: {{ include "akto.fullname" . }}-kafka-jaas-config
+        {{- end }}
+      {{- end }}
+{{- end }}

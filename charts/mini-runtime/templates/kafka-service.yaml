@@ -1,0 +1,50 @@
+{{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.useSeparateKafkaDeployment }}
+---
+# Headless Service for StatefulSet pod DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-kafka-headless
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kafka
+spec:
+  clusterIP: None
+  selector:
+    app: {{ include "akto.fullname" . }}-kafka
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+  {{- if .Values.mini_runtime.kafka1.useSasl }}
+  {{- .Values.ports.sasl | toYaml | nindent 4 -}}
+  {{- else if .Values.mini_runtime.kafka1.useTls }}
+  {{- .Values.ports.tls | toYaml | nindent 4 -}}
+  {{- else }}
+  {{- .Values.ports.default | toYaml | nindent 4 -}}
+  {{- end }}
+---
+# Regular Service for client connections
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-kafka
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+    app.kubernetes.io/component: kafka
+  annotations:
+    {{- with .Values.mini_runtime.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.mini_runtime.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-kafka
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+  {{- if .Values.mini_runtime.kafka1.useSasl }}
+  {{- .Values.ports.sasl | toYaml | nindent 4 -}}
+  {{- else if .Values.mini_runtime.kafka1.useTls }}
+  {{- .Values.ports.tls | toYaml | nindent 4 -}}
+  {{- else }}
+  {{- .Values.ports.default | toYaml | nindent 4 -}}
+  {{- end }}
+{{- end }}
