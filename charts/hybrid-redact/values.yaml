@@ -158,3 +158,28 @@ keel:
     annotations: {}
   type: LoadBalancer
 kubernetesClusterDomain: cluster.local
+
+fluent_bit:
+  enabled: false
+  
+  image:
+    repository: public.ecr.aws/aktosecurity/agent-traffic-collector
+    tag: "4.2.2"
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  flush: 5
+  metricsPort: 2020
+  logLevel: info
+  # default values 
+  logStorage:
+    sizeLimit: "1Gi"
+  stateStorage:
+    sizeLimit: "500Mi"

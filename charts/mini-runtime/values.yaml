@@ -237,7 +237,7 @@ redis:
     size: "2Gi"
     storageClass: ""
 
-fluent-bit:
+fluent_bit:
   enabled: false
   
   image:
