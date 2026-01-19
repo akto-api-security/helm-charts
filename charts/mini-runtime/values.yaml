@@ -237,11 +237,11 @@ redis:
     size: "2Gi"
     storageClass: ""
 
-fluent-bit:
+fluent_bit:
   enabled: false
   
   image:
-    repository: public.ecr.aws/aktosecurity/agent-traffic-collector
+    repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
     tag: "4.2.2"
     pullPolicy: IfNotPresent
 
