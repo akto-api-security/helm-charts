@@ -27,7 +27,7 @@ mini_runtime:
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.57.9_local
+      tag: 1.58.0_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -163,7 +163,7 @@ fluent_bit:
   enabled: false
   
   image:
-    repository: public.ecr.aws/aktosecurity/agent-traffic-collector
+    repository: public.ecr.aws/aktosecurity/akto-logging-sidecar 
     tag: "4.2.2"
     pullPolicy: IfNotPresent
 
