@@ -210,7 +210,7 @@ threat_client:
       useHostName: true
     image:
       repository: aktosecurity/akto-threat-detection
-      tag: "1.6.7"
+      tag: "1.8.9"
     imagePullPolicy: Always
     resources:
       requests:
@@ -236,3 +236,28 @@ redis:
     enabled: false
     size: "2Gi"
     storageClass: ""
+
+fluent-bit:
+  enabled: false
+  
+  image:
+    repository: public.ecr.aws/aktosecurity/agent-traffic-collector
+    tag: "4.2.2"
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  flush: 5
+  metricsPort: 2020
+  logLevel: info
+  # default values 
+  logStorage:
+    sizeLimit: "1Gi"
+  stateStorage:
+    sizeLimit: "500Mi"

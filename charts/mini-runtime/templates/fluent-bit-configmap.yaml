@@ -1,0 +1,93 @@
+{{- if .Values.fluent_bit.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "akto.fullname" . }}-fluent-bit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: fluent-bit
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon Off
+        Flush {{ .Values.fluent_bit.flush }}
+        Log_Level {{ .Values.fluent_bit.logLevel }}
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port {{ .Values.fluent_bit.metricsPort }}
+        Health_Check On
+        storage.path          /var/log/state/flb-storage/
+        storage.keep.rejected on
+        storage.rejected.path rejected
+
+    [INPUT]
+        Name tail
+        Path /var/log/app/*.log
+        Alias tail_runtime
+        Tag app.*
+        Mem_Buf_Limit 10MB
+        Skip_Long_Lines On
+        Refresh_Interval 10
+        DB /var/fluent-bit/state/flb_app.db
+        Read_from_Head On
+
+    [FILTER]
+        Name record_modifier
+        Match app.*
+        Record container_name akto-api-security-runtime
+
+    [FILTER]
+        Name nest
+        Match app.*
+        Operation nest
+        Wildcard k8s.*
+        Nest_under kubernetes
+        Remove_prefix k8s.
+
+    [FILTER]
+        Name record_modifier
+        Match app.*
+        Record kubernetes.pod_name ${POD_NAME}
+        Record kubernetes.namespace_name ${POD_NAMESPACE}
+        Record kubernetes.container_name akto-api-security-runtime
+        Record kubernetes.deployment_name {{ include "akto.fullname" . }}-mini-runtime
+        Record stream stdout
+
+    [OUTPUT]
+        Name http
+        Match app.*
+        Host observability.akto.io
+        Port 443
+        URI /logs
+        Format json
+        {{- /* compute header into single line to avoid extra indentation/blank lines */ -}}
+        {{- $header := "" -}}
+        {{- if and .Values.mini_runtime .Values.mini_runtime.aktoApiSecurityRuntime -}}
+          {{- $mr := .Values.mini_runtime -}}
+          {{- if $mr.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken -}}
+            {{- $secName := $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret -}}
+            {{- if $secName -}}
+              {{- $sec := lookup "v1" "Secret" .Release.Namespace $secName -}}
+              {{- if $sec -}}
+                {{- $header = printf "Header Authorization Bearer %s" (index $sec.data "token" | b64dec) -}}
+              {{- else -}}
+                {{- $header = printf "Header Authorization Bearer %s" (default "" $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.token) -}}
+              {{- end -}}
+            {{- else -}}
+              {{- $header = printf "Header Authorization Bearer %s" (default "" $mr.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.token) -}}
+            {{- end -}}
+          {{- else -}}
+            {{- $header = printf "Header Authorization Bearer %s" $mr.aktoApiSecurityRuntime.env.databaseAbstractorToken -}}
+          {{- end -}}
+        {{- end -}}
+        {{- if ne $header "" }}
+        {{ $header }}
+        {{- end }}
+        tls On
+        tls.verify On
+        net.keepalive on
+        net.keepalive_idle_timeout 30
+        retry_limit 3
+
+{{- end }}
