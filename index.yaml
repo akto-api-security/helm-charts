@@ -1124,6 +1124,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.6.3/akto-mini-runtime-0.6.3.tgz
     version: 0.6.3
   - apiVersion: v2
+    appVersion: 0.6.3-sha
+    created: "2026-01-27T15:54:22.294658098Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: 6aa71dd3188de9d19846e4ac62d56c514514b387cb497606085de52cf11bd67e
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.6.3-sha/akto-mini-runtime-0.6.3-sha.tgz
+    version: 0.6.3-sha
+  - apiVersion: v2
     appVersion: 0.6.2
     created: "2026-01-22T12:19:40.721353382Z"
     description: Helm chart for installing Akto hybrid runtime
@@ -2738,6 +2760,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.1/akto-threat-backend-0.1.1.tgz
     version: 0.1.1
   - apiVersion: v2
+    appVersion: 0.1.1-sha
+    created: "2026-01-27T15:54:22.527118279Z"
+    description: Helm chart for installing Akto threat backend
+    digest: c202197e91c94a52a351578c911b52a66a6a542cc90f32203c65fe9a49428afe
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-threat-backend
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-threat-backend
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.1-sha/akto-threat-backend-0.1.1-sha.tgz
+    version: 0.1.1-sha
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-11-25T15:31:09.142319138Z"
     description: Helm chart for installing Akto
@@ -2809,6 +2853,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.1/data-ingestion-service-0.1.1.tgz
     version: 0.1.1
   - apiVersion: v2
+    appVersion: 0.1.1-sha
+    created: "2026-01-27T15:54:22.76812165Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: 061e1e20589c09ab73d2cf2c89bf8bee4f4edf7f8f0748ba532d8125745af6cd
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.1-sha/data-ingestion-service-0.1.1-sha.tgz
+    version: 0.1.1-sha
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2025-10-08T15:03:30.895193626Z"
     description: Helm chart for Akto Data Ingestion Service
@@ -2849,4 +2915,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-23T13:13:38.298736723Z"
+generated: "2026-01-27T15:54:22.768587912Z"
