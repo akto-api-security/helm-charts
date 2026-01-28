@@ -488,8 +488,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: AKTO_ACCOUNT_NAME
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoAccountName }}
+        - name: IS_KUBERNETES
+          value: "true"
         - name: RUNTIME_MODE
           value: "hybrid"
+        - name: AKTO_CONFIG_NAME
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoConfigName }}
+        - name: AKTO_INSTANCE_TYPE
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoInstanceType }}
+        - name: USE_HOSTNAME
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.useHostName}}
         - name: AKTO_THREAT_DETECTION_POSTGRES
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUrl }}
         - name: AKTO_THREAT_DETECTION_POSTGRES_USER
