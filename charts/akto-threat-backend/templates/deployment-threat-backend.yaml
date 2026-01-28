@@ -70,7 +70,7 @@ spec:
           value: {{ quote .Values.threat_protection_backend.kafka1.env.kafkaClusterId }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.threat_protection_backend.kafka1.image.repository }}{{ if not (contains "@" .Values.threat_protection_backend.kafka1.image.repository) }}:{{ .Values.threat_protection_backend.kafka1.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.threat_protection_backend.kafka1.image.repository }}:{{ .Values.threat_protection_backend.kafka1.image.tag | default .Chart.AppVersion }}
         name: kafka1
         ports:
         - containerPort: 9092
@@ -89,7 +89,7 @@ spec:
           value: {{ quote .Values.threat_protection_backend.aktoApiSecurityThreatBackend.env.kafkaBrokerUrl }}
         - name: AKTO_LOG_LEVEL
           value: {{ quote .Values.threat_protection_backend.aktoApiSecurityThreatBackend.env.aktoLogLevel }}
-        image: {{ .Values.threat_protection_backend.aktoApiSecurityThreatBackend.image.repository }}{{ if not (contains "@" .Values.threat_protection_backend.aktoApiSecurityThreatBackend.image.repository) }}:{{ .Values.threat_protection_backend.aktoApiSecurityThreatBackend.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.threat_protection_backend.aktoApiSecurityThreatBackend.image.repository }}:{{ .Values.threat_protection_backend.aktoApiSecurityThreatBackend.image.tag | default .Chart.AppVersion }}
         name: akto-api-security-threat-backend
         ports:
         - containerPort: 9090

@@ -17,7 +17,7 @@ spec:
       restartPolicy: {{ .Values.dataIngestionService.restartPolicy }}
       containers:
       - name: data-ingestion-service
-        image: {{ .Values.dataIngestionService.image.repository }}{{ if not (contains "@" .Values.dataIngestionService.image.repository) }}:{{ .Values.dataIngestionService.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.dataIngestionService.image.repository }}:{{ .Values.dataIngestionService.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.dataIngestionService.imagePullPolicy }}
         ports:
         - containerPort: {{ .Values.dataIngestionService.service.targetPort }}
@@ -37,8 +37,6 @@ spec:
           value: {{ quote .Values.dataIngestionService.env.aktoKafkaTopicName }}
         - name: AKTO_LOG_LEVEL
           value: {{ quote .Values.dataIngestionService.env.aktoLogLevel }}
-        - name: AKTO_KAFKA_RECONNECT_INTERVAL_SECONDS
-          value: {{ quote .Values.dataIngestionService.env.aktoKafkaReconnectIntervalSeconds }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         resources:

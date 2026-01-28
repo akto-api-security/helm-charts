@@ -2,8 +2,8 @@ kubernetesClusterDomain: cluster.local
 
 dataIngestionService:
   image:
-    repository: aktosecurity/data-ingestion-service@sha256:d53854b0eac22c85888c3cb15888d1e91e16e1bb9846f32b8d0e8a504ca22c89
-    tag: ""
+    repository: aktosecurity/data-ingestion-service
+    tag: "latest"
   imagePullPolicy: Always
 
   env:
@@ -14,7 +14,6 @@ dataIngestionService:
     aktoKafkaProducerLingerMs: "10"
     aktoKafkaTopicName: "akto.api.logs"
     aktoLogLevel: "WARN"
-    aktoKafkaReconnectIntervalSeconds: "70"
 
   resources:
     requests:

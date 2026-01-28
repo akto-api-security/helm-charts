@@ -159,7 +159,7 @@ spec:
           value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
         {{- end }}
         {{- end }}
-        image: {{ .Values.mini_runtime.aktoApiSecurityRuntime.image.repository }}{{ if not (contains "@" .Values.mini_runtime.aktoApiSecurityRuntime.image.repository) }}:{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.mini_runtime.aktoApiSecurityRuntime.image.repository }}:{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.mini_runtime.aktoApiSecurityRuntime.imagePullPolicy }}
         name: akto-api-security-runtime
         resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
@@ -313,7 +313,7 @@ spec:
 
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.mini_runtime.kafka1.image.repository }}{{ if not (contains "@" .Values.mini_runtime.kafka1.image.repository) }}:{{ .Values.mini_runtime.kafka1.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.mini_runtime.kafka1.image.repository }}:{{ .Values.mini_runtime.kafka1.image.tag | default .Chart.AppVersion }}
         volumeMounts:
         {{- if .Values.mini_runtime.kafka1.useSasl }}
         - name: kafka-jaas-config
@@ -425,7 +425,7 @@ spec:
           value: {{ quote .Values.keel.keel.env.insecureRegistry }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.keel.keel.image.repository }}{{ if not (contains "@" .Values.keel.keel.image.repository) }}:{{ .Values.keel.keel.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.keel.keel.image.repository }}:{{ .Values.keel.keel.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
         livenessProbe:
           httpGet:
@@ -556,7 +556,7 @@ spec:
           value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
         {{- end }}
         {{- end}}
-        image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}{{ if not (contains "@" .Values.threat_client.aktoApiSecurityThreatClient.image.repository) }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag | default .Chart.AppVersion }}{{ end }}
+        image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.threat_client.aktoApiSecurityThreatClient.imagePullPolicy }}
         name: akto-api-security-threat-client
         resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}

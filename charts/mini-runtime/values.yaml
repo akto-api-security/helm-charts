@@ -65,8 +65,8 @@ mini_runtime:
         # Token to use if existingSecret is not provided
         token: ""
     image:
-      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime@sha256:ffedd525aff09e5b41f2a811e365935b7d714d19e7e70f87b0988d41974c3b1d
-      tag: ""
+      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
+      tag: 1.58.3_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -118,8 +118,8 @@ mini_runtime:
     useTls: false
     useSasl: false
     image:
-      repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka@sha256:d20bd62f01826c454e88530efc6d73654cb4697182f37206742b96c7b947236e
-      tag: ""
+      repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
+      tag: 8.1.1-1-ubi9
     resources:
       requests:
         cpu: 1.5
@@ -152,8 +152,8 @@ keel:
       notificationLevel: info
       webhookEndpoint: ""
     image:
-      repository: public.ecr.aws/aktosecurity/keelhq-keel@sha256:1eb61443d68eff7efe1dc5607e8b3054a518c4abba0aa840ffb6a19456b04507
-      tag: ""
+      repository: public.ecr.aws/aktosecurity/keelhq-keel
+      tag: akto_v1.0.0
     imagePullPolicy: IfNotPresent
     enabled: true
     resources:
@@ -209,8 +209,8 @@ threat_client:
       aktoLogLevel: WARN
       useHostName: true
     image:
-      repository: aktosecurity/akto-threat-detection@sha256:cdb0ced5dcc1c1fe4717343d6481d1581f8856c65ad8774fdfc483bcaa99354c
-      tag: ""
+      repository: aktosecurity/akto-threat-detection
+      tag: "1.8.9"
     imagePullPolicy: Always
     resources:
       requests:
@@ -222,8 +222,8 @@ threat_client:
 
 redis:
   image:
-    repository: redis@sha256:66aa868bf695bfbe0d812cd9cac8c7388bec0f4dcddc598d3718da1455a72366
-    tag: ""
+    repository: redis
+    tag: "7.0"
     pullPolicy: IfNotPresent
   resources:
     requests:
