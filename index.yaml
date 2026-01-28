@@ -2831,6 +2831,28 @@ entries:
     version: 0.1.0
   data-ingestion-service:
   - apiVersion: v2
+    appVersion: 0.1.2-sha
+    created: "2026-01-28T11:10:10.225146569Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: 7f58c30c85d641fbce39cedeb8b1826ec7c430c523a2ed0b22a000e5e311f198
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.2-sha/data-ingestion-service-0.1.2-sha.tgz
+    version: 0.1.2-sha
+  - apiVersion: v2
     appVersion: 0.1.1
     created: "2025-10-13T15:36:50.938169122Z"
     description: Helm chart for Akto Data Ingestion Service
@@ -2915,4 +2937,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-27T15:54:22.768587912Z"
+generated: "2026-01-28T11:10:10.225397649Z"
