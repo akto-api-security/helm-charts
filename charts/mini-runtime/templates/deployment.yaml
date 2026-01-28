@@ -480,6 +480,14 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         - name: RUNTIME_MODE
           value: "hybrid"
         - name: AKTO_THREAT_DETECTION_POSTGRES
