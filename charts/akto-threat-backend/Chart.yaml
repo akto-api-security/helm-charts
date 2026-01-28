@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-threat-backend
 description: Helm chart for installing Akto threat backend
 type: application
-version: 0.1.1-sha
-appVersion: "0.1.1-sha"
+version: 0.1.2
+appVersion: "0.1.2"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:
