@@ -1102,6 +1102,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.6.4
+    created: "2026-01-29T05:10:05.827515419Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: 295b23a4d47e20e47ec8d6b660bcdd3006fdeaed3880de24040a4ec5941e5273
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.6.4/akto-mini-runtime-0.6.4.tgz
+    version: 0.6.4
+  - apiVersion: v2
     appVersion: 0.6.3
     created: "2026-01-23T13:13:38.298226373Z"
     description: Helm chart for installing Akto hybrid runtime
@@ -2738,6 +2760,28 @@ entries:
     version: 1.42.12
   akto-threat-backend:
   - apiVersion: v2
+    appVersion: 0.1.2
+    created: "2026-01-29T05:10:05.971963435Z"
+    description: Helm chart for installing Akto threat backend
+    digest: 6025591302ae4a6a41279ba54f967856d249b95f9d6d644570d4967eee8bcf9e
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-threat-backend
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-threat-backend
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.2/akto-threat-backend-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 0.1.1
     created: "2025-12-02T08:15:50.594562478Z"
     description: Helm chart for installing Akto threat backend
@@ -2830,6 +2874,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/damn-vulnerable-mcp-server-0.1.0/damn-vulnerable-mcp-server-0.1.0.tgz
     version: 0.1.0
   data-ingestion-service:
+  - apiVersion: v2
+    appVersion: 0.1.3
+    created: "2026-01-29T05:10:06.125897912Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: 0b55de03d49ed5bf4535ae623713db21bfb392b27483ecf0ebe5db4860a35cdf
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.3/data-ingestion-service-0.1.3.tgz
+    version: 0.1.3
   - apiVersion: v2
     appVersion: 0.1.2-sha
     created: "2026-01-28T11:10:10.225146569Z"
@@ -2937,4 +3003,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-28T11:10:10.225397649Z"
+generated: "2026-01-29T05:10:06.126537483Z"
