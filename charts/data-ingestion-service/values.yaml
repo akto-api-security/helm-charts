@@ -1,5 +1,28 @@
 kubernetesClusterDomain: cluster.local
 
+# Node scheduling configuration
+nodeSelector: {}
+  # Example usage:
+  # nodetype: coreservices
+
+tolerations: []
+  # Example usage:
+  # - key: nodetype
+  #   operator: Equal
+  #   value: coreservices
+  #   effect: NoSchedule
+
+affinity: {}
+  # Example usage:
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #     - matchExpressions:
+  #       - key: nodetype
+  #         operator: In
+  #         values:
+  #         - coreservices
+
 dataIngestionService:
   image:
     repository: aktosecurity/data-ingestion-service
