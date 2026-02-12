@@ -1102,6 +1102,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.6.6-kafka-scram
+    created: "2026-02-12T10:28:38.221244021Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: ce28b60594074ea66e58eb7f2a4b6f72deb1e288383e77b03991f611e8fed22f
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.6.6-kafka-scram/akto-mini-runtime-0.6.6-kafka-scram.tgz
+    version: 0.6.6-kafka-scram
+  - apiVersion: v2
     appVersion: 0.6.5
     created: "2026-01-29T06:11:58.894983706Z"
     description: Helm chart for installing Akto hybrid runtime
@@ -2919,6 +2941,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.5-sha/data-ingestion-service-0.1.5-sha.tgz
     version: 0.1.5-sha
   - apiVersion: v2
+    appVersion: 0.1.5-kafka-scram
+    created: "2026-02-12T10:28:38.488060128Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: 9ac222160a3e0b13b407148f6fa9d920197fd1d93922aa13c768c12887952d2e
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.5-kafka-scram/data-ingestion-service-0.1.5-kafka-scram.tgz
+    version: 0.1.5-kafka-scram
+  - apiVersion: v2
     appVersion: 0.1.4
     created: "2026-02-02T13:29:34.309439432Z"
     description: Helm chart for Akto Data Ingestion Service
@@ -3113,4 +3157,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-03T06:38:39.923930117Z"
+generated: "2026-02-12T10:28:38.488579637Z"
