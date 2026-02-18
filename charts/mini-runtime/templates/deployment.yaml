@@ -2,16 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "akto.fullname" . }}-mini-runtime
-  {{ if .Values.keel.keel.enabled }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
   annotations:
+    {{- with .Values.mini_runtime.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.keel.keel.enabled }}
     keel.sh/policy: force
     keel.sh/match-tag: "true"
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@every 60m"
     keel.sh/monitorContainers: "runtime"
-  {{ end }}
-  labels:
-  {{- include "akto.labels" . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.mini_runtime.replicas }}
   selector:
@@ -23,6 +26,10 @@ spec:
       labels:
         app: {{ include "akto.fullname" . }}-mini-runtime
       {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.mini_runtime.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -452,6 +459,10 @@ metadata:
   labels:
     app: keel
   {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.keel.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.keel.replicas }}
   selector:
@@ -463,6 +474,10 @@ spec:
       labels:
         app: {{ include "akto.fullname" . }}-keel
       {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.keel.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -532,15 +547,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "akto.fullname" . }}-threat-client
-  {{ if .Values.keel.keel.enabled }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
   annotations:
+    {{- with .Values.threat_client.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.keel.keel.enabled }}
     keel.sh/policy: force
     keel.sh/match-tag: "true"
     keel.sh/trigger: poll
     keel.sh/pollSchedule: "@every 60m"
-  {{ end }}
-  labels:
-  {{- include "akto.labels" . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.threat_client.replicas }}
   selector:
@@ -552,6 +570,10 @@ spec:
       labels:
         app: {{ include "akto.fullname" . }}-threat-client
       {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.threat_client.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:

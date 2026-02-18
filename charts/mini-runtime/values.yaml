@@ -84,11 +84,11 @@ mini_runtime:
     imagePullPolicy: Always
     resources:
       requests:
-        cpu: 2
-        memory: "4Gi"
+        cpu: 1
+        memory: "2Gi"
       limits:
         cpu: 2
-        memory: "8Gi"
+        memory: "4Gi"
   kafka1:
     env:
       # add advertised listeners if you want to override the default listeners
@@ -147,7 +147,7 @@ mini_runtime:
         ephemeral-storage: "500Mi"
       limits:
         cpu: 1.5
-        memory: "8Gi"
+        memory: "4Gi"
         ephemeral-storage: "11Gi"
 
   replicas: 1
@@ -238,7 +238,7 @@ threat_client:
         memory: "2Gi"
       limits:
         cpu: 1.5
-        memory: "4Gi"
+        memory: "2.5Gi"
 
 redis:
   image:
@@ -251,7 +251,7 @@ redis:
       memory: "500Mi"
     limits:
       cpu: "900m"
-      memory: "1500Mi"
+      memory: "1Gi"
   persistence:
     enabled: false
     size: "2Gi"

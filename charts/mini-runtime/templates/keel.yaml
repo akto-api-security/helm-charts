@@ -6,6 +6,10 @@ metadata:
   labels:
     app: keel
   {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.keel.serviceAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   type: {{ .Values.keel.type }}
   selector:

@@ -52,6 +52,81 @@ Here are the steps to install Akto mini-runtime via Helm charts -
    helm upgrade akto-mini-runtime akto/akto-mini-runtime -n <namespace> --version <latest-version> --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<your-database-abstractor-token>"
    ```
 
+## Configuring Annotations
+
+You can add custom Kubernetes annotations to Service, Deployment, and Pod resources for all components. This is useful for integrating with monitoring systems, logging, or other Kubernetes-native tools.
+
+### Annotation Keys
+
+For each component (`mini_runtime`, `threat_client`, `keel`, `redis`), you can configure three types of annotations:
+
+- `<component>.deploymentAnnotations` - Applied to Deployment metadata
+- `<component>.podAnnotations` - Applied to Pod template metadata
+- `<component>.serviceAnnotations` - Applied to Service metadata
+
+### Examples
+
+#### 1. Add Prometheus monitoring annotations to pods
+
+```bash
+helm install akto-mini-runtime akto/akto-mini-runtime \
+  --set mini_runtime.podAnnotations."prometheus\.io/scrape"=true \
+  --set mini_runtime.podAnnotations."prometheus\.io/port"=9090 \
+  --set threat_client.podAnnotations."prometheus\.io/scrape"=true \
+  --set threat_client.podAnnotations."prometheus\.io/port"=8080
+```
+
+#### 2. Add custom labels to deployment metadata
+
+```bash
+helm install akto-mini-runtime akto/akto-mini-runtime \
+  --set mini_runtime.deploymentAnnotations."deployment\.kubernetes\.io/team"=platform \
+  --set mini_runtime.deploymentAnnotations."deployment\.kubernetes\.io/component"=api-security
+```
+
+#### 3. Configure AWS load balancer annotations on services
+
+```bash
+helm install akto-mini-runtime akto/akto-mini-runtime \
+  --set mini_runtime.serviceAnnotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=nlb \
+  --set mini_runtime.serviceAnnotations."service\.beta\.kubernetes\.io/aws-load-balancer-scheme"=internal
+```
+
+#### 4. Using values file
+
+Alternatively, you can configure annotations in a `values.yaml` file:
+
+```yaml
+mini_runtime:
+  deploymentAnnotations:
+    app.example.com/version: "1.0"
+    app.example.com/owner: "platform-team"
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+  serviceAnnotations:
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+threat_client:
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+
+redis:
+  podAnnotations:
+    app.example.com/component: "cache"
+```
+
+Then install with:
+
+```bash
+helm install akto-mini-runtime akto/akto-mini-runtime -f values.yaml
+```
+
+### Keel Auto-Update Annotations
+
+When Keel is enabled (`keel.keel.enabled=true`), deployment metadata annotations for `mini_runtime` and `threat_client` will automatically include Keel's update policy annotations. You can still add custom annotations alongside these managed annotations using `deploymentAnnotations`.
+
 ## Get Support for your Akto setup
 
 There are multiple ways to request support from Akto. We are 24X7 available on the following:
