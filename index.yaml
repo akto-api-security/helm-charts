@@ -3067,6 +3067,28 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.0/akto-threat-backend-0.1.0.tgz
     version: 0.1.0
+  api-gateway-logging:
+  - apiVersion: v2
+    appVersion: api-gateway-logging
+    created: "2026-02-18T12:31:20.57337758Z"
+    description: Helm chart for Akto API Gateway logging collector
+    digest: 1cf9c9c785c61693c64213d3358ee9cfba467e68aa4c9ceaa2aa7f6e20fe3665
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - api-gateway
+    - logging
+    - openapi
+    maintainers:
+    - name: Ankush Jain
+      url: https://www.akto.io
+    name: api-gateway-logging
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/api-gateway-logging-0.1.0/api-gateway-logging-0.1.0.tgz
+    version: 0.1.0
   damn-vulnerable-mcp-server:
   - apiVersion: v2
     appVersion: latest
@@ -3377,4 +3399,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-18T06:56:26.16063965Z"
+generated: "2026-02-18T12:31:20.573766411Z"
