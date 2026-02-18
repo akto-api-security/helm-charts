@@ -24,6 +24,10 @@ metadata:
   name: {{ include "akto.fullname" . }}-redis
   labels:
     {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.redis.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   replicas: 1
   selector:
@@ -35,6 +39,10 @@ spec:
       labels:
         app: {{ include "akto.fullname" . }}-redis
       {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.redis.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -83,6 +91,10 @@ metadata:
   name: {{ include "akto.fullname" . }}-redis
   labels:
     {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.redis.serviceAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ports:
   - port: 6379
