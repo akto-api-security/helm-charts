@@ -196,7 +196,7 @@ keel:
 
 ports:
   default:
-    - port: 9092 # Over-ride this to kafka service exposed port
+    - port: 9092 # Over-ride this to change kafka service exposed port
       targetPort: 9092
   tls:
     - name: plaintext
