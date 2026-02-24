@@ -201,21 +201,21 @@ keel:
 
 ports:
   default:
-    - port: 9092
+    - port: 9092  # Override via mini_runtime.kafka1.servicePort
       targetPort: 9092
   tls:
     - name: plaintext
-      port: 9092
+      port: 9092  # Override via mini_runtime.kafka1.servicePort
       targetPort: 9092
     - name: ssl
-      port: 9093
+      port: 9093  # Override via mini_runtime.kafka1.servicePortTls
       targetPort: 9093
   sasl:
     - name: sasl-plaintext
-      port: 9092
+      port: 9092  # Override via mini_runtime.kafka1.servicePort
       targetPort: 9092
     - name: sasl-ssl
-      port: 9093
+      port: 9093  # Override via mini_runtime.kafka1.servicePortTls
       targetPort: 9093
 
 threat_client:
