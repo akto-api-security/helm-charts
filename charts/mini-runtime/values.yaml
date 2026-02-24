@@ -196,7 +196,7 @@ keel:
 
 ports:
   default:
-    - port: 9092 # Change this to 80 for firewall-restricted environments
+    - port: 9092 # Over-ride this to kafka service exposed port
       targetPort: 9092
   tls:
     - name: plaintext
