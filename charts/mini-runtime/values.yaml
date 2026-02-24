@@ -196,21 +196,21 @@ keel:
 
 ports:
   default:
-    - port: 9092  # Change this to 80 for firewall-restricted environments
+    - port: 9092 # Change this to 80 for firewall-restricted environments
       targetPort: 9092
   tls:
     - name: plaintext
-      port: 9092  # Change this to 80 for firewall-restricted environments
+      port: 9092
       targetPort: 9092
     - name: ssl
-      port: 9093  # Change this to 443 for firewall-restricted environments
+      port: 9093
       targetPort: 9093
   sasl:
     - name: sasl-plaintext
-      port: 9092  # Change this to 80 for firewall-restricted environments
+      port: 9092
       targetPort: 9092
     - name: sasl-ssl
-      port: 9093  # Change this to 443 for firewall-restricted environments
+      port: 9093
       targetPort: 9093
 
 threat_client:
