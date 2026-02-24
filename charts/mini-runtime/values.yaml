@@ -79,8 +79,8 @@ mini_runtime:
         # Token to use if existingSecret is not provided
         token: ""
     image:
-      repository: aktosecurity/mini-runtime
-      digest: sha256:fbbe345d9c11407bb1b089438c6567b7b367d5c215431428b485fe8fc91a3334
+      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
+      tag: 1.61.2_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -139,7 +139,7 @@ mini_runtime:
     autoFormatWithScram: false
     image:
       repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
-      digest: sha256:d20bd62f01826c454e88530efc6d73654cb4697182f37206742b96c7b947236e
+      tag: 8.1.1-1-ubi9
     resources:
       requests:
         cpu: 1.5
@@ -196,7 +196,7 @@ keel:
 
 ports:
   default:
-    - port: 9092
+    - port: 9092 # Over-ride this to change kafka service exposed port
       targetPort: 9092
   tls:
     - name: plaintext
@@ -230,7 +230,7 @@ threat_client:
       useHostName: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      digest: sha256:b59092bc50886b5c47ecfd044a8708e573e662dad559bd080ce202a7d65d3eae
+      tag: 1.12.4
     imagePullPolicy: Always
     resources:
       requests:
