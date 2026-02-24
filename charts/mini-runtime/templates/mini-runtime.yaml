@@ -20,33 +20,10 @@ spec:
   {{- include "akto.selectorLabels" . | nindent 4 }}
   ports:
   {{- if .Values.mini_runtime.kafka1.useSasl }}
-  {{- range .Values.ports.sasl }}
-  - name: {{ .name }}
-    port: {{ if eq .name "sasl-plaintext" }}{{ $.Values.mini_runtime.kafka1.servicePort | default .port }}{{ else }}{{ $.Values.mini_runtime.kafka1.servicePortTls | default .port }}{{ end }}
-    targetPort: {{ .targetPort }}
-    {{- if .protocol }}
-    protocol: {{ .protocol }}
-    {{- end }}
-  {{- end }}
+  {{- .Values.ports.sasl | toYaml | nindent 4 -}}
   {{- else if .Values.mini_runtime.kafka1.useTls }}
-  {{- range .Values.ports.tls }}
-  - name: {{ .name }}
-    port: {{ if eq .name "plaintext" }}{{ $.Values.mini_runtime.kafka1.servicePort | default .port }}{{ else }}{{ $.Values.mini_runtime.kafka1.servicePortTls | default .port }}{{ end }}
-    targetPort: {{ .targetPort }}
-    {{- if .protocol }}
-    protocol: {{ .protocol }}
-    {{- end }}
-  {{- end }}
+  {{- .Values.ports.tls | toYaml | nindent 4 -}}
   {{- else }}
-  {{- range .Values.ports.default }}
-  - {{- if .name }}
-    name: {{ .name }}
-    {{- end }}
-    port: {{ $.Values.mini_runtime.kafka1.servicePort | default .port }}
-    targetPort: {{ .targetPort }}
-    {{- if .protocol }}
-    protocol: {{ .protocol }}
-    {{- end }}
-  {{- end }}
+  {{- .Values.ports.default | toYaml | nindent 4 -}}
   {{- end }}
 {{- end }}
