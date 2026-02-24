@@ -235,13 +235,13 @@ spec:
             {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
               {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
             {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePortTls | default 9093 }}, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
             {{- else if .Values.mini_runtime.kafka1.useSasl }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}
             {{- else if .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePort | default 9092 }},LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePortTls | default 9093 }}
             {{- else }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}
             {{- end }}
         - name: KAFKA_BROKER_ID
           value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}
@@ -607,9 +607,9 @@ spec:
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
             }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}{{ end }}
         - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}{{ end }}
         - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
           value: "redis://{{ include "akto.fullname" . }}-redis:6379"
 

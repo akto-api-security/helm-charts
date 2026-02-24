@@ -20,10 +20,21 @@ spec:
   {{- include "akto.selectorLabels" . | nindent 4 }}
   ports:
   {{- if .Values.mini_runtime.kafka1.useSasl }}
-  {{- .Values.ports.sasl | toYaml | nindent 4 -}}
+  - name: sasl-plaintext
+    port: {{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}
+    targetPort: 9092
+  - name: sasl-ssl
+    port: {{ .Values.mini_runtime.kafka1.servicePortTls | default 9093 }}
+    targetPort: 9093
   {{- else if .Values.mini_runtime.kafka1.useTls }}
-  {{- .Values.ports.tls | toYaml | nindent 4 -}}
+  - name: plaintext
+    port: {{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}
+    targetPort: 9092
+  - name: ssl
+    port: {{ .Values.mini_runtime.kafka1.servicePortTls | default 9093 }}
+    targetPort: 9093
   {{- else }}
-  {{- .Values.ports.default | toYaml | nindent 4 -}}
+  - port: {{ .Values.mini_runtime.kafka1.servicePort | default 9092 }}
+    targetPort: 9092
   {{- end }}
 {{- end }}
