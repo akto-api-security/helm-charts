@@ -53,6 +53,8 @@ spec:
             value: {{ (.Values.env.AKTO_KAFKA_BROKER_MAL | default (printf "%s.%s.svc.cluster.local:9092" (default (printf "%s-mini-runtime" .Values.miniRuntimeReleaseName) .Values.miniRuntimeServiceName) .Release.Namespace)) | quote }}
           - name: AKTO_K8_METADATA_CAPTURE
             value: {{ .Values.env.AKTO_K8_METADATA_CAPTURE | quote }}
+          - name: AKTO_THREAT_ENABLED
+            value: {{ .Values.env.AKTO_THREAT_ENABLED | quote }}
           - name: NODE_NAME
             valueFrom:
               fieldRef:
