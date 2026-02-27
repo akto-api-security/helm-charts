@@ -1030,6 +1030,30 @@ entries:
   akto-k8s-ebpf:
   - apiVersion: v2
     appVersion: k8s_ebpf
+    created: "2026-02-27T17:03:23.214355253Z"
+    description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API
+      logging
+    digest: 769e71c3aeb696e351cef0bbf8ff83dd8c3319be94aa6ac30e0e13e0aad6d95c
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - daemonset
+    - ebpf
+    - logging
+    - k8s
+    - metadata
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-k8s-ebpf
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-k8s-ebpf-0.1.3/akto-k8s-ebpf-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: k8s_ebpf
     created: "2026-01-12T14:29:05.174612049Z"
     description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API
       logging
@@ -3486,4 +3510,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-02-24T11:42:04.147665625Z"
+generated: "2026-02-27T17:03:23.214738063Z"
