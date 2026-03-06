@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-hybrid-redact
 description: Helm chart for installing Akto
 type: application
-version: 1.44.1
-appVersion: "1.44.1"
+version: 1.44.2
+appVersion: "1.44.2"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:
