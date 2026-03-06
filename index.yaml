@@ -1126,6 +1126,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.7.12-sha
+    created: "2026-03-06T11:59:41.678039816Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: d129d64cbd3d8462d58923ed55bdb483e9887c945a9a543c75b65487e7cba764
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.7.12-sha/akto-mini-runtime-0.7.12-sha.tgz
+    version: 0.7.12-sha
+  - apiVersion: v2
     appVersion: 0.7.10-sha
     created: "2026-03-04T18:26:58.478813226Z"
     description: Helm chart for installing Akto hybrid runtime
@@ -3598,4 +3620,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-04T18:26:58.643255412Z"
+generated: "2026-03-06T11:59:41.678456891Z"
