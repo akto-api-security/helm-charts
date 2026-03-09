@@ -277,6 +277,29 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-0.1.0/akto-ai-guardrails-0.1.0.tgz
     version: 0.1.0
+  akto-aws-api-gateway-connector:
+  - apiVersion: v2
+    appVersion: "1.0"
+    created: "2026-03-09T12:17:02.333346716Z"
+    description: Akto AWS API Gateway connector for EKS (CloudWatch Logs)
+    digest: f98e6adbee2b02d71a21841026b67ef442bc8fac4d8d9664d476185c4f646c37
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - api-gateway
+    - aws
+    - cloudwatch
+    - eks
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-aws-api-gateway-connector
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-aws-api-gateway-connector-0.1.0/akto-aws-api-gateway-connector-0.1.0.tgz
+    version: 0.1.0
   akto-dashboard:
   - apiVersion: v2
     appVersion: 0.1.5
@@ -3620,4 +3643,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-06T11:59:41.678456891Z"
+generated: "2026-03-09T12:17:02.333765316Z"
