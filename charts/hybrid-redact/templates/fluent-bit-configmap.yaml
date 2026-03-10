@@ -1,0 +1,71 @@
+{{- if .Values.fluent_bit.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "akto.fullname" . }}-fluent-bit
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: fluent-bit
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Daemon Off
+        Flush {{ .Values.fluent_bit.flush }}
+        Log_Level {{ .Values.fluent_bit.logLevel }}
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port {{ .Values.fluent_bit.metricsPort }}
+        Health_Check On
+        storage.path          /var/log/state/flb-storage/
+        storage.keep.rejected on
+        storage.rejected.path rejected
+
+    [INPUT]
+        Name tail
+        Path /var/log/app/*.log
+        Alias tail_runtime
+        Tag app.*
+        Mem_Buf_Limit 10MB
+        Skip_Long_Lines On
+        Refresh_Interval 10
+        DB /var/fluent-bit/state/flb_app.db
+        Read_from_Head On
+
+    [FILTER]
+        Name record_modifier
+        Match app.*
+        Record container_name akto-api-security-runtime
+
+    [FILTER]
+        Name nest
+        Match app.*
+        Operation nest
+        Wildcard k8s.*
+        Nest_under kubernetes
+        Remove_prefix k8s.
+
+    [FILTER]
+        Name record_modifier
+        Match app.*
+        Record kubernetes.pod_name ${POD_NAME}
+        Record kubernetes.namespace_name ${POD_NAMESPACE}
+        Record kubernetes.container_name akto-api-security-runtime
+        Record kubernetes.deployment_name {{ include "akto.fullname" . }}-mini-runtime
+        Record stream stdout
+
+    [OUTPUT]
+        Name http
+        Match app.*
+        Host observability.akto.io
+        Port 443
+        URI /logs
+        Format json
+        Header Authorization Bearer {{ .Values.tokens.env.databaseAbstractorToken }}
+        tls On
+        tls.verify On
+        net.keepalive on
+        net.keepalive_idle_timeout 30
+        retry_limit 3
+
+{{- end }}
