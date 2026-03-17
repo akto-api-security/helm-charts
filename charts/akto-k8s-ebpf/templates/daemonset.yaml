@@ -65,6 +65,16 @@ spec:
                 fieldPath: metadata.name
           - name: AKTO_IMAGE_VERSION
             value: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          - name: AKTO_MEM_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: mirror-api-logging
+                resource: limits.memory
+          - name: AKTO_CPU_LIMIT
+            valueFrom:
+              resourceFieldRef:
+                containerName: mirror-api-logging
+                resource: limits.cpu
         {{- with .Values.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}

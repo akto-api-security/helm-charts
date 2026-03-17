@@ -37,7 +37,7 @@ securityContext:
 # Resource limits and requests
 resources:
   limits:
-    cpu: 500m
+    cpu: 1
     memory: 1Gi
   requests:
     cpu: 50m
