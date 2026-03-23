@@ -114,9 +114,6 @@ threat_client:
     env:
       enabled: false
       aggregationRulesEnabled: false
-      postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
-      postgresUser: akto
-      postgresPassword: akto
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
