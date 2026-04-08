@@ -82,7 +82,7 @@ mini_runtime:
         token: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      digest: sha256:135c7eea3de0a6d432243b158d2676b2fb932a3635bd5ecf674097f48ed49047
+      digest: sha256:30b81665c22eebc1ad6db819021a145bd0a66d4ac7d5d6ab9211770df1aef86f
     imagePullPolicy: Always
     resources:
       requests:
