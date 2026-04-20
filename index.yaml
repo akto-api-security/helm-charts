@@ -1193,6 +1193,29 @@ entries:
     version: 0.1.0
   akto-k8s-ebpf-openshift:
   - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2026-04-20T10:48:51.587589212Z"
+    description: Akto eBPF DaemonSet for OpenShift (configurable SCC, hostNetwork,
+      BTF + host /proc mounts)
+    digest: cba17ad6d2997976465102e79bc0e2205dc3584efe2e197fcda10c6cecfa99f2
+    home: https://www.akto.io
+    keywords:
+    - akto
+    - openshift
+    - scc
+    - ebpf
+    - security
+    maintainers:
+    - name: Akto
+      url: https://www.akto.io
+    name: akto-k8s-ebpf-openshift
+    sources:
+    - https://github.com/akto-api-security/helm-charts
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-k8s-ebpf-openshift-0.1.1/akto-k8s-ebpf-openshift-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2026-04-19T13:42:40.078914388Z"
     description: Akto eBPF DaemonSet for OpenShift (configurable SCC, hostNetwork,
@@ -3843,4 +3866,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-19T13:42:40.079255043Z"
+generated: "2026-04-20T10:48:51.587976606Z"
