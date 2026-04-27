@@ -232,7 +232,7 @@ threat_client:
       useHostName: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      digest: sha256:1bd73a6606258800324bf96bd3425e371506ebe058efd34962b690e0400436a4
+      digest: sha256:414915b6eb0c9f5113c78f956b594e7aaacb7e4cf75a15abfd6372532852f3a9
     imagePullPolicy: Always
     resources:
       requests:
@@ -245,7 +245,7 @@ threat_client:
 redis:
   image:
     repository: public.ecr.aws/aktosecurity/redis
-    digest: sha256:47200b04138293fae39737e50878a238b13ec0781083126b1b0c63cf5d992e8d
+    digest: sha256:832d7785830f3f4b559300e6191fc914b15642c1935252338825cf4332200148
     pullPolicy: IfNotPresent
   resources:
     requests:
