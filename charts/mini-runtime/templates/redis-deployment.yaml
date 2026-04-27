@@ -68,6 +68,8 @@ spec:
           - ""
           - --dir
           - /data/
+          - --loadmodule
+          - /usr/local/lib/redis/modules/redisbloom.so
         ports:
         - containerPort: 6379
           name: redis
