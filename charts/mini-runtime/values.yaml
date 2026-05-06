@@ -34,8 +34,7 @@ affinity: {}
 
 mini_runtime:
   # External Kafka Configuration
-  # Set useExternalKafka to true to use an existing Kafka cluster
-  # When enabled, the internal Kafka container will not be deployed
+  # Set useExternalKafka to true to use an existing Kafka cluster outside of this chart
   useExternalKafka: false
   externalKafka:
     # Kafka broker URL (e.g., kafka.example.com:9092 or kafka1:9092,kafka2:9092,kafka3:9092)
@@ -56,8 +55,9 @@ mini_runtime:
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
-      aktoKafkaBrokerMal: localhost:29092
-      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      # Broker URL used when useExternalKafka: true (ignored when kafkaCluster.enabled: true)
+      aktoKafkaBrokerMal: ""
+      aktoKafkaBrokerUrl: ""
       aktoKafkaGroupIdConfig: asdf
       aktoKafkaMaxPollRecordsConfig: "100"
       aktoKafkaTopicName: akto.api.logs
@@ -75,7 +75,7 @@ mini_runtime:
       # If not using secrets, place token here.
       databaseAbstractorToken: ""
       # If using secrets, place token here.
-      databaseAbstractorTokenSecrets: 
+      databaseAbstractorTokenSecrets:
         # Name of an existing secret containing the Database Abstractor Token
         existingSecret: ""
         # Token to use if existingSecret is not provided
@@ -91,71 +91,78 @@ mini_runtime:
       limits:
         cpu: 2
         memory: "4Gi"
-  kafka1:
-    env:
-      # add advertised listeners if you want to override the default listeners
-      kafkaAdvertisedListeners: ""
-      kafkaBrokerId: "1"
-      kafkaCleanupPolicy: delete
-      kafkaCreateTopics: akto.api.logs:3:3
-      kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
-      kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
-      kafkaListenerSecurityProtocolMapSsl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
-      kafkaListenerSecurityProtocolMapSasl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:SASL_PLAINTEXT
-      kafkaListenerSecurityProtocolMapSaslTls: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_SSL,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT
-      kafkaProcessRoles: "broker,controller"
-      kafkaNodeId: "1"
-      kafkaControllerQuorumVoters: "1@localhost:9094"
-      kafkaControllerListenerNames: "CONTROLLER"
-      kafkaListeners: ""
-      kafkaLogCleanerEnable: "true"
-      kafkaLogRetentionBytes: "10737418240"
-      kafkaLogRetentionCheckIntervalMs: "60000"
-      kafkaLogRetentionHours: "5"
-      kafkaLogSegmentBytes: "104857600"
-      kafkaOffsetsTopicReplicationFactor: "1"
-      kafkaTransactionStateLogMinIsr: "1"
-      kafkaTransactionStateLogReplicationFactor: "1"
-      kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
-      sslKeystoreLocation: "/etc/kafka/ssl/secrets/server.keystore.jks"
-      sslKeystorePassword: "password"
-      sslKeyPassword: "password"
-      sslTruststoreLocation: "/etc/kafka/ssl/secrets/server.truststore.jks"
-      sslTruststorePassword: "password"
-      sslBaseMountPath: "/etc/kafka/ssl/secrets"
-      sslSecretName: "kafka-certs"
-      useSecretsForSaslCredentials: false
-      saslCredentialsSecrets:
-        existingSecret: ""
-        username: ""
-        password: ""
-      saslUsername: ""
-      saslPassword: ""
-      # SASL mechanism: PLAIN, SCRAM-SHA-256, or SCRAM-SHA-512
-      saslMechanism: "SCRAM-SHA-512"
-    useTls: false
-    useSasl: false
-    # Auto-format storage with SCRAM on first deployment (single helm install)
-    # When enabled, Kafka will format storage with SCRAM user on first run
-    # Requires persistence.enabled: true
-    autoFormatWithScram: false
-    image:
-      repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
-      tag: 8.2.0-1-ubi9
-    resources:
-      requests:
-        cpu: 1.5
-        memory: "4Gi"
-        ephemeral-storage: "500Mi"
-      limits:
-        cpu: 1.5
-        memory: "4Gi"
-        ephemeral-storage: "11Gi"
 
   replicas: 1
-  type: ClusterIP
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+# Strimzi-based Kafka cluster deployed by this chart
+# Requires the Strimzi operator to be installed first (see strimziInstall below)
+kafkaCluster:
+  enabled: false              # set true to deploy Strimzi Kafka CRDs
+  clusterName: "my-cluster"  # used in labels and bootstrap DNS
+
+  broker:
+    replicas: 3
+    storage:
+      size: "10Gi"
+      storageClass: ""       # leave empty for default StorageClass
+      deleteClaim: true
+
+  controller:
+    replicas: 1
+    storage:
+      size: "10Gi"
+      storageClass: ""
+      deleteClaim: true
+
+  config:
+    retentionMs: "604800000"       # 7 days
+    retentionBytes: "5368709120"   # 5GB per partition
+    cleanupPolicy: "delete"
+    defaultReplicationFactor: 3
+    minInsyncReplicas: 2
+    offsetsTopicReplicationFactor: 3
+    transactionStateLogReplicationFactor: 3
+    transactionStateLogMinIsr: 2
+
+  # Listener port overrides — also controls the bootstrap URL injected into runtime/threat-client
+  ports:
+    plain: 9092   # plain (or SASL) listener port
+    tls: 9093     # TLS listener port (only used when tls: true)
+
+  tls: false      # enable TLS listener; Strimzi auto-generates broker certs via cluster CA
+                  # CA cert stored in Secret: <clusterName>-cluster-ca-cert
+
+  sasl:
+    enabled: false
+    mechanism: "SCRAM-SHA-512"   # SCRAM-SHA-256 or SCRAM-SHA-512
+    username: "akto-runtime"
+    password: ""
+    useExistingSecret: false
+    existingSecret: ""           # existing Secret name; must have keys: username, password
+
+  # Annotations forwarded to Strimzi-generated Kafka Services via spec.kafka.template
+  # Replaces the old mini_runtime.serviceAnnotations / mini_runtime.annotations
+  serviceAnnotations: {}
+  # Example:
+  #   service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+  topics:
+    - name: "akto.api.logs"
+      partitions: 3
+      replicas: 3
+    - name: "akto.api.logs2"
+      partitions: 3
+      replicas: 3
+    - name: "akto.api.producer.logs"
+      partitions: 3
+      replicas: 3
+    - name: "akto.daemonset.producer.heartbeats"
+      partitions: 3
+      replicas: 3
+
+  # Pre-install hook to install the Strimzi operator automatically
+  strimziInstall:
+    enabled: true   # set false if Strimzi operator is already installed in the cluster
 
 keel:
   keel:
@@ -195,25 +202,6 @@ keel:
   serviceAccount:
     annotations: {}
   type: LoadBalancer
-
-ports:
-  default:
-    - port: 9092 # Over-ride this to change kafka service exposed port
-      targetPort: 9092
-  tls:
-    - name: plaintext
-      port: 9092
-      targetPort: 9092
-    - name: ssl
-      port: 9093
-      targetPort: 9093
-  sasl:
-    - name: sasl-plaintext
-      port: 9092
-      targetPort: 9092
-    - name: sasl-ssl
-      port: 9093
-      targetPort: 9093
 
 threat_client:
   replicas: 1
@@ -261,7 +249,7 @@ redis:
 
 fluent_bit:
   enabled: false
-  
+
   image:
     repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
     tag: latest
@@ -278,7 +266,7 @@ fluent_bit:
   flush: 5
   metricsPort: 2020
   logLevel: info
-  # default values 
+  # default values
   logStorage:
     sizeLimit: "1Gi"
   stateStorage:

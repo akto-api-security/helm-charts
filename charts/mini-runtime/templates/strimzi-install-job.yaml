@@ -1,0 +1,40 @@
+{{- if and .Values.kafkaCluster.enabled .Values.kafkaCluster.strimziInstall.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "akto.fullname" . }}-strimzi-install
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-strimzi-install
+    spec:
+      serviceAccountName: {{ include "akto.fullname" . }}-strimzi-installer
+      restartPolicy: OnFailure
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: kubectl
+          image: bitnami/kubectl:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl apply -f 'https://strimzi.io/install/latest?namespace={{ .Release.Namespace }}'
+              echo "Strimzi operator installation complete."
+{{- end }}
