@@ -28,7 +28,7 @@ testing:
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.55.0_local
+      tag: 1.59.3_local
     imagePullPolicy: Always
     resources:
       requests:

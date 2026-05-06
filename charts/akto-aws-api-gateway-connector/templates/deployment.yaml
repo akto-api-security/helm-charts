@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-logging
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: api-gateway-logging
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: api-gateway-logging
+    spec:
+      serviceAccountName: service-account-eks
+      containers:
+        - name: api-gateway-logging
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AWS_REGION
+              value: {{ .Values.env.awsRegion | quote }}
+            - name: LOG_GROUP_NAME
+              value: {{ .Values.env.logGroupName | quote }}
+            - name: AKTO_KAFKA_BROKER_MAL
+              value: {{ .Values.env.aktoKafkaBrokerMal | quote }}
+            - name: DATABASE_ABSTRACTOR_TOKEN
+              {{- if .Values.env.useSecretsForDatabaseAbstractorToken }}
+              valueFrom:
+                secretKeyRef:
+                  key: token
+                  name: {{ .Values.env.databaseAbstractorTokenSecrets.existingSecret | default (printf "%s-db-token" .Release.Name) }}
+              {{- else }}
+              value: {{ .Values.env.databaseAbstractorToken | quote }}
+              {{- end }}
+            - name: AKTO_BYTES_IN_THRESHOLD
+              value: {{ .Values.env.aktoBytesInThreshold | quote }}
+            - name: AKTO_TRAFFIC_BATCH_TIME_SECS
+              value: {{ .Values.env.aktoTrafficBatchTimeSecs | quote }}
+            - name: AKTO_TRAFFIC_BATCH_SIZE
+              value: {{ .Values.env.aktoTrafficBatchSize | quote }}
+            - name: CLOUDWATCH_READ_BATCH_SIZE
+              value: {{ .Values.env.cloudwatchReadBatchSize | quote }}
+            - name: DISCOVER_OPENAPI_SPEC
+              value: {{ .Values.env.discoverOpenApiSpec | quote }}
+            - name: OPENAPI_DISCOVERY_INTERVAL_MINUTES
+              value: {{ .Values.env.openApiDiscoveryIntervalMinutes | quote }}

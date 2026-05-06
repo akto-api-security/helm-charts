@@ -1,0 +1,17 @@
+apiVersion: v2
+name: api-gateway-logging
+description: Helm chart for Akto API Gateway logging collector
+type: application
+version: 0.1.2
+appVersion: "api-gateway-logging"
+home: https://www.akto.io
+sources:
+  - https://github.com/akto-api-security/helm-charts
+keywords:
+  - akto
+  - api-gateway
+  - logging
+  - openapi
+maintainers:
+  - name: Ankush Jain
+    url: https://www.akto.io

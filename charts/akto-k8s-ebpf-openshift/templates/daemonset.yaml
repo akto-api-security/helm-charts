@@ -1,0 +1,91 @@
+{{- if .Values.daemonset.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "akto-k8s-ebpf-openshift.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: akto-collector
+    {{- include "akto-k8s-ebpf-openshift.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: akto-collector
+      {{- include "akto-k8s-ebpf-openshift.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: akto-collector
+        {{- include "akto-k8s-ebpf-openshift.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      hostPID: {{ .Values.hostPID }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mirror-api-logging
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: AKTO_TRAFFIC_BATCH_TIME_SECS
+              value: {{ .Values.env.AKTO_TRAFFIC_BATCH_TIME_SECS | quote }}
+            - name: AKTO_TRAFFIC_BATCH_SIZE
+              value: {{ .Values.env.AKTO_TRAFFIC_BATCH_SIZE | quote }}
+            - name: AKTO_KAFKA_BROKER_MAL
+              value: {{ .Values.env.AKTO_KAFKA_BROKER_MAL | quote }}
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: HOST_PROC
+              value: {{ .Values.env.HOST_PROC | quote }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: sys-kernel-btf
+              mountPath: {{ .Values.volumeMounts.sysKernelBtf.mountPath }}
+              readOnly: {{ .Values.volumeMounts.sysKernelBtf.readOnly }}
+            - name: host-proc
+              mountPath: {{ .Values.volumeMounts.hostProc.mountPath }}
+              readOnly: {{ .Values.volumeMounts.hostProc.readOnly }}
+      volumes:
+        - name: sys-kernel-btf
+          hostPath:
+            path: {{ .Values.volumes.sysKernelBtf.hostPath }}
+            type: {{ .Values.volumes.sysKernelBtf.type }}
+        - name: host-proc
+          hostPath:
+            path: {{ .Values.volumes.hostProc.hostPath }}
+            type: {{ .Values.volumes.hostProc.type }}
+{{- end }}

@@ -1,0 +1,31 @@
+image:
+  repository: aktosecurity/mirror-api-logging
+  tag: api-gateway-logging-multi-logging
+  pullPolicy: Always
+
+replicas: 1
+
+# IRSA: IAM role ARN for the ServiceAccount (required at install: --set serviceAccount.roleArn=arn:aws:iam::ACCOUNT:role/ROLE_NAME)
+serviceAccount:
+  roleArn: ""
+
+# Override at install time via --set or -f if needed (keys are camelCase)
+env:
+  awsRegion: ""
+  logGroupName: ""
+  aktoKafkaBrokerMal: ""
+  # Database abstractor token: use direct value (below) or secrets (see databaseAbstractorTokenSecrets). Default: from secrets.
+  databaseAbstractorToken: ""
+  # If true (default), token is read from a Kubernetes Secret (created by Helm or existing)
+  useSecretsForDatabaseAbstractorToken: true
+  databaseAbstractorTokenSecrets:
+    # Name of an existing secret containing the token (key: token)
+    existingSecret: ""
+    # Token value when Helm creates the secret (used when existingSecret is not set)
+    token: ""
+  aktoBytesInThreshold: "100"
+  aktoTrafficBatchTimeSecs: "10"
+  aktoTrafficBatchSize: "100"
+  cloudwatchReadBatchSize: "5"
+  discoverOpenApiSpec: "true"
+  openApiDiscoveryIntervalMinutes: "15"

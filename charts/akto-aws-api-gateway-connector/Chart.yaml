@@ -1,0 +1,18 @@
+apiVersion: v2
+name: akto-aws-api-gateway-connector
+description: Akto AWS API Gateway connector for EKS (CloudWatch Logs)
+type: application
+version: 0.1.1
+appVersion: "1.0"
+home: https://www.akto.io
+sources:
+  - https://github.com/akto-api-security/helm-charts
+keywords:
+  - akto
+  - api-gateway
+  - aws
+  - cloudwatch
+  - eks
+maintainers:
+  - name: Akto
+    url: https://www.akto.io

@@ -1,0 +1,112 @@
+daemonset:
+  enabled: true
+
+image:
+  repository: public.ecr.aws/aktosecurity/mirror-api-logging
+  tag: k8s_ebpf_core_imp
+  pullPolicy: Always
+
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+hostPID: false
+
+podAnnotations: {}
+podLabels: {}
+
+# Pod-level securityContext (spec.securityContext). Matches openshift-local-deployments/daemonset.yaml.
+podSecurityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  runAsNonRoot: false
+
+tolerations: []
+nodeSelector: {}
+affinity: {}
+
+# Service account for the DaemonSet (SCC grant + optional scc.openshift.io/scc annotation).
+# Override name (e.g. akto-daemonset-serviceaccount) if you must match flat OpenShift YAMLs.
+serviceAccount:
+  create: true
+  name: pod-watcher
+  annotations: {}
+  sccAnnotation: true
+
+# ClusterRole for in-cluster pod metadata (same scope as akto-k8s-ebpf).
+rbac:
+  create: true
+
+# Cluster-scoped SecurityContextConstraints (OpenShift only). Requires cluster-admin install.
+# Defaults: minimal SCC verified on ARO for mirror-api-logging:k8s_ebpf_core_imp (hostNetwork + hostPath
+# + BPF/PERFMON/SYS_PTRACE; no SYS_ADMIN; no host PID/IPC; no privileged SCC).
+# Tighten further with examples/scc-profiles/*.yaml; override scc.name if you need a fixed resource name.
+scc:
+  create: true
+  name: akto-k8s-ebpf-openshift-scc
+  description: "eBPF SCC for Akto on OpenShift (hostNetwork, hostPath; capabilities per values)"
+  grantWithClusterRoleBinding: true
+  priority: 10
+  allowHostDirVolumePlugin: true
+  allowHostNetwork: true
+  allowHostIPC: false
+  allowHostPID: false
+  allowHostPorts: false
+  allowPrivilegedContainer: false
+  readOnlyRootFilesystem: false
+  allowedCapabilities:
+    - BPF
+    - PERFMON
+    - SYS_PTRACE
+  runAsUser:
+    type: RunAsAny
+    uidRangeMin: 100000
+    uidRangeMax: 2147483647
+  extraUsers:
+    - system:serviceaccount:akto:pod-watcher
+
+env:
+  AKTO_TRAFFIC_BATCH_TIME_SECS: "10"
+  AKTO_TRAFFIC_BATCH_SIZE: "100"
+  AKTO_KAFKA_BROKER_MAL: "akto-mini-runtime-mini-runtime.default.svc.cluster.local:9092"
+  HOST_PROC: "/host/proc"
+
+# Container securityContext (mirror-api-logging). Matches openshift-local-deployments/daemonset.yaml.
+securityContext:
+  runAsUser: 0
+  runAsGroup: 0
+  runAsNonRoot: false
+  allowPrivilegeEscalation: false
+  privileged: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - BPF
+      - PERFMON
+      - SYS_PTRACE
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 50m
+    memory: 50Mi
+
+volumes:
+  sysKernelBtf:
+    hostPath: /sys/kernel/btf
+    type: Directory
+  hostProc:
+    hostPath: /proc
+    type: Directory
+
+volumeMounts:
+  sysKernelBtf:
+    mountPath: /sys/kernel/btf
+    readOnly: true
+  hostProc:
+    mountPath: /host/proc
+    readOnly: true
+
+nameOverride: ""
+fullnameOverride: ""

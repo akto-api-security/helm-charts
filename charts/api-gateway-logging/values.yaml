@@ -1,0 +1,27 @@
+image:
+  repository: aktosecurity/mirror-api-logging
+  tag: api-gateway-logging-openapi
+  pullPolicy: Always
+
+replicas: 1
+
+env:
+  AKTO_BYTES_IN_THRESHOLD: "100"
+  AKTO_TRAFFIC_BATCH_TIME_SECS: "10"
+  AKTO_TRAFFIC_BATCH_SIZE: "100"
+  AKTO_KAFKA_BROKER_MAL: ""
+  AWS_ACCESS_KEY_ID: ""
+  AWS_SECRET_ACCESS_KEY: ""
+  AWS_SESSION_TOKEN: ""
+  CLOUDWATCH_READ_BATCH_SIZE: "5"
+  LOG_GROUP_NAME: ""
+  AWS_REGION: ""
+  DATABASE_ABSTRACTOR_TOKEN: ""
+  DISCOVER_OPENAPI_SPEC: "true"
+  OPENAPI_DISCOVERY_INTERVAL_MINUTES: "15"
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

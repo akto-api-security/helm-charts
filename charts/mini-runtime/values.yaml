@@ -65,6 +65,8 @@ mini_runtime:
       aktoTrafficBatchTimeSecs: "10"
       aktoLogLevel: WARN
       aktoRunMcpJobs: "true"
+      # Enable sending traffic to threat detection (runtime reads SEND_TO_THREAT_ENABLED env)
+      sendToThreatEnabled: "true"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
       databaseAbstractorUrl: https://cyborg.akto.io
@@ -79,8 +81,8 @@ mini_runtime:
         # Token to use if existingSecret is not provided
         token: ""
     image:
-      repository: aktosecurity/mini-runtime
-      digest: sha256:fbbe345d9c11407bb1b089438c6567b7b367d5c215431428b485fe8fc91a3334
+      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
+      tag: latest
     imagePullPolicy: Always
     resources:
       requests:
@@ -139,7 +141,7 @@ mini_runtime:
     autoFormatWithScram: false
     image:
       repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
-      digest: sha256:d20bd62f01826c454e88530efc6d73654cb4697182f37206742b96c7b947236e
+      tag: 8.2.0-1-ubi9
     resources:
       requests:
         cpu: 1.5
@@ -173,7 +175,7 @@ keel:
       webhookEndpoint: ""
     image:
       repository: public.ecr.aws/aktosecurity/keelhq-keel
-      digest: sha256:1eb61443d68eff7efe1dc5607e8b3054a518c4abba0aa840ffb6a19456b04507
+      tag: latest
     imagePullPolicy: IfNotPresent
     enabled: true
     resources:
@@ -196,7 +198,7 @@ keel:
 
 ports:
   default:
-    - port: 9092
+    - port: 9092 # Over-ride this to change kafka service exposed port
       targetPort: 9092
   tls:
     - name: plaintext
@@ -230,7 +232,7 @@ threat_client:
       useHostName: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      digest: sha256:b59092bc50886b5c47ecfd044a8708e573e662dad559bd080ce202a7d65d3eae
+      tag: latest
     imagePullPolicy: Always
     resources:
       requests:
@@ -243,7 +245,7 @@ threat_client:
 redis:
   image:
     repository: public.ecr.aws/aktosecurity/redis
-    digest: sha256:47200b04138293fae39737e50878a238b13ec0781083126b1b0c63cf5d992e8d
+    tag: latestV8.6.2
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -262,7 +264,7 @@ fluent_bit:
   
   image:
     repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
-    digest: sha256:7d727245767ae632eb296c2ff4d206bf2e205b5f244c1f37b8fdd61f9fb33985
+    tag: latest
     pullPolicy: IfNotPresent
 
   resources:

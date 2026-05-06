@@ -1,0 +1,49 @@
+{{- if .Values.scc.create }}
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: {{ .Values.scc.name }}
+  labels:
+    {{- include "akto-k8s-ebpf-openshift.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/description: {{ .Values.scc.description | quote }}
+allowHostDirVolumePlugin: {{ .Values.scc.allowHostDirVolumePlugin }}
+allowHostIPC: {{ .Values.scc.allowHostIPC }}
+allowHostNetwork: {{ .Values.scc.allowHostNetwork }}
+allowHostPID: {{ .Values.scc.allowHostPID }}
+allowHostPorts: {{ .Values.scc.allowHostPorts }}
+allowPrivilegedContainer: {{ .Values.scc.allowPrivilegedContainer }}
+allowedCapabilities:
+  {{- toYaml .Values.scc.allowedCapabilities | nindent 2 }}
+defaultAddCapabilities: []
+requiredDropCapabilities:
+  - ALL
+readOnlyRootFilesystem: {{ .Values.scc.readOnlyRootFilesystem }}
+{{- if eq .Values.scc.runAsUser.type "RunAsAny" }}
+runAsUser:
+  type: RunAsAny
+{{- else }}
+runAsUser:
+  type: MustRunAsRange
+  uidRangeMin: {{ .Values.scc.runAsUser.uidRangeMin }}
+  uidRangeMax: {{ .Values.scc.runAsUser.uidRangeMax }}
+{{- end }}
+seLinuxContext:
+  type: MustRunAs
+fsGroup:
+  type: RunAsAny
+supplementalGroups:
+  type: RunAsAny
+users:
+  - system:serviceaccount:{{ .Release.Namespace }}:{{ .Values.serviceAccount.name }}
+  {{- range .Values.scc.extraUsers }}
+  - {{ . }}
+  {{- end }}
+volumes:
+  - configMap
+  - secret
+  - emptyDir
+  - projected
+  - hostPath
+priority: {{ .Values.scc.priority }}
+{{- end }}

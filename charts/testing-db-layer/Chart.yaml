@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-testing-db-layer
 description: Helm chart for installing Akto
 type: application
-version: 1.42.15
-appVersion: "1.42.15"
+version: 1.42.16
+appVersion: "1.42.16"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:

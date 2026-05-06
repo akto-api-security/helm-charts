@@ -68,8 +68,11 @@ dataIngestionService:
   useSasl: false  # Set to true to enable SASL authentication
 
   kafka:
+    saslMechanism: "SCRAM-SHA-256"
     saslUsername: ""
     saslPassword: ""
+    # Security protocol: SASL_PLAINTEXT or SASL_SSL (for MSK/TLS)
+    securityProtocol: "SASL_PLAINTEXT"
 
     useSecretsForSaslCredentials: false
     saslCredentialsSecrets:

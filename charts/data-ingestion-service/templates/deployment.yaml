@@ -107,7 +107,7 @@ spec:
         - name: AKTO_KAFKA_SASL_MECHANISM
           value: {{ quote .Values.dataIngestionService.kafka.saslMechanism }}
         - name: AKTO_KAFKA_SECURITY_PROTOCOL
-          value: "SASL_PLAINTEXT"
+          value: {{ quote (.Values.dataIngestionService.kafka.securityProtocol | default "SASL_PLAINTEXT") }}
         {{- if and .Values.dataIngestionService.useSasl .Values.dataIngestionService.kafka.useSecretsForSaslCredentials }}
         - name: AKTO_KAFKA_USERNAME
           valueFrom:

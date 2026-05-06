@@ -138,6 +138,8 @@ spec:
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoLogLevel }}
         - name: AKTO_RUN_MCP_JOBS
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoRunMcpJobs }}
+        - name: SEND_TO_THREAT_ENABLED
+          value: {{ quote (.Values.mini_runtime.aktoApiSecurityRuntime.env.sendToThreatEnabled | default "true") }}
         - name: AKTO_MONGO_CONN
           value: {{ quote .Values.mongo.aktoMongoConn }}
         - name: USE_HOSTNAME
@@ -235,13 +237,13 @@ spec:
             {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
               {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
             {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 1).port }}, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
             {{- else if .Values.mini_runtime.kafka1.useSasl }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 0).port }}
             {{- else if .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9093
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 0).port }},LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 1).port }}
             {{- else }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}
             {{- end }}
         - name: KAFKA_BROKER_ID
           value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}
@@ -607,9 +609,9 @@ spec:
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
             }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
         - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
         - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
           value: "redis://{{ include "akto.fullname" . }}-redis:6379"
 
@@ -647,6 +649,10 @@ spec:
           value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.saslMechanism }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}{{ end }}
         - name: KAFKA_AUTH_ENABLED
           value: "true"
+        {{- if .Values.mini_runtime.useExternalKafka }}
+        - name: AKTO_KAFKA_SECURITY_PROTOCOL
+          value: {{ quote .Values.mini_runtime.externalKafka.securityProtocol }}
+        {{- end }}
         {{- if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
         - name: KAFKA_USERNAME
           valueFrom:
@@ -658,10 +664,24 @@ spec:
             secretKeyRef:
               name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
               key: password
+        - name: AKTO_KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: AKTO_KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: password
         {{- else }}
         - name: KAFKA_USERNAME
           value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.username }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}
         - name: KAFKA_PASSWORD
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
+        - name: AKTO_KAFKA_USERNAME
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.username }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}
+        - name: AKTO_KAFKA_PASSWORD
           value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
         {{- end }}
         {{- end}}

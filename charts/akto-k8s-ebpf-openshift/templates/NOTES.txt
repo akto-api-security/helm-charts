@@ -1,0 +1,38 @@
+Akto OpenShift eBPF DaemonSet has been installed in namespace "{{ .Release.Namespace }}".
+
+Documentation: https://docs.akto.io/getting-started/quick-start-with-akto-self-hosted/openshift-deploy
+
+Chart defaults use SCC name {{ .Values.scc.name }} and ServiceAccount {{ .Values.serviceAccount.name }}.
+SCC knobs (capabilities, host PID/IPC, privileged) follow values.yaml; the DaemonSet uses non-privileged
+container securityContext with BPF, PERFMON, SYS_PTRACE and read-only mounts for /sys/kernel/btf and host /proc.
+To match flat openshift-local-deployments names, set serviceAccount.name to akto-daemonset-serviceaccount
+and scc.name to akto-ebpf-scc (and adjust scc.extraUsers if needed).
+
+The SCC grant uses a Helm post-install/post-upgrade hook so the OpenShift-generated
+ClusterRole system:openshift:scc:{{ .Values.scc.name }} exists before the SCC ClusterRoleBinding
+is created.
+
+1. Deploy the rest of Akto with Helm as described in the Akto Helm deploy guide.
+
+2. Set env.AKTO_KAFKA_BROKER_MAL to your mini-runtime Kafka DNS name in this cluster
+   (for example akto-mini-runtime-mini-runtime.<namespace>.svc.cluster.local:9092).
+
+3. Optional: set fullnameOverride to "akto-k8s-ebpf" if you need the DaemonSet name to match
+   flat YAML examples exactly.
+
+4. If some clusters block capture on all interfaces, follow Akto guidance for a dedicated
+   interface (for example br-ex).
+
+5. SCC hardening experiments: under examples/scc-profiles/, use isolate-*.yaml (one knob each) or
+   cumulative-minimal.yaml. After changing SCC, pods must restart to re-admit:
+     chmod +x examples/scc-profiles/rollout-test.sh
+     ./examples/scc-profiles/rollout-test.sh {{ .Release.Namespace }} {{ .Release.Name }} examples/scc-profiles/isolate-drop-SYS_ADMIN.yaml
+   isolate-allowHostNetwork-false / isolate-allowHostDirVolumePlugin-false are expected to fail with the current DaemonSet.
+   On failure: helm rollback {{ .Release.Name }} -n {{ .Release.Namespace }} or re-apply a looser -f profile.
+   Do not use helm upgrade --reuse-values with these fragments alone; use rollout-test.sh (merges prior values + profile).
+
+{{- if not .Values.scc.grantWithClusterRoleBinding }}
+
+6. Grant the SCC to the ServiceAccount (cluster admin), for example:
+     oc adm policy add-scc-to-user {{ .Values.scc.name }} -z {{ .Values.serviceAccount.name }} -n {{ .Release.Namespace }}
+{{- end }}

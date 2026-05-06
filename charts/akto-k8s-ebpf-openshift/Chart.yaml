@@ -1,16 +1,15 @@
 apiVersion: v2
-name: akto-k8s-ebpf
-description: Akto Kubernetes DaemonSet with eBPF for metadata capture and API logging
+name: akto-k8s-ebpf-openshift
+description: Akto eBPF DaemonSet for OpenShift (configurable SCC, hostNetwork, BTF + host /proc mounts)
 type: application
-version: 0.1.3
-appVersion: "k8s_ebpf"
+version: 0.1.1
+appVersion: "0.1.1"
 keywords:
   - akto
-  - daemonset
+  - openshift
+  - scc
   - ebpf
-  - logging
-  - k8s
-  - metadata
+  - security
 home: "https://www.akto.io"
 sources:
   - "https://github.com/akto-api-security/helm-charts"
