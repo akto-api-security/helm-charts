@@ -130,25 +130,6 @@ spec:
         secretKeyRef:
           name: {{ if .Values.kafkaCluster.sasl.useExistingSecret }}{{ .Values.kafkaCluster.sasl.existingSecret | quote }}{{ else }}{{ printf "%s-sasl-credentials" .Values.kafkaCluster.clusterName | quote }}{{ end }}
           key: password
-  authorization:
-    type: simple
-    acls:
-      - resource:
-          type: topic
-          name: "*"
-          patternType: literal
-        operations:
-          - Read
-          - Write
-          - Create
-          - Describe
-      - resource:
-          type: group
-          name: "*"
-          patternType: literal
-        operations:
-          - Read
-          - Describe
 {{- end }}
 {{- range .Values.kafkaCluster.topics }}
 ---
