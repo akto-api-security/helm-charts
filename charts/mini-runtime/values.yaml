@@ -88,10 +88,10 @@ mini_runtime:
 
   replicas: 1
 
-# Strimzi-based Kafka cluster deployed by this chart
-# Requires the Strimzi operator to be installed first (see strimziInstall below)
+# Strimzi-based Kafka cluster (default mode)
+# Set mini_runtime.useExternalKafka: true to disable and use your own Kafka instead
 kafkaCluster:
-  enabled: false              # set true to deploy Strimzi Kafka CRDs
+  enabled: true
   clusterName: "my-cluster"  # used in labels and bootstrap DNS
 
   broker:
@@ -168,10 +168,6 @@ kafkaCluster:
     - name: "akto.daemonset.producer.heartbeats"
       partitions: 1
       replicas: 1
-
-  # Pre-install hook to install the Strimzi operator automatically
-  strimziInstall:
-    enabled: true   # set false if Strimzi operator is already installed in the cluster
 
 keel:
   keel:

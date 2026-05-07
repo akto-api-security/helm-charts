@@ -4,20 +4,27 @@
 
 Deploys the Akto hybrid runtime stack into a Kubernetes cluster. The chart installs:
 - **mini-runtime** deployment — API security runtime container
-- **Strimzi Kafka cluster** (optional, `kafkaCluster.enabled: true`) — Strimzi-managed Kafka via KafkaNodePool, Kafka, KafkaTopic, and KafkaUser CRDs
-- **Strimzi operator install hook** (optional, `kafkaCluster.strimziInstall.enabled: true`) — pre-install Job that runs `kubectl apply` to install the Strimzi operator
+- **Strimzi Kafka cluster** (default) — Strimzi operator + KafkaNodePool, Kafka, KafkaTopic CRDs via Helm subchart dependency
 - **Keel** deployment (auto-updater)
 - **Threat detection client** deployment
 - **Redis** deployment (when threat client + aggregation rules enabled)
 
-**Kafka options:**
-- `kafkaCluster.enabled: true` — Strimzi-managed Kafka deployed by this chart (recommended)
-- `mini_runtime.useExternalKafka: true` — bring your own Kafka cluster
-- Both false — no Kafka; you must provide broker URLs manually via `aktoKafkaBrokerUrl`/`aktoKafkaBrokerMal`
+**Two Kafka modes:**
+- **Strimzi mode** (default, `kafkaCluster.enabled: true`) — Strimzi operator and Kafka cluster deployed automatically by this chart
+- **External mode** (`mini_runtime.useExternalKafka: true`) — bring your own Kafka; disables all Strimzi resources
 
 **Current install command:**
 ```sh
 helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken=""
+```
+
+**External Kafka install command:**
+```sh
+helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
+  --set kafkaCluster.enabled=false \
+  --set mini_runtime.useExternalKafka=true \
+  --set mini_runtime.externalKafka.brokerUrl="kafka1:9092" \
   --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken=""
 ```
 
@@ -43,22 +50,14 @@ helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
 ```
 
 This will:
-1. Run a pre-install Job to install the Strimzi operator (`strimzi.sh` equivalent)
-2. Deploy a 3-broker + 1-controller KRaft Kafka cluster named `my-cluster`
+1. Install the Strimzi operator via the bundled Helm subchart dependency
+2. Deploy a 1-broker + 1-controller KRaft Kafka cluster named `my-cluster`
 3. Create 4 KafkaTopics (`akto.api.logs`, `akto.api.logs2`, `akto.api.producer.logs`, `akto.daemonset.producer.heartbeats`)
 4. Auto-configure the runtime and threat client to connect to `my-cluster-kafka-bootstrap.<namespace>.svc.cluster.local:9092`
 
-### Strimzi operator install hook
+### Strimzi operator
 
-A pre-install/pre-upgrade Helm hook Job installs the Strimzi operator before the chart resources are created.
-
-```yaml
-kafkaCluster:
-  strimziInstall:
-    enabled: true   # set false if Strimzi is already installed in the cluster
-```
-
-The Job uses a ServiceAccount with `cluster-admin` ClusterRoleBinding (required to create Strimzi CRDs). The Job and its RBAC are deleted after success (`hook-delete-policy: hook-succeeded`).
+The Strimzi operator is bundled as a Helm subchart (`strimzi/strimzi-kafka-operator 0.51.0`). It is installed automatically when `kafkaCluster.enabled: true` and skipped when `kafkaCluster.enabled: false` (external Kafka mode). Helm handles idempotency — re-installing or upgrading is safe even if the operator is already present.
 
 ### Cluster topology
 
@@ -271,8 +270,7 @@ Annotation injection points — **not in default values.yaml**, add as needed:
 
 | Component | Enabled when | Default |
 |-----------|-------------|---------|
-| Strimzi install hook (Job + RBAC) | `kafkaCluster.enabled: true` AND `kafkaCluster.strimziInstall.enabled: true` | disabled |
-| Strimzi CRDs (Kafka, NodePools, Topics, User) | `kafkaCluster.enabled: true` | disabled |
+| Strimzi operator (subchart) + Strimzi CRDs (Kafka, NodePools, Topics, User) | `kafkaCluster.enabled: true` | **enabled** |
 | Kafka SASL Secret + KafkaUser | `kafkaCluster.enabled: true` AND `kafkaCluster.sasl.enabled: true` AND `useExistingSecret: false` | disabled |
 | Strimzi CA cert volume mount | `kafkaCluster.enabled: true` AND `kafkaCluster.tls: true` | disabled |
 | Keel deployment + RBAC | `keel.keel.enabled: true` | **enabled** |
@@ -335,14 +333,6 @@ Applied to all deployments and the Strimzi install Job.
 ```sh
 helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
   --set kafkaCluster.enabled=true \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<token>"
-```
-
-**Deploy with Strimzi Kafka (Strimzi already installed):**
-```sh
-helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
-  --set kafkaCluster.enabled=true \
-  --set kafkaCluster.strimziInstall.enabled=false \
   --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<token>"
 ```
 
