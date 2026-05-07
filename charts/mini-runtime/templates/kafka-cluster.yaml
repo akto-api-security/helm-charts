@@ -10,6 +10,8 @@ spec:
   replicas: {{ .Values.kafkaCluster.controller.replicas }}
   roles:
     - controller
+  resources:
+    {{- toYaml .Values.kafkaCluster.controller.resources | nindent 4 }}
   storage:
     type: jbod
     volumes:
@@ -32,6 +34,8 @@ spec:
   replicas: {{ .Values.kafkaCluster.broker.replicas }}
   roles:
     - broker
+  resources:
+    {{- toYaml .Values.kafkaCluster.broker.resources | nindent 4 }}
   storage:
     type: jbod
     volumes:

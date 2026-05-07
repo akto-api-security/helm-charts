@@ -95,7 +95,14 @@ kafkaCluster:
   clusterName: "my-cluster"  # used in labels and bootstrap DNS
 
   broker:
-    replicas: 3
+    replicas: 1             # increase to 3 for HA (also bump replication factors below)
+    resources:
+      requests:
+        cpu: "1.5"
+        memory: "4Gi"
+      limits:
+        cpu: "1.5"
+        memory: "4Gi"
     storage:
       size: "10Gi"
       storageClass: ""       # leave empty for default StorageClass
@@ -103,6 +110,13 @@ kafkaCluster:
 
   controller:
     replicas: 1
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
     storage:
       size: "10Gi"
       storageClass: ""
@@ -112,11 +126,12 @@ kafkaCluster:
     retentionMs: "604800000"       # 7 days
     retentionBytes: "5368709120"   # 5GB per partition
     cleanupPolicy: "delete"
-    defaultReplicationFactor: 3
-    minInsyncReplicas: 2
-    offsetsTopicReplicationFactor: 3
-    transactionStateLogReplicationFactor: 3
-    transactionStateLogMinIsr: 2
+    # set to 3 when broker.replicas: 3
+    defaultReplicationFactor: 1
+    minInsyncReplicas: 1
+    offsetsTopicReplicationFactor: 1
+    transactionStateLogReplicationFactor: 1
+    transactionStateLogMinIsr: 1
 
   # Listener port overrides — also controls the bootstrap URL injected into runtime/threat-client
   ports:
@@ -142,17 +157,17 @@ kafkaCluster:
 
   topics:
     - name: "akto.api.logs"
-      partitions: 3
-      replicas: 3
+      partitions: 1         # increase to 3 when broker.replicas: 3
+      replicas: 1           # increase to 3 when broker.replicas: 3
     - name: "akto.api.logs2"
-      partitions: 3
-      replicas: 3
+      partitions: 1
+      replicas: 1
     - name: "akto.api.producer.logs"
-      partitions: 3
-      replicas: 3
+      partitions: 1
+      replicas: 1
     - name: "akto.daemonset.producer.heartbeats"
-      partitions: 3
-      replicas: 3
+      partitions: 1
+      replicas: 1
 
   # Pre-install hook to install the Strimzi operator automatically
   strimziInstall:
