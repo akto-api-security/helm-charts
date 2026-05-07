@@ -16,3 +16,8 @@ keywords:
 maintainers:
   - name: Ankush Jain
     email: ankush@akto.io
+dependencies:
+  - name: strimzi-kafka-operator
+    version: "0.51.0"
+    repository: "https://strimzi.io/charts/"
+    condition: kafkaCluster.strimziInstall.enabled

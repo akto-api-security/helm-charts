@@ -1,6 +1,6 @@
 {{- if .Values.kafkaCluster.enabled }}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
   name: controller
@@ -22,7 +22,7 @@ spec:
         kraftMetadata: shared
         deleteClaim: {{ .Values.kafkaCluster.controller.storage.deleteClaim }}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
   name: broker
@@ -44,7 +44,7 @@ spec:
         kraftMetadata: shared
         deleteClaim: {{ .Values.kafkaCluster.broker.storage.deleteClaim }}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: {{ .Values.kafkaCluster.clusterName | quote }}
@@ -112,7 +112,7 @@ data:
   password: {{ .Values.kafkaCluster.sasl.password | b64enc | quote }}
 ---
 {{- end }}
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaUser
 metadata:
   name: {{ .Values.kafkaCluster.sasl.username | quote }}
@@ -148,7 +148,7 @@ spec:
 {{- end }}
 {{- range .Values.kafkaCluster.topics }}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
   name: {{ .name | quote }}
