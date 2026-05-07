@@ -51,9 +51,9 @@ helm install akto-mini-runtime akto/akto-mini-runtime -n dev \
 
 This will:
 1. Install the Strimzi operator via the bundled Helm subchart dependency
-2. Deploy a 1-broker + 1-controller KRaft Kafka cluster named `my-cluster`
+2. Deploy a 1-broker + 1-controller KRaft Kafka cluster named `akto-kafka`
 3. Create 4 KafkaTopics (`akto.api.logs`, `akto.api.logs2`, `akto.api.producer.logs`, `akto.daemonset.producer.heartbeats`)
-4. Auto-configure the runtime and threat client to connect to `my-cluster-kafka-bootstrap.<namespace>.svc.cluster.local:9092`
+4. Auto-configure the runtime and threat client to connect to `akto-kafka-kafka-bootstrap.<namespace>.svc.cluster.local:9092`
 
 ### Strimzi operator
 
@@ -63,7 +63,7 @@ The Strimzi operator is bundled as a Helm subchart (`strimzi/strimzi-kafka-opera
 
 ```yaml
 kafkaCluster:
-  clusterName: "my-cluster"
+  clusterName: "akto-kafka"
   broker:
     replicas: 3
     storage:
