@@ -318,7 +318,7 @@ spec:
         resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
       serviceAccountName: {{ include "akto.fullname" . }}-keel
 {{ end }}
-
+---
 {{ if .Values.threat_client.aktoApiSecurityThreatClient.env.enabled }}
 apiVersion: apps/v1
 kind: Deployment

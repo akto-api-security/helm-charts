@@ -1,0 +1,55 @@
+suite: Service Annotations
+templates:
+  - templates/kafka-cluster.yaml
+
+tests:
+  # ── template block rendered with annotations on both services ─────────────
+  - it: renders spec.kafka.template with annotations on bootstrap and brokers services
+    set:
+      kafkaCluster.serviceAnnotations:
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.template.bootstrapService.metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-internal"]
+          value: "true"
+      - equal:
+          path: spec.kafka.template.bootstrapService.metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-type"]
+          value: nlb
+      - equal:
+          path: spec.kafka.template.brokersService.metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-internal"]
+          value: "true"
+
+  # ── No template block when serviceAnnotations empty (default) ─────────────
+  - it: does not render spec.kafka.template block when serviceAnnotations is empty
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - notExists:
+          path: spec.kafka.template
+
+  # ── Single annotation forwarded to both services ──────────────────────────
+  - it: forwards a single annotation to both bootstrapService and brokersService
+    set:
+      kafkaCluster.serviceAnnotations:
+        custom.io/annotation: my-value
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.template.bootstrapService.metadata.annotations["custom.io/annotation"]
+          value: my-value
+      - equal:
+          path: spec.kafka.template.brokersService.metadata.annotations["custom.io/annotation"]
+          value: my-value

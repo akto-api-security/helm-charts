@@ -1,0 +1,154 @@
+suite: External Kafka Mode
+templates:
+  - templates/kafka-cluster.yaml
+  - templates/deployment.yaml
+
+tests:
+  # ── No documents when kafkaCluster disabled ───────────────────────────────
+  - it: renders no documents when kafkaCluster disabled
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: kafka1:9092
+    template: templates/kafka-cluster.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # ── Runtime uses external broker URL ──────────────────────────────────────
+  - it: runtime AKTO_KAFKA_BROKER_URL uses external brokerUrl
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: "kafka1:9092,kafka2:9092"
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_BROKER_URL
+            value: "kafka1:9092,kafka2:9092"
+
+  # ── No wait-for-kafka init container in external mode ─────────────────────
+  - it: does not render wait-for-kafka init container when kafkaCluster disabled
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: kafka1:9092
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - notExists:
+          path: spec.template.spec.initContainers
+
+  # ── External Kafka with SASL: runtime gets auth env vars ──────────────────
+  - it: injects SASL env vars into runtime when external Kafka has username set
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: kafka1:9092
+      mini_runtime.externalKafka.username: myuser
+      mini_runtime.externalKafka.password: mypass
+      mini_runtime.externalKafka.saslMechanism: SCRAM-SHA-256
+      mini_runtime.externalKafka.securityProtocol: SASL_SSL
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_AUTH_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SASL_MECHANISM
+            value: SCRAM-SHA-256
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SECURITY_PROTOCOL
+            value: SASL_SSL
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_USERNAME
+            value: myuser
+
+  # ── External Kafka with SASL: threat client gets auth env vars ────────────
+  - it: injects SASL env vars into threat client when external Kafka has username set
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: kafka1:9092
+      mini_runtime.externalKafka.username: myuser
+      mini_runtime.externalKafka.password: mypass
+      mini_runtime.externalKafka.saslMechanism: SCRAM-SHA-256
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_USERNAME
+            value: myuser
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SASL_MECHANISM
+            value: SCRAM-SHA-256
+
+  # ── Threat client uses external broker URL ────────────────────────────────
+  - it: threat client bootstrap servers use external brokerUrl
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: "kafka1:9092,kafka2:9092"
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
+            value: "kafka1:9092,kafka2:9092"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
+            value: "kafka1:9092,kafka2:9092"
+
+  # ── No SASL env vars when external Kafka has no username ──────────────────
+  - it: does not inject SASL env vars when external Kafka username is empty
+    set:
+      kafkaCluster.enabled: false
+      mini_runtime.useExternalKafka: true
+      mini_runtime.externalKafka.brokerUrl: kafka1:9092
+      mini_runtime.externalKafka.username: ""
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_AUTH_ENABLED
+            value: "true"

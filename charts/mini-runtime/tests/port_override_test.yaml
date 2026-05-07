@@ -1,0 +1,117 @@
+suite: Port Override
+templates:
+  - templates/kafka-cluster.yaml
+  - templates/deployment.yaml
+
+# Note: helm-unittest renders with .Release.Namespace = "NAMESPACE"
+
+tests:
+  # ── Kafka CR plain listener uses overridden port ───────────────────────────
+  - it: sets plain listener port to overridden value in Kafka CR
+    set:
+      kafkaCluster.ports.plain: 9094
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.listeners[0].port
+          value: 9094
+
+  # ── TLS listener uses overridden tls port ─────────────────────────────────
+  - it: sets tls listener port to overridden value in Kafka CR
+    set:
+      kafkaCluster.tls: true
+      kafkaCluster.ports.tls: 9095
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.listeners[1].port
+          value: 9095
+
+  # ── Runtime AKTO_KAFKA_BROKER_URL reflects overridden port ────────────────
+  - it: runtime AKTO_KAFKA_BROKER_URL reflects overridden plain port
+    set:
+      kafkaCluster.ports.plain: 9094
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_BROKER_URL
+            value: akto-kafka-kafka-bootstrap.NAMESPACE.svc.cluster.local:9094
+
+  # ── Runtime AKTO_KAFKA_BROKER_MAL reflects overridden port ────────────────
+  - it: runtime AKTO_KAFKA_BROKER_MAL reflects overridden plain port
+    set:
+      kafkaCluster.ports.plain: 9094
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_BROKER_MAL
+            value: akto-kafka-kafka-bootstrap.NAMESPACE.svc.cluster.local:9094
+
+  # ── Threat client bootstrap servers reflect overridden port ───────────────
+  - it: threat client bootstrap server env vars reflect overridden port
+    set:
+      kafkaCluster.ports.plain: 9094
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
+            value: akto-kafka-kafka-bootstrap.NAMESPACE.svc.cluster.local:9094
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
+            value: akto-kafka-kafka-bootstrap.NAMESPACE.svc.cluster.local:9094
+
+  # ── Init container uses overridden port ───────────────────────────────────
+  - it: wait-for-kafka init container command contains overridden port
+    set:
+      kafkaCluster.ports.plain: 9094
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.initContainers[0].command[2]
+          pattern: 'KAFKA_PORT="9094"'
+
+  # ── Default port 9092 used when no override ───────────────────────────────
+  - it: uses default port 9092 when no port override set
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_BROKER_URL
+            value: akto-kafka-kafka-bootstrap.NAMESPACE.svc.cluster.local:9092
