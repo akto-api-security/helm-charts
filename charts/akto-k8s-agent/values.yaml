@@ -30,3 +30,25 @@ affinity: {}
 miniRuntimeServiceName: ""
 miniRuntimeReleaseName: "akto-mini-runtime"
 
+# SASL credentials — set existingSecret to reference a pre-existing Secret
+# (e.g. the "<clusterName>-sasl-credentials" Secret created by the mini-runtime chart)
+sasl:
+  existingSecret: ""      # name of existing Secret with SASL credentials
+  usernameKey: "username" # key inside the Secret for the Kafka username
+  passwordKey: "password" # key inside the Secret for the Kafka password
+
+# TLS configuration for Kafka connection
+# Mode 1 (default): auto-discover Strimzi CA cert secret
+#   Set tls.enabled=true — secret name derived as "<kafkaClusterName>-cluster-ca-cert"
+# Mode 2: bring your own secret
+#   Set tls.enabled=true, tls.autoDiscover=false, tls.caSecretName=<your-secret>
+tls:
+  enabled: false
+  autoDiscover: true              # derive CA secret from kafkaClusterName (Strimzi default)
+  kafkaClusterName: "akto-kafka"  # matches kafkaCluster.clusterName in mini-runtime chart
+  kafkaPort: 9093                 # TLS listener port — used when autoDiscover=true and AKTO_KAFKA_BROKER_MAL is not overridden
+  caSecretName: ""                # used when autoDiscover=false
+  caCertKey: "ca.crt"             # key inside the secret containing the CA cert
+  mountPath: "/etc/kafka/tls"
+  insecureSkipVerify: false
+

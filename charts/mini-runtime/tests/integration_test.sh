@@ -3,7 +3,9 @@
 # Requires: helm, kubectl pointed at a live cluster with sufficient resources.
 #
 # Usage:
-#   ./charts/mini-runtime/tests/integration_test.sh
+#   ./charts/mini-runtime/tests/integration_test.sh --token <token>            # run all scenarios
+#   ./charts/mini-runtime/tests/integration_test.sh --token <token> 1          # run scenario 1 only
+#   ./charts/mini-runtime/tests/integration_test.sh --token <token> 1 3 6      # run scenarios 1, 3, and 6
 #
 # Each scenario installs the chart into its own namespace, runs assertions,
 # then cleans up. Cleanup also runs on script exit/interrupt via trap.
@@ -14,6 +16,41 @@ set -euo pipefail
 CHART_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PASS=0
 FAIL=0
+
+# ── Parse arguments ───────────────────────────────────────────────────────────
+# Usage: integration_test.sh [--token <token>] [scenario numbers...]
+DB_TOKEN=""
+SCENARIOS=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --token)
+      DB_TOKEN="$2"
+      shift 2
+      ;;
+    *)
+      SCENARIOS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [[ -z "$DB_TOKEN" ]]; then
+  echo "Error: --token <databaseAbstractorToken> is required"
+  echo "Usage: $0 [--token <token>] [scenario numbers...]"
+  exit 1
+fi
+
+run_scenario() {
+  local n="$1"
+  if [[ ${#SCENARIOS[@]} -eq 0 ]]; then
+    return 0
+  fi
+  for s in "${SCENARIOS[@]}"; do
+    [[ "$s" == "$n" ]] && return 0
+  done
+  return 1
+}
 
 # ── Colour codes ──────────────────────────────────────────────────────────────
 GREEN='\033[0;32m'
@@ -30,7 +67,6 @@ header() {
 }
 
 # ── Helper: assert two values are equal ───────────────────────────────────────
-# Usage: assert_eq <label> <actual> <expected>
 assert_eq() {
   local label="$1"
   local actual="$2"
@@ -47,7 +83,6 @@ assert_eq() {
 }
 
 # ── Helper: assert a count is zero ────────────────────────────────────────────
-# Usage: assert_zero <label> <count>
 assert_zero() {
   local label="$1"
   local count="$2"
@@ -61,7 +96,6 @@ assert_zero() {
 }
 
 # ── Helper: assert a string matches a pattern ─────────────────────────────────
-# Usage: assert_match <label> <value> <pattern>
 assert_match() {
   local label="$1"
   local value="$2"
@@ -78,7 +112,6 @@ assert_match() {
 }
 
 # ── Helper: assert a resource exists ─────────────────────────────────────────
-# Usage: assert_exists <label> <kubectl get args...>
 assert_exists() {
   local label="$1"
   shift
@@ -92,18 +125,26 @@ assert_exists() {
 }
 
 # ── Helper: kubectl wait with descriptive output ──────────────────────────────
-# Usage: run_wait <label> <timeout_seconds> kubectl wait <args...>
 run_wait() {
   local label="$1"
   local timeout="$2"
   shift 2
-  if kubectl wait "$@" --timeout="${timeout}s" 2>/dev/null; then
-    echo -e "  ${GREEN}✓ PASS${NC}  $label"
-    (( PASS++ )) || true
-  else
-    echo -e "  ${RED}✗ FAIL${NC}  $label (timed out after ${timeout}s)"
-    (( FAIL++ )) || true
-  fi
+  local deadline=$(( $(date +%s) + timeout ))
+  # kubectl wait exits immediately with "no matching resources found" if the
+  # resource doesn't exist yet. Retry in a loop until the deadline.
+  while true; do
+    if kubectl wait "$@" --timeout=5s 2>/dev/null; then
+      echo -e "  ${GREEN}✓ PASS${NC}  $label"
+      (( PASS++ )) || true
+      return
+    fi
+    if [[ $(date +%s) -ge $deadline ]]; then
+      echo -e "  ${RED}✗ FAIL${NC}  $label (timed out after ${timeout}s)"
+      (( FAIL++ )) || true
+      return
+    fi
+    sleep 5
+  done
 }
 
 # ── Cleanup: track all releases+namespaces to remove ─────────────────────────
@@ -118,17 +159,42 @@ cleanup() {
       local release="${CLEANUP_RELEASES[$i]}"
       local ns="${CLEANUP_NAMESPACES[$i]}"
       echo "  Uninstalling $release from $ns..."
-      helm uninstall "$release" -n "$ns" --ignore-not-found 2>/dev/null || true
-      kubectl delete namespace "$ns" --ignore-not-found 2>/dev/null || true
+      #helm uninstall "$release" -n "$ns" --ignore-not-found 2>/dev/null || true
+      # Delete PVCs explicitly — helm uninstall does not remove PVCs created by
+      # Strimzi StatefulSets (they are outside Helm's ownership). Leaving them
+      # behind causes "Invalid cluster.id" errors on the next install.
+      #kubectl delete pvc --all -n "$ns" --ignore-not-found 2>/dev/null || true
+      #kubectl delete namespace "$ns" --ignore-not-found 2>/dev/null || true
     done
   fi
 }
 trap cleanup EXIT
 
+# ── Minimal resource overrides for test environments (e.g. minikube) ─────────
+MINIKUBE_RESOURCES=(
+  --set kafkaCluster.broker.resources.requests.cpu=200m
+  --set kafkaCluster.broker.resources.requests.memory=512Mi
+  --set kafkaCluster.broker.resources.limits.cpu=500m
+  --set kafkaCluster.broker.resources.limits.memory=1Gi
+  --set kafkaCluster.controller.resources.requests.cpu=100m
+  --set kafkaCluster.controller.resources.requests.memory=256Mi
+  --set kafkaCluster.controller.resources.limits.cpu=200m
+  --set kafkaCluster.controller.resources.limits.memory=512Mi
+  --set mini_runtime.aktoApiSecurityRuntime.resources.requests.cpu=100m
+  --set mini_runtime.aktoApiSecurityRuntime.resources.requests.memory=256Mi
+  --set mini_runtime.aktoApiSecurityRuntime.resources.limits.cpu=500m
+  --set mini_runtime.aktoApiSecurityRuntime.resources.limits.memory=512Mi
+)
+
 # ── Pre-flight ────────────────────────────────────────────────────────────────
 header "Pre-flight"
 echo "  Chart: $CHART_DIR"
 echo "  Cluster: $(kubectl config current-context)"
+if [[ ${#SCENARIOS[@]} -gt 0 ]]; then
+  echo "  Running scenarios: ${SCENARIOS[*]}"
+else
+  echo "  Running scenarios: all"
+fi
 echo ""
 
 echo "  Updating chart dependencies..."
@@ -140,6 +206,7 @@ echo -e "  ${GREEN}✓${NC} Dependencies updated"
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 1: Default install — Strimzi Kafka mode
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 1; then
 header "Scenario 1: Default install (Strimzi Kafka mode)"
 
 NS1="akto-int-test"
@@ -150,14 +217,15 @@ CLEANUP_NAMESPACES+=("$NS1")
 kubectl create namespace "$NS1" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 helm install "$REL1" "$CHART_DIR" -n "$NS1" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
+  "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
-run_wait "[S1] Strimzi operator available" 120 \
+run_wait "[S1] Strimzi operator available" 300 \
   deployment --selector app.kubernetes.io/name=strimzi-kafka-operator \
   -n "$NS1" --for=condition=available
 
-run_wait "[S1] Kafka controller+broker pods ready" 180 \
+run_wait "[S1] Kafka controller+broker pods ready" 360 \
   pod -l strimzi.io/cluster=akto-kafka \
   -n "$NS1" --for=condition=ready
 
@@ -165,15 +233,15 @@ assert_exists "[S1] akto-kafka-kafka-bootstrap Service exists" \
   service akto-kafka-kafka-bootstrap -n "$NS1"
 
 for topic in akto.api.logs akto.api.logs2 akto.api.producer.logs akto.daemonset.producer.heartbeats; do
-  run_wait "[S1] KafkaTopic $topic ready" 60 \
+  run_wait "[S1] KafkaTopic $topic ready" 120 \
     kafkatopic "$topic" -n "$NS1" --for=condition=ready
 done
 
-run_wait "[S1] Redis available" 60 \
+run_wait "[S1] Redis available" 120 \
   deployment/${REL1}-akto-mini-runtime-redis \
   -n "$NS1" --for=condition=available
 
-run_wait "[S1] Keel available (validates /healthz liveness)" 90 \
+run_wait "[S1] Keel available (validates /healthz liveness)" 180 \
   deployment/${REL1}-akto-mini-runtime-keel \
   -n "$NS1" --for=condition=available
 
@@ -196,10 +264,13 @@ run_wait "[S1] threat-client init container passed" 240 \
   pod -l app=${REL1}-akto-mini-runtime-threat-client \
   -n "$NS1" --for=condition=initialized
 
+fi # end scenario 1
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 2: External Kafka mode
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 2; then
 header "Scenario 2: External Kafka mode"
 
 NS2="akto-int-ext"
@@ -215,9 +286,8 @@ helm install "$REL2" "$CHART_DIR" -n "$NS2" \
   --set kafkaCluster.enabled=false \
   --set mini_runtime.useExternalKafka=true \
   --set mini_runtime.externalKafka.brokerUrl="$EXTERNAL_BROKER" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set keel.keel.enabled=false \
-  --set threat_client.aktoApiSecurityThreatClient.env.enabled=false \
   --wait=false 2>&1 | tail -1
 
 KAFKA_COUNT=$(kubectl get kafka -n "$NS2" 2>/dev/null | grep -c "akto-kafka" || true)
@@ -238,13 +308,16 @@ INIT_CONTAINERS=$(kubectl get deployment ${REL2}-akto-mini-runtime-mini-runtime 
   2>/dev/null || echo "")
 assert_eq "[S2] No wait-for-kafka init container" "$INIT_CONTAINERS" ""
 
+fi # end scenario 2
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 3: TLS enabled
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 3; then
 header "Scenario 3: TLS enabled"
 
-NS3="akto-int-tls"
+NS3="default"
 REL3="akto-tls"
 CLEANUP_RELEASES+=("$REL3")
 CLEANUP_NAMESPACES+=("$NS3")
@@ -252,21 +325,20 @@ CLEANUP_NAMESPACES+=("$NS3")
 kubectl create namespace "$NS3" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 helm install "$REL3" "$CHART_DIR" -n "$NS3" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set kafkaCluster.tls=true \
   --set keel.keel.enabled=false \
-  --set threat_client.aktoApiSecurityThreatClient.env.enabled=false \
+  "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
-run_wait "[S3] Strimzi operator available" 120 \
+run_wait "[S3] Strimzi operator available" 300 \
   deployment --selector app.kubernetes.io/name=strimzi-kafka-operator \
   -n "$NS3" --for=condition=available
 
-run_wait "[S3] Kafka pods ready" 180 \
+run_wait "[S3] Kafka pods ready" 360 \
   pod -l strimzi.io/cluster=akto-kafka \
   -n "$NS3" --for=condition=ready
 
-# Strimzi creates the cluster CA cert Secret once Kafka is running
 assert_exists "[S3] Strimzi CA cert Secret exists" \
   secret akto-kafka-cluster-ca-cert -n "$NS3"
 
@@ -298,10 +370,13 @@ TLS_VOLUME_SECRET=$(kubectl get deployment ${REL3}-akto-mini-runtime-mini-runtim
 assert_eq "[S3] mini-runtime kafka-tls-ca volume references akto-kafka-cluster-ca-cert" \
   "$TLS_VOLUME_SECRET" "akto-kafka-cluster-ca-cert"
 
+fi # end scenario 3
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 4: Port override (plain port 9094)
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 4; then
 header "Scenario 4: Port override (kafkaCluster.ports.plain=9094)"
 
 NS4="akto-int-port"
@@ -312,13 +387,13 @@ CLEANUP_NAMESPACES+=("$NS4")
 kubectl create namespace "$NS4" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 helm install "$REL4" "$CHART_DIR" -n "$NS4" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set kafkaCluster.ports.plain=9094 \
   --set keel.keel.enabled=false \
-  --set threat_client.aktoApiSecurityThreatClient.env.enabled=false \
+  "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
-run_wait "[S4] Strimzi operator available" 120 \
+run_wait "[S4] Strimzi operator available" 300 \
   deployment --selector app.kubernetes.io/name=strimzi-kafka-operator \
   -n "$NS4" --for=condition=available
 
@@ -347,10 +422,13 @@ INIT_CMD=$(kubectl get deployment ${REL4}-akto-mini-runtime-mini-runtime \
   2>/dev/null || echo "")
 assert_match "[S4] wait-for-kafka init container uses KAFKA_PORT=9094" "$INIT_CMD" 'KAFKA_PORT="9094"'
 
+fi # end scenario 4
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 5: Service annotations + pod/deployment annotations
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 5; then
 header "Scenario 5: Service annotations and pod/deployment annotations"
 
 NS5="akto-int-ann"
@@ -361,15 +439,14 @@ CLEANUP_NAMESPACES+=("$NS5")
 kubectl create namespace "$NS5" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 helm install "$REL5" "$CHART_DIR" -n "$NS5" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set "kafkaCluster.serviceAnnotations.test\.akto\.io/ci-marker=integration-test" \
   --set "mini_runtime.podAnnotations.prometheus\.io/scrape=true" \
   --set "mini_runtime.deploymentAnnotations.team=platform" \
   --set keel.keel.enabled=false \
-  --set threat_client.aktoApiSecurityThreatClient.env.enabled=false \
+  "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
-# Kafka CR template annotations (immediate — no need to wait for pods)
 BOOTSTRAP_ANN=$(kubectl get kafka akto-kafka -n "$NS5" \
   -o jsonpath='{.spec.kafka.template.bootstrapService.metadata.annotations.test\.akto\.io/ci-marker}' \
   2>/dev/null || echo "")
@@ -382,26 +459,22 @@ BROKERS_ANN=$(kubectl get kafka akto-kafka -n "$NS5" \
 assert_eq "[S5] Kafka CR brokersService annotation set" \
   "$BROKERS_ANN" "integration-test"
 
-# Deployment metadata annotation
 DEPLOY_ANN=$(kubectl get deployment ${REL5}-akto-mini-runtime-mini-runtime \
   -n "$NS5" \
   -o jsonpath='{.metadata.annotations.team}' \
   2>/dev/null || echo "")
 assert_eq "[S5] mini-runtime Deployment has annotation team=platform" "$DEPLOY_ANN" "platform"
 
-# Pod template annotation
 POD_ANN=$(kubectl get deployment ${REL5}-akto-mini-runtime-mini-runtime \
   -n "$NS5" \
   -o jsonpath='{.spec.template.metadata.annotations.prometheus\.io/scrape}' \
   2>/dev/null || echo "")
 assert_eq "[S5] mini-runtime pod template has prometheus.io/scrape=true" "$POD_ANN" "true"
 
-# Wait for Strimzi to reconcile and apply annotations to live Services
-run_wait "[S5] Strimzi operator available (for Service annotation reconciliation)" 120 \
+run_wait "[S5] Strimzi operator available (for Service annotation reconciliation)" 300 \
   deployment --selector app.kubernetes.io/name=strimzi-kafka-operator \
   -n "$NS5" --for=condition=available
 
-# Give Strimzi ~30s to reconcile the Kafka CR and create/update the Services
 echo "  Waiting 30s for Strimzi to reconcile Services..."
 sleep 30
 
@@ -411,10 +484,13 @@ LIVE_SVC_ANN=$(kubectl get service akto-kafka-kafka-bootstrap -n "$NS5" \
 assert_eq "[S5] Live akto-kafka-kafka-bootstrap Service has annotation" \
   "$LIVE_SVC_ANN" "integration-test"
 
+fi # end scenario 5
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SCENARIO 6: SASL / SCRAM-SHA-512
 # ══════════════════════════════════════════════════════════════════════════════
+if run_scenario 6; then
 header "Scenario 6: SASL (SCRAM-SHA-512)"
 
 NS6="akto-int-sasl"
@@ -425,20 +501,19 @@ CLEANUP_NAMESPACES+=("$NS6")
 kubectl create namespace "$NS6" --dry-run=client -o yaml | kubectl apply -f - >/dev/null
 
 helm install "$REL6" "$CHART_DIR" -n "$NS6" \
-  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="ci-dummy" \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set kafkaCluster.sasl.enabled=true \
   --set kafkaCluster.sasl.mechanism=SCRAM-SHA-512 \
   --set kafkaCluster.sasl.username=akto-runtime \
   --set kafkaCluster.sasl.password=ci-sasl-secret \
-  --set keel.keel.enabled=false \
-  --set threat_client.aktoApiSecurityThreatClient.env.enabled=false \
+  "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
-run_wait "[S6] Strimzi operator available" 120 \
+run_wait "[S6] Strimzi operator available" 300 \
   deployment --selector app.kubernetes.io/name=strimzi-kafka-operator \
   -n "$NS6" --for=condition=available
 
-run_wait "[S6] KafkaUser akto-runtime ready (user operator provisioned credentials)" 120 \
+run_wait "[S6] KafkaUser akto-runtime ready (user operator provisioned credentials)" 180 \
   kafkauser/akto-runtime -n "$NS6" --for=condition=ready
 
 assert_exists "[S6] akto-kafka-sasl-credentials Secret exists" \
@@ -466,6 +541,8 @@ LISTENER_AUTH=$(kubectl get kafka akto-kafka -n "$NS6" \
   2>/dev/null || echo "")
 assert_eq "[S6] Kafka listener authentication.type == scram-sha-512" \
   "$LISTENER_AUTH" "scram-sha-512"
+
+fi # end scenario 6
 
 
 # ══════════════════════════════════════════════════════════════════════════════

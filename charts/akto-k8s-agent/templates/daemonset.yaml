@@ -1,4 +1,12 @@
 {{- if .Values.env.DEPLOY_DAEMONSET }}
+{{- $caSecretName := "" }}
+{{- if .Values.tls.enabled }}
+{{- if .Values.tls.autoDiscover }}
+{{- $caSecretName = printf "%s-cluster-ca-cert" .Values.tls.kafkaClusterName }}
+{{- else }}
+{{- $caSecretName = .Values.tls.caSecretName }}
+{{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -47,18 +55,57 @@ spec:
             - name: AKTO_INFRA_MIRRORING_MODE
               value: {{ .Values.env.AKTO_INFRA_MIRRORING_MODE | quote }}
             - name: AKTO_KAFKA_BROKER_MAL
-              value: {{ (.Values.env.AKTO_KAFKA_BROKER_MAL | default (printf "%s.%s.svc.cluster.local:9092" (default (printf "%s-mini-runtime" .Values.miniRuntimeReleaseName) .Values.miniRuntimeServiceName) .Release.Namespace)) | quote }}
+              {{- if and .Values.tls.enabled .Values.tls.autoDiscover }}
+              value: {{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.tls.kafkaClusterName .Release.Namespace .Values.tls.kafkaPort | quote }}
+              {{- else if .Values.env.AKTO_KAFKA_BROKER_MAL }}
+              value: {{ .Values.env.AKTO_KAFKA_BROKER_MAL | quote }}
+              {{- else }}
+              value: {{ printf "%s.%s.svc.cluster.local:9092" (default (printf "%s-mini-runtime" .Values.miniRuntimeReleaseName) .Values.miniRuntimeServiceName) .Release.Namespace | quote }}
+              {{- end }}
             - name: AKTO_MONGO_CONN
               value: {{ .Values.env.AKTO_MONGO_CONN | quote }}
             - name: IS_AUTH_IMPLEMENTED
               value: {{ .Values.env.IS_AUTH_IMPLEMENTED | quote }}
+            {{- if .Values.sasl.existingSecret }}
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sasl.existingSecret | quote }}
+                  key: {{ .Values.sasl.usernameKey | quote }}
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sasl.existingSecret | quote }}
+                  key: {{ .Values.sasl.passwordKey | quote }}
+            {{- else }}
             - name: KAFKA_USERNAME
               value: {{ .Values.env.KAFKA_USERNAME | quote }}
             - name: KAFKA_PASSWORD
               value: {{ .Values.env.KAFKA_PASSWORD | quote }}
+            {{- end }}
             - name: AKTO_THREAT_ENABLED
               value: {{ .Values.env.AKTO_THREAT_ENABLED | quote }}
+            {{- if .Values.tls.enabled }}
+            - name: USE_TLS
+              value: "true"
+            - name: TLS_CA_CERT_PATH
+              value: {{ printf "%s/%s" .Values.tls.mountPath .Values.tls.caCertKey | quote }}
+            - name: INSECURE_SKIP_VERIFY
+              value: {{ .Values.tls.insecureSkipVerify | quote }}
+            {{- end }}
+          {{- if .Values.tls.enabled }}
+          volumeMounts:
+            - name: kafka-tls-ca
+              mountPath: {{ .Values.tls.mountPath | quote }}
+              readOnly: true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.tls.enabled }}
+      volumes:
+        - name: kafka-tls-ca
+          secret:
+            secretName: {{ $caSecretName | quote }}
+      {{- end }}
 {{- end }}
 

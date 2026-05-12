@@ -53,7 +53,7 @@ spec:
           - -c
           - |
             KAFKA_HOST="{{ .Values.kafkaCluster.clusterName }}-kafka-bootstrap.{{ .Release.Namespace }}.svc.cluster.local"
-            KAFKA_PORT="{{ .Values.kafkaCluster.ports.plain }}"
+            KAFKA_PORT="{{ ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls }}"
             echo "Waiting for Kafka at ${KAFKA_HOST}:${KAFKA_PORT}..."
             until nc -z "${KAFKA_HOST}" "${KAFKA_PORT}"; do
               echo "Kafka not ready yet, retrying in 5s..."
@@ -82,9 +82,9 @@ spec:
         - name: AKTO_INSTANCE_TYPE
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoInstanceType }}
         - name: AKTO_KAFKA_BROKER_MAL
-          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace .Values.kafkaCluster.ports.plain | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}{{ end }}
+          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace (ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls) | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}{{ end }}
         - name: AKTO_KAFKA_BROKER_URL
-          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace .Values.kafkaCluster.ports.plain | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
+          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace (ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls) | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
         - name: AKTO_KAFKA_GROUP_ID_CONFIG
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaGroupIdConfig
             }}
@@ -374,7 +374,7 @@ spec:
           - -c
           - |
             KAFKA_HOST="{{ .Values.kafkaCluster.clusterName }}-kafka-bootstrap.{{ .Release.Namespace }}.svc.cluster.local"
-            KAFKA_PORT="{{ .Values.kafkaCluster.ports.plain }}"
+            KAFKA_PORT="{{ ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls }}"
             echo "Waiting for Kafka at ${KAFKA_HOST}:${KAFKA_PORT}..."
             until nc -z "${KAFKA_HOST}" "${KAFKA_PORT}"; do
               echo "Kafka not ready yet, retrying in 5s..."
@@ -402,9 +402,9 @@ spec:
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
             }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace .Values.kafkaCluster.ports.plain | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
+          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace (ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls) | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
         - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace .Values.kafkaCluster.ports.plain | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
+          value: {{ if .Values.kafkaCluster.enabled }}{{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.kafkaCluster.clusterName .Release.Namespace (ternary .Values.kafkaCluster.ports.tls .Values.kafkaCluster.ports.plain .Values.kafkaCluster.tls) | quote }}{{ else if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
         - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
           value: "redis://{{ include "akto.fullname" . }}-redis:6379"
 
