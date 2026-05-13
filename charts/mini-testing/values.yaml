@@ -12,6 +12,7 @@ testing:
       kafkaBrokerUrl: localhost:29092
       puppeteerReplayServiceUrl: http://localhost:3000
       databaseAbstractorUrl: https://cyborg.akto.io
+      automatedAgentBaseUrl: https://agentic-testing.akto.io
       # If you want to use secrets to store database abstractor token. default: false
       useSecretsForDatabaseAbstractorToken: false
       # If not using secrets, place token here.
@@ -28,7 +29,7 @@ testing:
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.59.3_local
+      tag: 1.64.1_local
     imagePullPolicy: Always
     resources:
       requests:

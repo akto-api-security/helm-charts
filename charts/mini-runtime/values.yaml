@@ -76,7 +76,7 @@ mini_runtime:
         token: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: latest
+      digest: sha256:f2aec6045c82ab6f4c1ca22748c09e5a346ec9f0d4ce5c908704fd35d4eed6f2
     imagePullPolicy: Always
     resources:
       requests:
@@ -187,7 +187,7 @@ keel:
       webhookEndpoint: ""
     image:
       repository: public.ecr.aws/aktosecurity/keelhq-keel
-      tag: latest
+      digest: sha256:1eb61443d68eff7efe1dc5607e8b3054a518c4abba0aa840ffb6a19456b04507
     imagePullPolicy: IfNotPresent
     enabled: true
     resources:
@@ -225,7 +225,7 @@ threat_client:
       useHostName: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      tag: latest
+      digest: sha256:1bd73a6606258800324bf96bd3425e371506ebe058efd34962b690e0400436a4
     imagePullPolicy: Always
     resources:
       requests:
@@ -238,7 +238,7 @@ threat_client:
 redis:
   image:
     repository: public.ecr.aws/aktosecurity/redis
-    tag: latestV8.6.2
+    digest: sha256:47200b04138293fae39737e50878a238b13ec0781083126b1b0c63cf5d992e8d
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -257,7 +257,7 @@ fluent_bit:
 
   image:
     repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
-    tag: latest
+    digest: sha256:7d727245767ae632eb296c2ff4d206bf2e205b5f244c1f37b8fdd61f9fb33985
     pullPolicy: IfNotPresent
 
   resources:

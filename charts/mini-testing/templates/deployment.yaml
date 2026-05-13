@@ -118,6 +118,8 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.aktoConfigName }}
         - name: DATABASE_ABSTRACTOR_SERVICE_URL
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorUrl}}
+        - name: AUTOMATED_AGENT_BASE_URL
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.automatedAgentBaseUrl}}
         - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
           {{- if .Values.testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken }}
           valueFrom:
