@@ -1,6 +1,6 @@
 image:
   repository: aktosecurity/mirror-api-logging
-  tag: k8s_agent
+  tag: strimzi-kafka-tcp
   pullPolicy: Always
 
 podAnnotations: {}
@@ -33,11 +33,16 @@ miniRuntimeReleaseName: "akto-mini-runtime"
 # SASL credentials — set existingSecret to reference a pre-existing Secret
 # (e.g. the "<clusterName>-sasl-credentials" Secret created by the mini-runtime chart)
 sasl:
-  existingSecret: ""      # option 1: reference existing Secret with SASL credentials
-  usernameKey: "username" # key inside the Secret for the Kafka username
-  passwordKey: "password" # key inside the Secret for the Kafka password
-  username: ""            # option 2: inline credentials
-  password: ""
+  enabled: true
+  autoDiscover: false              # derive secret from kafkaClusterName: "<kafkaClusterName>-sasl-credentials"
+  saslMechanism: ""  # don't change if using akto-kafka, it only supports 512.
+  kafkaClusterName: "akto-kafka"  # matches kafkaCluster.clusterName in mini-runtime chart
+  kafkaPort: 9092                 # Kafka port for SASL (plain listener port)
+  existingSecret: ""              # option 1: explicit secret name (overrides autoDiscover)
+  usernameKey: "username"         # key inside the Secret for the Kafka username
+  passwordKey: "password"         # key inside the Secret for the Kafka password
+  username: "test"                    # option 2: inline credentials
+  password: "test"
 
 # TLS configuration for Kafka connection
 # Mode 1 (default): auto-discover Strimzi CA cert secret

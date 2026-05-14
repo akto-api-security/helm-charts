@@ -7,6 +7,14 @@
 {{- $caSecretName = .Values.tls.caSecretName }}
 {{- end }}
 {{- end }}
+{{- $saslSecretName := "" }}
+{{- if .Values.sasl.enabled }}
+{{- if .Values.sasl.existingSecret }}
+{{- $saslSecretName = .Values.sasl.existingSecret }}
+{{- else if .Values.sasl.autoDiscover }}
+{{- $saslSecretName = printf "%s-sasl-credentials" .Values.sasl.kafkaClusterName }}
+{{- end }}
+{{- end }}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -57,6 +65,8 @@ spec:
             - name: AKTO_KAFKA_BROKER_MAL
               {{- if and .Values.tls.enabled .Values.tls.autoDiscover }}
               value: {{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.tls.kafkaClusterName .Release.Namespace .Values.tls.kafkaPort | quote }}
+              {{- else if and .Values.sasl.enabled .Values.sasl.autoDiscover }}
+              value: {{ printf "%s-kafka-bootstrap.%s.svc.cluster.local:%v" .Values.sasl.kafkaClusterName .Release.Namespace .Values.sasl.kafkaPort | quote }}
               {{- else if .Values.env.AKTO_KAFKA_BROKER_MAL }}
               value: {{ .Values.env.AKTO_KAFKA_BROKER_MAL | quote }}
               {{- else }}
@@ -65,28 +75,27 @@ spec:
             - name: AKTO_MONGO_CONN
               value: {{ .Values.env.AKTO_MONGO_CONN | quote }}
             - name: IS_AUTH_IMPLEMENTED
-              value: {{ .Values.env.IS_AUTH_IMPLEMENTED | quote }}
-            {{- if .Values.sasl.existingSecret }}
+              value: {{ .Values.sasl.enabled | quote }}
+            {{- if .Values.sasl.enabled }}
+            {{- if $saslSecretName }}
             - name: KAFKA_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.sasl.existingSecret | quote }}
+                  name: {{ $saslSecretName | quote }}
                   key: {{ .Values.sasl.usernameKey | quote }}
             - name: KAFKA_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.sasl.existingSecret | quote }}
+                  name: {{ $saslSecretName | quote }}
                   key: {{ .Values.sasl.passwordKey | quote }}
             {{- else if .Values.sasl.username }}
             - name: KAFKA_USERNAME
               value: {{ .Values.sasl.username | quote }}
             - name: KAFKA_PASSWORD
               value: {{ .Values.sasl.password | quote }}
-            {{- else }}
-            - name: KAFKA_USERNAME
-              value: {{ .Values.env.KAFKA_USERNAME | quote }}
-            - name: KAFKA_PASSWORD
-              value: {{ .Values.env.KAFKA_PASSWORD | quote }}
+            {{- end }}
+            - name: AKTO_KAFKA_SASL_MECHANISM
+              value: {{ .Values.sasl.saslMechanism | quote }}
             {{- end }}
             - name: AKTO_THREAT_ENABLED
               value: {{ .Values.env.AKTO_THREAT_ENABLED | quote }}

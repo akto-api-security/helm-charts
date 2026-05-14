@@ -143,7 +143,7 @@ kafkaCluster:
 
   sasl:
     enabled: false
-    mechanism: "SCRAM-SHA-512"   # SCRAM-SHA-256 or SCRAM-SHA-512
+    mechanism: "SCRAM-SHA-512" # don't change is using akto-kafka
     username: "akto-runtime"
     password: ""
     useExistingSecret: false
