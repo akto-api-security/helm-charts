@@ -2825,6 +2825,28 @@ entries:
     version: 0.1.4
   akto-mini-testing:
   - apiVersion: v2
+    appVersion: 1.44.4
+    created: "2026-05-14T15:10:59.191649035Z"
+    description: Helm chart for installing Akto hybrid testing
+    digest: 8578734959d033d982149e0dadb7f492aaf892d56b75ff2d452132e4a4ab3974
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-testing
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.44.4/akto-mini-testing-1.44.4.tgz
+    version: 1.44.4
+  - apiVersion: v2
     appVersion: 1.44.3
     created: "2026-05-14T14:37:54.784857017Z"
     description: Helm chart for installing Akto hybrid testing
@@ -3998,4 +4020,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-14T14:37:54.785599444Z"
+generated: "2026-05-14T15:10:59.192124692Z"
