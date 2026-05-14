@@ -75,8 +75,8 @@ mini_runtime:
         # Token to use if existingSecret is not provided
         token: ""
     image:
-      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      digest: sha256:f2aec6045c82ab6f4c1ca22748c09e5a346ec9f0d4ce5c908704fd35d4eed6f2
+      repository: aktosecurity/mini-runtime
+      tag: a-feat-mr-kafka-scram
     imagePullPolicy: Always
     resources:
       requests:
@@ -224,8 +224,8 @@ threat_client:
       aktoLogLevel: INFO
       useHostName: true
     image:
-      repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      digest: sha256:1bd73a6606258800324bf96bd3425e371506ebe058efd34962b690e0400436a4
+      repository: aktosecurity/akto-threat-detection
+      tag: a-fix-threat-use-scram-sasl
     imagePullPolicy: Always
     resources:
       requests:
