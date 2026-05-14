@@ -77,6 +77,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.sasl.existingSecret | quote }}
                   key: {{ .Values.sasl.passwordKey | quote }}
+            {{- else if .Values.sasl.username }}
+            - name: KAFKA_USERNAME
+              value: {{ .Values.sasl.username | quote }}
+            - name: KAFKA_PASSWORD
+              value: {{ .Values.sasl.password | quote }}
             {{- else }}
             - name: KAFKA_USERNAME
               value: {{ .Values.env.KAFKA_USERNAME | quote }}
