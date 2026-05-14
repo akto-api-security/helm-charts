@@ -209,8 +209,8 @@ echo -e "  ${GREEN}✓${NC} Dependencies updated"
 if run_scenario 1; then
 header "Scenario 1: Default install (Strimzi Kafka mode)"
 
-NS1="akto-int-test"
-REL1="akto-int"
+NS1="default"
+REL1="akto-mini-runtime"
 CLEANUP_RELEASES+=("$REL1")
 CLEANUP_NAMESPACES+=("$NS1")
 
@@ -218,7 +218,7 @@ kubectl create namespace "$NS1" --dry-run=client -o yaml | kubectl apply -f - >/
 
 helm install "$REL1" "$CHART_DIR" -n "$NS1" \
   --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
-  "${MINIKUBE_RESOURCES[@]}" \
+  # "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
 run_wait "[S1] Strimzi operator available" 300 \
@@ -493,8 +493,8 @@ fi # end scenario 5
 if run_scenario 6; then
 header "Scenario 6: SASL (SCRAM-SHA-512)"
 
-NS6="akto-int-sasl"
-REL6="akto-sasl"
+NS6="default"
+REL6="akto-mini-runtime"
 CLEANUP_RELEASES+=("$REL6")
 CLEANUP_NAMESPACES+=("$NS6")
 
@@ -503,10 +503,9 @@ kubectl create namespace "$NS6" --dry-run=client -o yaml | kubectl apply -f - >/
 helm install "$REL6" "$CHART_DIR" -n "$NS6" \
   --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="$DB_TOKEN" \
   --set kafkaCluster.sasl.enabled=true \
-  --set kafkaCluster.sasl.mechanism=SCRAM-SHA-512 \
   --set kafkaCluster.sasl.username=akto-runtime \
   --set kafkaCluster.sasl.password=ci-sasl-secret \
-  "${MINIKUBE_RESOURCES[@]}" \
+  # "${MINIKUBE_RESOURCES[@]}" \
   --wait=false 2>&1 | tail -1
 
 run_wait "[S6] Strimzi operator available" 300 \
