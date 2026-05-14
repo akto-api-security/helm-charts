@@ -3,12 +3,6 @@ mongo:
 
 kubernetesClusterDomain: cluster.local
 
-# Busybox image for init containers
-busybox:
-  image:
-    repository: busybox
-    digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
-
 # Node scheduling configuration
 nodeSelector: {}
   # Example usage:
@@ -34,8 +28,7 @@ affinity: {}
 
 mini_runtime:
   # External Kafka Configuration
-  # Set useExternalKafka to true to use an existing Kafka cluster
-  # When enabled, the internal Kafka container will not be deployed
+  # Set useExternalKafka to true to use an existing Kafka cluster outside of this chart
   useExternalKafka: false
   externalKafka:
     # Kafka broker URL (e.g., kafka.example.com:9092 or kafka1:9092,kafka2:9092,kafka3:9092)
@@ -56,8 +49,9 @@ mini_runtime:
       aktoAccountName: Helios
       aktoConfigName: staging
       aktoInstanceType: DASHBOARD
-      aktoKafkaBrokerMal: localhost:29092
-      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      # Broker URL used when useExternalKafka: true (ignored when kafkaCluster.enabled: true)
+      aktoKafkaBrokerMal: ""
+      aktoKafkaBrokerUrl: ""
       aktoKafkaGroupIdConfig: asdf
       aktoKafkaMaxPollRecordsConfig: "100"
       aktoKafkaTopicName: akto.api.logs
@@ -75,14 +69,14 @@ mini_runtime:
       # If not using secrets, place token here.
       databaseAbstractorToken: ""
       # If using secrets, place token here.
-      databaseAbstractorTokenSecrets: 
+      databaseAbstractorTokenSecrets:
         # Name of an existing secret containing the Database Abstractor Token
         existingSecret: ""
         # Token to use if existingSecret is not provided
         token: ""
     image:
-      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      digest: sha256:f2aec6045c82ab6f4c1ca22748c09e5a346ec9f0d4ce5c908704fd35d4eed6f2
+      repository: aktosecurity/mini-runtime
+      tag: a-feat-mr-kafka-scram
     imagePullPolicy: Always
     resources:
       requests:
@@ -91,71 +85,89 @@ mini_runtime:
       limits:
         cpu: 2
         memory: "4Gi"
-  kafka1:
-    env:
-      # add advertised listeners if you want to override the default listeners
-      kafkaAdvertisedListeners: ""
-      kafkaBrokerId: "1"
-      kafkaCleanupPolicy: delete
-      kafkaCreateTopics: akto.api.logs:3:3
-      kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
-      kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
-      kafkaListenerSecurityProtocolMapSsl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
-      kafkaListenerSecurityProtocolMapSasl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:SASL_PLAINTEXT
-      kafkaListenerSecurityProtocolMapSaslTls: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_SSL,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT
-      kafkaProcessRoles: "broker,controller"
-      kafkaNodeId: "1"
-      kafkaControllerQuorumVoters: "1@localhost:9094"
-      kafkaControllerListenerNames: "CONTROLLER"
-      kafkaListeners: ""
-      kafkaLogCleanerEnable: "true"
-      kafkaLogRetentionBytes: "10737418240"
-      kafkaLogRetentionCheckIntervalMs: "60000"
-      kafkaLogRetentionHours: "5"
-      kafkaLogSegmentBytes: "104857600"
-      kafkaOffsetsTopicReplicationFactor: "1"
-      kafkaTransactionStateLogMinIsr: "1"
-      kafkaTransactionStateLogReplicationFactor: "1"
-      kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
-      sslKeystoreLocation: "/etc/kafka/ssl/secrets/server.keystore.jks"
-      sslKeystorePassword: "password"
-      sslKeyPassword: "password"
-      sslTruststoreLocation: "/etc/kafka/ssl/secrets/server.truststore.jks"
-      sslTruststorePassword: "password"
-      sslBaseMountPath: "/etc/kafka/ssl/secrets"
-      sslSecretName: "kafka-certs"
-      useSecretsForSaslCredentials: false
-      saslCredentialsSecrets:
-        existingSecret: ""
-        username: ""
-        password: ""
-      saslUsername: ""
-      saslPassword: ""
-      # SASL mechanism: PLAIN, SCRAM-SHA-256, or SCRAM-SHA-512
-      saslMechanism: "SCRAM-SHA-512"
-    useTls: false
-    useSasl: false
-    # Auto-format storage with SCRAM on first deployment (single helm install)
-    # When enabled, Kafka will format storage with SCRAM user on first run
-    # Requires persistence.enabled: true
-    autoFormatWithScram: false
-    image:
-      repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
-      digest: sha256:d20bd62f01826c454e88530efc6d73654cb4697182f37206742b96c7b947236e
-    resources:
-      requests:
-        cpu: 1.5
-        memory: "4Gi"
-        ephemeral-storage: "500Mi"
-      limits:
-        cpu: 1.5
-        memory: "4Gi"
-        ephemeral-storage: "11Gi"
 
   replicas: 1
-  type: ClusterIP
-  annotations:
-    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+# Strimzi-based Kafka cluster (default mode)
+# Set mini_runtime.useExternalKafka: true to disable and use your own Kafka instead
+kafkaCluster:
+  enabled: true
+  clusterName: "akto-kafka"  # used in labels and bootstrap DNS
+
+  broker:
+    replicas: 1             # increase to 3 for HA (also bump replication factors below)
+    resources:
+      requests:
+        cpu: "1.5"
+        memory: "4Gi"
+      limits:
+        cpu: "1.5"
+        memory: "4Gi"
+    storage:
+      size: "10Gi"
+      storageClass: ""       # leave empty for default StorageClass
+      deleteClaim: true
+
+  controller:
+    replicas: 1
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+    storage:
+      size: "10Gi"
+      storageClass: ""
+      deleteClaim: true
+
+  config:
+    retentionMs: "604800000"       # 7 days
+    retentionBytes: "5368709120"   # 5GB per partition
+    cleanupPolicy: "delete"
+    # set to 3 when broker.replicas: 3
+    defaultReplicationFactor: 1
+    minInsyncReplicas: 1
+    offsetsTopicReplicationFactor: 1
+    transactionStateLogReplicationFactor: 1
+    transactionStateLogMinIsr: 1
+
+  # Listener port overrides — also controls the bootstrap URL injected into runtime/threat-client
+  ports:
+    plain: 9092   # plain (or SASL) listener port
+    tls: 9093     # TLS listener port (only used when tls: true)
+
+  tls: false      # enable TLS listener; Strimzi auto-generates broker certs via cluster CA
+                  # CA cert stored in Secret: <clusterName>-cluster-ca-cert
+
+  sasl:
+    enabled: false
+    mechanism: "SCRAM-SHA-512"   # SCRAM-SHA-256 or SCRAM-SHA-512
+    username: "akto-runtime"
+    password: ""
+    useExistingSecret: false
+    existingSecret: ""           # existing Secret name; must have keys: username, password
+
+  # Annotations forwarded to Strimzi-generated Kafka Services via spec.kafka.template
+  # Replaces the old mini_runtime.serviceAnnotations / mini_runtime.annotations
+  serviceAnnotations: {}
+  # Example:
+  #   service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+  topics:
+    - name: "akto.api.logs"
+      partitions: 1         # increase to 3 when broker.replicas: 3
+      replicas: 1           # increase to 3 when broker.replicas: 3
+    - name: "akto.api.logs2"
+      partitions: 1
+      replicas: 1
+    - name: "akto.api.producer.logs"
+      partitions: 1
+      replicas: 1
+    - name: "akto.daemonset.producer.heartbeats"
+      partitions: 1
+      replicas: 1
 
 keel:
   keel:
@@ -196,25 +208,6 @@ keel:
     annotations: {}
   type: LoadBalancer
 
-ports:
-  default:
-    - port: 9092 # Over-ride this to change kafka service exposed port
-      targetPort: 9092
-  tls:
-    - name: plaintext
-      port: 9092
-      targetPort: 9092
-    - name: ssl
-      port: 9093
-      targetPort: 9093
-  sasl:
-    - name: sasl-plaintext
-      port: 9092
-      targetPort: 9092
-    - name: sasl-ssl
-      port: 9093
-      targetPort: 9093
-
 threat_client:
   replicas: 1
   aktoApiSecurityThreatClient:
@@ -231,8 +224,8 @@ threat_client:
       aktoLogLevel: INFO
       useHostName: true
     image:
-      repository: public.ecr.aws/aktosecurity/akto-threat-detection
-      digest: sha256:1bd73a6606258800324bf96bd3425e371506ebe058efd34962b690e0400436a4
+      repository: aktosecurity/akto-threat-detection
+      tag: a-fix-threat-use-scram-sasl
     imagePullPolicy: Always
     resources:
       requests:
@@ -261,7 +254,7 @@ redis:
 
 fluent_bit:
   enabled: false
-  
+
   image:
     repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
     digest: sha256:7d727245767ae632eb296c2ff4d206bf2e205b5f244c1f37b8fdd61f9fb33985
@@ -278,7 +271,7 @@ fluent_bit:
   flush: 5
   metricsPort: 2020
   logLevel: info
-  # default values 
+  # default values
   logStorage:
     sizeLimit: "1Gi"
   stateStorage:

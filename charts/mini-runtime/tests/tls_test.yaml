@@ -1,0 +1,181 @@
+suite: TLS
+templates:
+  - templates/kafka-cluster.yaml
+  - templates/deployment.yaml
+
+tests:
+  # ── TLS listener added to Kafka CR ────────────────────────────────────────
+  - it: adds tls listener to Kafka CR when tls enabled
+    set:
+      kafkaCluster.tls: true
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.kafka.listeners
+          content:
+            name: tls
+            port: 9093
+            type: internal
+            tls: true
+
+  # ── No TLS listener by default ────────────────────────────────────────────
+  - it: does not add tls listener when tls disabled (default)
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.listeners
+          value:
+            - name: plain
+              port: 9092
+              type: internal
+              tls: false
+
+  # ── TLS listener has SASL authentication when both enabled ────────────────
+  - it: tls listener has authentication when sasl and tls both enabled
+    set:
+      kafkaCluster.tls: true
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-512
+      kafkaCluster.sasl.password: secret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.listeners[1].authentication.type
+          value: scram-sha-512
+
+  # ── Runtime: TLS env vars injected ────────────────────────────────────────
+  - it: injects TLS env vars into runtime container when tls enabled
+    set:
+      kafkaCluster.tls: true
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_TLS_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_SSL_TRUSTSTORE_LOCATION
+            value: /etc/kafka/tls/ca.crt
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SECURITY_PROTOCOL
+            value: SSL
+
+  # ── SASL_SSL when both sasl and tls enabled ───────────────────────────────
+  - it: sets AKTO_KAFKA_SECURITY_PROTOCOL to SASL_SSL when sasl and tls both enabled
+    set:
+      kafkaCluster.tls: true
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.password: secret
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SECURITY_PROTOCOL
+            value: SASL_SSL
+
+  # ── Runtime: CA cert volume and mount when tls enabled ────────────────────
+  - it: mounts kafka-tls-ca volume in runtime container when tls enabled
+    set:
+      kafkaCluster.tls: true
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: kafka-tls-ca
+            mountPath: /etc/kafka/tls
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: kafka-tls-ca
+            secret:
+              secretName: akto-kafka-cluster-ca-cert
+
+  # ── Runtime: no TLS env var when tls disabled ─────────────────────────────
+  - it: does not inject TLS env vars when tls disabled
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_TLS_ENABLED
+            value: "true"
+
+  # ── Threat client: TLS env vars injected ──────────────────────────────────
+  - it: injects TLS env vars into threat client container when tls enabled
+    set:
+      kafkaCluster.tls: true
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_TLS_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_SSL_TRUSTSTORE_LOCATION
+            value: /etc/kafka/tls/ca.crt
+
+  # ── Threat client: CA cert volume mounted ─────────────────────────────────
+  - it: mounts kafka-tls-ca volume in threat client when tls enabled
+    set:
+      kafkaCluster.tls: true
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: kafka-tls-ca
+            mountPath: /etc/kafka/tls
+            readOnly: true
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: kafka-tls-ca
+            secret:
+              secretName: akto-kafka-cluster-ca-cert

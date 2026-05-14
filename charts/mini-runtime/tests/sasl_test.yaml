@@ -1,0 +1,209 @@
+suite: SASL / SCRAM Authentication
+templates:
+  - templates/kafka-cluster.yaml
+  - templates/deployment.yaml
+
+tests:
+  # ── KafkaUser rendered with scram-sha-512 ─────────────────────────────────
+  - it: renders KafkaUser with scram-sha-512 when sasl enabled
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-512
+      kafkaCluster.sasl.username: akto-runtime
+      kafkaCluster.sasl.password: mysecret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: KafkaUser
+      skipEmptyTemplates: true
+    asserts:
+      - isKind:
+          of: KafkaUser
+      - equal:
+          path: spec.authentication.type
+          value: scram-sha-512
+
+  # ── KafkaUser rendered with scram-sha-256 ─────────────────────────────────
+  - it: renders KafkaUser with scram-sha-256 when mechanism is SCRAM-SHA-256
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-256
+      kafkaCluster.sasl.username: akto-runtime
+      kafkaCluster.sasl.password: mysecret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: KafkaUser
+      skipEmptyTemplates: true
+    asserts:
+      - isKind:
+          of: KafkaUser
+      - equal:
+          path: spec.authentication.type
+          value: scram-sha-256
+
+  # ── Kafka listener has authentication block when sasl enabled ──────────────
+  - it: adds authentication to plain listener when sasl enabled
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-512
+      kafkaCluster.sasl.password: mysecret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.kafka.listeners[0].authentication.type
+          value: scram-sha-512
+
+  # ── No authentication block on listener when sasl disabled (default) ───────
+  - it: does not add authentication to listener when sasl disabled
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: Kafka
+      skipEmptyTemplates: true
+    asserts:
+      - notExists:
+          path: spec.kafka.listeners[0].authentication
+
+  # ── SASL credentials Secret created ───────────────────────────────────────
+  - it: creates sasl-credentials Secret when sasl enabled and not useExistingSecret
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.username: akto-runtime
+      kafkaCluster.sasl.password: mysecret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: metadata.name
+      value: akto-kafka-sasl-credentials
+      skipEmptyTemplates: true
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: metadata.name
+          value: akto-kafka-sasl-credentials
+
+  # ── KafkaUser references existingSecret when useExistingSecret true ────────
+  - it: KafkaUser references existingSecret when useExistingSecret is true
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.useExistingSecret: true
+      kafkaCluster.sasl.existingSecret: my-sasl-secret
+    template: templates/kafka-cluster.yaml
+    documentSelector:
+      path: kind
+      value: KafkaUser
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.authentication.password.valueFrom.secretKeyRef.name
+          value: my-sasl-secret
+
+  # ── Runtime: KAFKA_AUTH_ENABLED injected ──────────────────────────────────
+  - it: injects KAFKA_AUTH_ENABLED and SASL env vars into runtime container
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-512
+      kafkaCluster.sasl.password: mysecret
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_AUTH_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SASL_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SASL_MECHANISM
+            value: SCRAM-SHA-512
+
+  # ── Runtime reads KAFKA_USERNAME from secret ──────────────────────────────
+  - it: runtime container reads KAFKA_USERNAME from sasl-credentials secret
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.password: mysecret
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: akto-kafka-sasl-credentials
+                key: username
+
+  # ── Threat client: SASL env vars injected ─────────────────────────────────
+  - it: injects SASL env vars into threat client container
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.mechanism: SCRAM-SHA-512
+      kafkaCluster.sasl.password: mysecret
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_SASL_ENABLED
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_AUTH_ENABLED
+            value: "true"
+
+  # ── Threat client reads AKTO_KAFKA_USERNAME from secret ───────────────────
+  - it: threat client reads AKTO_KAFKA_USERNAME from sasl-credentials secret
+    set:
+      kafkaCluster.sasl.enabled: true
+      kafkaCluster.sasl.password: mysecret
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: AKTO_KAFKA_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: akto-kafka-sasl-credentials
+                key: username
+
+  # ── No SASL env vars when sasl disabled (default) ─────────────────────────
+  - it: does not inject SASL env vars when sasl disabled
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: KAFKA_AUTH_ENABLED
+            value: "true"

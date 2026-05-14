@@ -1,0 +1,78 @@
+name: test
+
+on:
+  push:
+    branches-ignore:
+      - master
+    paths:
+      - 'charts/mini-runtime/**'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'charts/mini-runtime/**'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Add Strimzi Helm repo
+        run: helm repo add strimzi https://strimzi.io/charts/ && helm repo update
+
+      - name: Update chart dependencies
+        run: helm dependency update charts/mini-runtime
+
+      - name: Install helm-unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version 1.0.3
+
+      - name: Lint (default values)
+        run: helm lint charts/mini-runtime
+
+      - name: Lint (SASL enabled)
+        run: |
+          helm lint charts/mini-runtime \
+            --set kafkaCluster.sasl.enabled=true \
+            --set kafkaCluster.sasl.password=secret
+
+      - name: Lint (TLS enabled)
+        run: helm lint charts/mini-runtime --set kafkaCluster.tls=true
+
+      - name: Lint (SASL + TLS)
+        run: |
+          helm lint charts/mini-runtime \
+            --set kafkaCluster.sasl.enabled=true \
+            --set kafkaCluster.sasl.password=secret \
+            --set kafkaCluster.tls=true
+
+      - name: Lint (external Kafka)
+        run: |
+          helm lint charts/mini-runtime \
+            --set kafkaCluster.enabled=false \
+            --set mini_runtime.useExternalKafka=true \
+            --set mini_runtime.externalKafka.brokerUrl=kafka1:9092
+
+      - name: Lint (external Kafka with SASL_SSL)
+        run: |
+          helm lint charts/mini-runtime \
+            --set kafkaCluster.enabled=false \
+            --set mini_runtime.useExternalKafka=true \
+            --set mini_runtime.externalKafka.brokerUrl=kafka1:9092 \
+            --set mini_runtime.externalKafka.username=user \
+            --set mini_runtime.externalKafka.password=pass \
+            --set mini_runtime.externalKafka.saslMechanism=SCRAM-SHA-256 \
+            --set mini_runtime.externalKafka.useSsl=true \
+            --set mini_runtime.externalKafka.securityProtocol=SASL_SSL
+
+      - name: Lint (port override)
+        run: helm lint charts/mini-runtime --set kafkaCluster.ports.plain=9094
+
+      - name: Run unit tests
+        run: helm unittest charts/mini-runtime

@@ -1,0 +1,146 @@
+{{- if .Values.kafkaCluster.enabled }}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: controller
+  labels:
+    strimzi.io/cluster: {{ .Values.kafkaCluster.clusterName | quote }}
+spec:
+  replicas: {{ .Values.kafkaCluster.controller.replicas }}
+  roles:
+    - controller
+  resources:
+    {{- toYaml .Values.kafkaCluster.controller.resources | nindent 4 }}
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: {{ .Values.kafkaCluster.controller.storage.size | quote }}
+        {{- if .Values.kafkaCluster.controller.storage.storageClass }}
+        class: {{ .Values.kafkaCluster.controller.storage.storageClass | quote }}
+        {{- end }}
+        kraftMetadata: shared
+        deleteClaim: {{ .Values.kafkaCluster.controller.storage.deleteClaim }}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: broker
+  labels:
+    strimzi.io/cluster: {{ .Values.kafkaCluster.clusterName | quote }}
+spec:
+  replicas: {{ .Values.kafkaCluster.broker.replicas }}
+  roles:
+    - broker
+  resources:
+    {{- toYaml .Values.kafkaCluster.broker.resources | nindent 4 }}
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: {{ .Values.kafkaCluster.broker.storage.size | quote }}
+        {{- if .Values.kafkaCluster.broker.storage.storageClass }}
+        class: {{ .Values.kafkaCluster.broker.storage.storageClass | quote }}
+        {{- end }}
+        kraftMetadata: shared
+        deleteClaim: {{ .Values.kafkaCluster.broker.storage.deleteClaim }}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: {{ .Values.kafkaCluster.clusterName | quote }}
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+spec:
+  kafka:
+    version: 4.1.1
+    metadataVersion: 4.1-IV1
+    listeners:
+      - name: plain
+        port: {{ .Values.kafkaCluster.ports.plain }}
+        type: internal
+        tls: false
+        {{- if .Values.kafkaCluster.sasl.enabled }}
+        authentication:
+          type: {{ .Values.kafkaCluster.sasl.mechanism | lower }}
+        {{- end }}
+      {{- if .Values.kafkaCluster.tls }}
+      - name: tls
+        port: {{ .Values.kafkaCluster.ports.tls }}
+        type: internal
+        tls: true
+        {{- if .Values.kafkaCluster.sasl.enabled }}
+        authentication:
+          type: {{ .Values.kafkaCluster.sasl.mechanism | lower }}
+        {{- end }}
+      {{- end }}
+    config:
+      offsets.topic.replication.factor: {{ .Values.kafkaCluster.config.offsetsTopicReplicationFactor }}
+      transaction.state.log.replication.factor: {{ .Values.kafkaCluster.config.transactionStateLogReplicationFactor }}
+      transaction.state.log.min.isr: {{ .Values.kafkaCluster.config.transactionStateLogMinIsr }}
+      default.replication.factor: {{ .Values.kafkaCluster.config.defaultReplicationFactor }}
+      min.insync.replicas: {{ .Values.kafkaCluster.config.minInsyncReplicas }}
+      log.retention.ms: {{ .Values.kafkaCluster.config.retentionMs | quote }}
+      log.retention.bytes: {{ .Values.kafkaCluster.config.retentionBytes | quote }}
+      log.cleanup.policy: {{ .Values.kafkaCluster.config.cleanupPolicy | quote }}
+    {{- if .Values.kafkaCluster.serviceAnnotations }}
+    template:
+      bootstrapService:
+        metadata:
+          annotations:
+            {{- toYaml .Values.kafkaCluster.serviceAnnotations | nindent 12 }}
+      brokersService:
+        metadata:
+          annotations:
+            {{- toYaml .Values.kafkaCluster.serviceAnnotations | nindent 12 }}
+    {{- end }}
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+---
+{{- if .Values.kafkaCluster.sasl.enabled }}
+{{- if not .Values.kafkaCluster.sasl.useExistingSecret }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ printf "%s-sasl-credentials" .Values.kafkaCluster.clusterName }}
+  labels:
+    {{- include "akto.labels" . | nindent 4 }}
+type: Opaque
+data:
+  username: {{ .Values.kafkaCluster.sasl.username | b64enc | quote }}
+  password: {{ .Values.kafkaCluster.sasl.password | b64enc | quote }}
+---
+{{- end }}
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaUser
+metadata:
+  name: {{ .Values.kafkaCluster.sasl.username | quote }}
+  labels:
+    strimzi.io/cluster: {{ .Values.kafkaCluster.clusterName | quote }}
+spec:
+  authentication:
+    type: {{ .Values.kafkaCluster.sasl.mechanism | lower }}
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: {{ if .Values.kafkaCluster.sasl.useExistingSecret }}{{ .Values.kafkaCluster.sasl.existingSecret | quote }}{{ else }}{{ printf "%s-sasl-credentials" .Values.kafkaCluster.clusterName | quote }}{{ end }}
+          key: password
+{{- end }}
+{{- range .Values.kafkaCluster.topics }}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: {{ .name | quote }}
+  labels:
+    strimzi.io/cluster: {{ $.Values.kafkaCluster.clusterName | quote }}
+spec:
+  partitions: {{ .partitions }}
+  replicas: {{ .replicas }}
+{{- end }}
+{{- end }}

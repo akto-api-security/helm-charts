@@ -1,0 +1,116 @@
+suite: Deployment and Pod Annotations
+templates:
+  - templates/deployment.yaml
+
+tests:
+  # ── mini-runtime deployment annotations ───────────────────────────────────
+  - it: applies deploymentAnnotations to mini-runtime Deployment metadata
+    set:
+      mini_runtime.deploymentAnnotations:
+        my-annotation: foo
+        team: platform
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: metadata.annotations["my-annotation"]
+          value: foo
+      - equal:
+          path: metadata.annotations.team
+          value: platform
+
+  # ── mini-runtime pod annotations ──────────────────────────────────────────
+  - it: applies podAnnotations to mini-runtime Pod template metadata
+    set:
+      mini_runtime.podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-mini-runtime
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/scrape"]
+          value: "true"
+      - equal:
+          path: spec.template.metadata.annotations["prometheus.io/port"]
+          value: "8080"
+
+  # ── threat client deployment annotations ──────────────────────────────────
+  - it: applies deploymentAnnotations to threat-client Deployment metadata
+    set:
+      threat_client.deploymentAnnotations:
+        my-annotation: bar
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: metadata.annotations["my-annotation"]
+          value: bar
+
+  # ── threat client pod annotations ─────────────────────────────────────────
+  - it: applies podAnnotations to threat-client Pod template metadata
+    set:
+      threat_client.podAnnotations:
+        sidecar.istio.io/inject: "false"
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations["sidecar.istio.io/inject"]
+          value: "false"
+
+  # ── keel deployment annotations ───────────────────────────────────────────
+  - it: applies deploymentAnnotations to keel Deployment metadata
+    set:
+      keel.deploymentAnnotations:
+        keel-custom: annotation
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-keel
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: metadata.annotations["keel-custom"]
+          value: annotation
+
+  # ── keel pod annotations ──────────────────────────────────────────────────
+  - it: applies podAnnotations to keel Pod template metadata
+    set:
+      keel.podAnnotations:
+        custom: value
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-keel
+      skipEmptyTemplates: true
+    asserts:
+      - equal:
+          path: spec.template.metadata.annotations.custom
+          value: value
+
+  # ── No annotation cross-leaking between deployments ───────────────────────
+  - it: runtime deploymentAnnotations do not appear on threat-client Deployment
+    set:
+      mini_runtime.deploymentAnnotations:
+        only-for-runtime: "true"
+    template: templates/deployment.yaml
+    documentSelector:
+      path: metadata.name
+      value: RELEASE-NAME-threat-client
+      skipEmptyTemplates: true
+    asserts:
+      - notExists:
+          path: metadata.annotations["only-for-runtime"]
