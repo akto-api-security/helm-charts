@@ -93,7 +93,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: KAFKA_ADVERTISED_LISTENERS
-          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+          value: "LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:9092"
         - name: KAFKA_BROKER_ID
           value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}
         - name: KAFKA_CLEANUP_POLICY
