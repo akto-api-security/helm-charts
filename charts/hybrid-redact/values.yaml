@@ -38,8 +38,7 @@ mini_runtime:
         memory: "8Gi"
   kafka1:
     env:
-      kafkaAdvertisedListeners: LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,
-        LISTENER_DOCKER_EXTERNAL_DIFFHOST://akto-mini-runtime.$(MY_POD_NAMESPACE).svc.cluster.local:9092
+      kafkaAdvertisedListeners: "LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://akto-mini-runtime.$(MY_POD_NAMESPACE).svc.cluster.local:9092"
       kafkaBrokerId: "1"
       kafkaCleanupPolicy: delete
       kafkaCreateTopics: akto.api.logs:3:3
@@ -51,7 +50,7 @@ mini_runtime:
       kafkaControllerQuorumVoters: "1@localhost:9094"
       kafkaControllerListenerNames: "CONTROLLER"
       kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
-      kafkaListeners: ""
+      kafkaListeners: "CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_LOCALHOST://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://0.0.0.0:9092"
       kafkaLogCleanerEnable: "true"
       kafkaLogRetentionBytes: "10737418240"
       kafkaLogRetentionCheckIntervalMs: "60000"

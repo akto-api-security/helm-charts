@@ -141,7 +141,7 @@ spec:
         name: kafka1
         ports:
         - containerPort: 9092
-        - containerPort: 19092
+        - containerPort: 9094
         - containerPort: 29092
         - containerPort: 9999
         resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
