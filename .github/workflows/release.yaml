@@ -28,7 +28,7 @@ jobs:
       - name: Validate sha chart image digests
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^charts/mini-runtime-sha/'; then
-            bash charts/mini-runtime-sha/validate-digests.sh
+            bash .github/workflows/validate-digests.sh
           else
             echo "Skipping digest validation — mini-runtime-sha chart not changed."
           fi
