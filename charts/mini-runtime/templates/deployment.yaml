@@ -237,13 +237,13 @@ spec:
             {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
               {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
             {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 1).port }}, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 1).port }}, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
             {{- else if .Values.mini_runtime.kafka1.useSasl }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 0).port }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 0).port }}
             {{- else if .Values.mini_runtime.kafka1.useTls }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 0).port }},LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 1).port }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 0).port }},LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 1).port }}
             {{- else }}
-              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}
             {{- end }}
         - name: KAFKA_BROKER_ID
           value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}
