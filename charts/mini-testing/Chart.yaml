@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-mini-testing
 description: Helm chart for installing Akto hybrid testing
 type: application
-version: 1.44.4
-appVersion: "1.44.4"
+version: 1.44.5
+appVersion: "1.44.5"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:

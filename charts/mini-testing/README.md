@@ -202,7 +202,8 @@ helm install akto-mini-testing akto/akto-mini-testing \
 Enable the `ai-automated-testing` sidecar container in the mini-testing pod by setting `testing.aiAutomatedTesting.enabled=true` at install time:
 
 ```bash
-helm upgrade --install mini-testing ./charts/mini-testing \
+helm install mini-testing akto/akto-mini-testing \
+  --namespace <your-namespace> \
   --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>" \
   --set testing.aiAutomatedTesting.enabled=true
 ```
