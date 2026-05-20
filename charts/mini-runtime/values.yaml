@@ -66,7 +66,7 @@ mini_runtime:
       aktoLogLevel: WARN
       aktoRunMcpJobs: "true"
       # Enable sending traffic to threat detection (runtime reads SEND_TO_THREAT_ENABLED env)
-      sendToThreatEnabled: "true"
+      sendToThreatEnabled: "false"
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
       databaseAbstractorUrl: https://cyborg.akto.io
