@@ -1,0 +1,54 @@
+mini_runtime:
+  aktoApiSecurityRuntime:
+    env:
+      aktoLogLevel: DEBUG
+      databaseAbstractorToken: ""
+    resources:
+      requests:
+        cpu: 1
+        memory: "1Gi"
+      limits:
+        cpu: 1
+        memory: "1Gi"
+  kafka1:
+    resources:
+      requests:
+        cpu: 1
+        memory: "1Gi"
+        ephemeral-storage: "500Mi"
+      limits:
+        cpu: 1
+        memory: "1Gi"
+        ephemeral-storage: "11Gi"
+keel:
+  keel:
+    enabled: false
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+
+threat_client:
+  replicas: 1
+  aktoApiSecurityThreatClient:
+    env:
+      enabled: false
+    resources:
+      requests:
+        cpu: 1
+        memory: "1Gi"
+      limits:
+        cpu: 1
+        memory: "1Gi"
+
+redis:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "500Mi"
+    limits:
+      cpu: "900m"
+      memory: "1500Mi"

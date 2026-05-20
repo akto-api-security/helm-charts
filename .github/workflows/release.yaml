@@ -25,6 +25,14 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
 
+      - name: Validate sha chart image digests
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -q '^charts/mini-runtime-sha/'; then
+            bash charts/mini-runtime-sha/validate-digests.sh
+          else
+            echo "Skipping digest validation — mini-runtime-sha chart not changed."
+          fi
+
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         env:

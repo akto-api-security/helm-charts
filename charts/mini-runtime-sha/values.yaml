@@ -1,0 +1,285 @@
+mongo:
+  aktoMongoConn: ""
+
+kubernetesClusterDomain: cluster.local
+
+# Busybox image for init containers
+busybox:
+  image:
+    repository: busybox
+    digest: sha256:b3255e7dfbcd10cb367af0d409747d511aeb66dfac98cf30e97e87e4207dd76f
+
+# Node scheduling configuration
+nodeSelector: {}
+  # Example usage:
+  # nodetype: coreservices
+
+tolerations: []
+  # Example usage:
+  # - key: nodetype
+  #   operator: Equal
+  #   value: coreservices
+  #   effect: NoSchedule
+
+affinity: {}
+  # Example usage:
+  # nodeAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     nodeSelectorTerms:
+  #     - matchExpressions:
+  #       - key: nodetype
+  #         operator: In
+  #         values:
+  #         - coreservices
+
+mini_runtime:
+  # External Kafka Configuration
+  # Set useExternalKafka to true to use an existing Kafka cluster
+  # When enabled, the internal Kafka container will not be deployed
+  useExternalKafka: false
+  externalKafka:
+    # Kafka broker URL (e.g., kafka.example.com:9092 or kafka1:9092,kafka2:9092,kafka3:9092)
+    brokerUrl: ""
+    # SASL authentication (leave empty for no authentication)
+    username: ""
+    password: ""
+    # SASL mechanism for external Kafka: PLAIN, SCRAM-SHA-256, or SCRAM-SHA-512
+    saslMechanism: "SCRAM-SHA-256"
+    # SSL/TLS configuration for external Kafka
+    # Set to true if connecting via SSL/TLS (e.g., MSK with TLS)
+    useSsl: false
+    # Security protocol: PLAINTEXT, SASL_PLAINTEXT, SASL_SSL, SSL
+    securityProtocol: "SASL_SSL"
+
+  aktoApiSecurityRuntime:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      aktoLogLevel: WARN
+      aktoRunMcpJobs: "true"
+      # Enable sending traffic to threat detection (runtime reads SEND_TO_THREAT_ENABLED env)
+      sendToThreatEnabled: "true"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+      useHostName: true
+      databaseAbstractorUrl: https://cyborg.akto.io
+      # If you want to use secrets to store database abstractor token. default: false
+      useSecretsForDatabaseAbstractorToken: false
+      # If not using secrets, place token here.
+      databaseAbstractorToken: ""
+      # If using secrets, place token here.
+      databaseAbstractorTokenSecrets: 
+        # Name of an existing secret containing the Database Abstractor Token
+        existingSecret: ""
+        # Token to use if existingSecret is not provided
+        token: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
+      digest: sha256:f2aec6045c82ab6f4c1ca22748c09e5a346ec9f0d4ce5c908704fd35d4eed6f2
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 2
+        memory: "4Gi"
+  kafka1:
+    env:
+      # add advertised listeners if you want to override the default listeners
+      kafkaAdvertisedListeners: ""
+      kafkaBrokerId: "1"
+      kafkaCleanupPolicy: delete
+      kafkaCreateTopics: akto.api.logs:3:3
+      kafkaInterBrokerListenerName: LISTENER_DOCKER_EXTERNAL_LOCALHOST
+      kafkaListenerSecurityProtocolMap: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT
+      kafkaListenerSecurityProtocolMapSsl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED:SSL
+      kafkaListenerSecurityProtocolMapSasl: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_LOCALHOST:SASL_PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST:SASL_PLAINTEXT
+      kafkaListenerSecurityProtocolMapSaslTls: CONTROLLER:PLAINTEXT,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL:SASL_SSL,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL:SASL_PLAINTEXT
+      kafkaProcessRoles: "broker,controller"
+      kafkaNodeId: "1"
+      kafkaControllerQuorumVoters: "1@localhost:9094"
+      kafkaControllerListenerNames: "CONTROLLER"
+      kafkaListeners: ""
+      kafkaLogCleanerEnable: "true"
+      kafkaLogRetentionBytes: "10737418240"
+      kafkaLogRetentionCheckIntervalMs: "60000"
+      kafkaLogRetentionHours: "5"
+      kafkaLogSegmentBytes: "104857600"
+      kafkaOffsetsTopicReplicationFactor: "1"
+      kafkaTransactionStateLogMinIsr: "1"
+      kafkaTransactionStateLogReplicationFactor: "1"
+      kafkaClusterId: "c6a1b8e2-4f2a-4b2a-9c3f-1a2b3c4d5e6f"
+      sslKeystoreLocation: "/etc/kafka/ssl/secrets/server.keystore.jks"
+      sslKeystorePassword: "password"
+      sslKeyPassword: "password"
+      sslTruststoreLocation: "/etc/kafka/ssl/secrets/server.truststore.jks"
+      sslTruststorePassword: "password"
+      sslBaseMountPath: "/etc/kafka/ssl/secrets"
+      sslSecretName: "kafka-certs"
+      useSecretsForSaslCredentials: false
+      saslCredentialsSecrets:
+        existingSecret: ""
+        username: ""
+        password: ""
+      saslUsername: ""
+      saslPassword: ""
+      # SASL mechanism: PLAIN, SCRAM-SHA-256, or SCRAM-SHA-512
+      saslMechanism: "SCRAM-SHA-512"
+    useTls: false
+    useSasl: false
+    # Auto-format storage with SCRAM on first deployment (single helm install)
+    # When enabled, Kafka will format storage with SCRAM user on first run
+    # Requires persistence.enabled: true
+    autoFormatWithScram: false
+    image:
+      repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
+      digest: sha256:d20bd62f01826c454e88530efc6d73654cb4697182f37206742b96c7b947236e
+    resources:
+      requests:
+        cpu: 1.5
+        memory: "4Gi"
+        ephemeral-storage: "500Mi"
+      limits:
+        cpu: 1.5
+        memory: "4Gi"
+        ephemeral-storage: "11Gi"
+
+  replicas: 1
+  type: ClusterIP
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+
+keel:
+  keel:
+    env:
+      awsAccessKeyId: ""
+      awsRegion: ""
+      awsSecretAccessKey: ""
+      hipchatApprovalsBotName: ""
+      hipchatApprovalsChannel: ""
+      hipchatApprovalsPasswort: ""
+      hipchatApprovalsUserName: ""
+      hipchatChannels: ""
+      hipchatToken: ""
+      insecureRegistry: "true"
+      mattermostEndpoint: ""
+      notificationLevel: info
+      webhookEndpoint: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/keelhq-keel
+      digest: sha256:1eb61443d68eff7efe1dc5607e8b3054a518c4abba0aa840ffb6a19456b04507
+    imagePullPolicy: IfNotPresent
+    enabled: true
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  maxUnavailable: 1
+  ports:
+  - name: keel
+    port: 9300
+    protocol: TCP
+    targetPort: 9300
+  replicas: 1
+  serviceAccount:
+    annotations: {}
+  type: LoadBalancer
+
+ports:
+  default:
+    - port: 9092 # Over-ride this to change kafka service exposed port
+      targetPort: 9092
+  tls:
+    - name: plaintext
+      port: 9092
+      targetPort: 9092
+    - name: ssl
+      port: 9093
+      targetPort: 9093
+  sasl:
+    - name: sasl-plaintext
+      port: 9092
+      targetPort: 9092
+    - name: sasl-ssl
+      port: 9093
+      targetPort: 9093
+
+threat_client:
+  replicas: 1
+  aktoApiSecurityThreatClient:
+    env:
+      enabled: true
+      aggregationRulesEnabled: true
+      postgresUrl: jdbc:postgresql://postgres.default.svc.cluster.local:5432/akto
+      postgresUser: akto
+      postgresPassword: akto
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      backendUrl: https://tbs.akto.io
+      aktoLogLevel: INFO
+      useHostName: true
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-threat-detection
+      digest: sha256:b1362efbb9eee9d42dd1c61b18634dc6cf2770f74971d57ce96ff91d78386658
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 1.5
+        memory: "2Gi"
+      limits:
+        cpu: 1.5
+        memory: "2.5Gi"
+
+redis:
+  image:
+    repository: public.ecr.aws/aktosecurity/redis
+    digest: sha256:47200b04138293fae39737e50878a238b13ec0781083126b1b0c63cf5d992e8d
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "500Mi"
+    limits:
+      cpu: "900m"
+      memory: "1Gi"
+  persistence:
+    enabled: false
+    size: "2Gi"
+    storageClass: ""
+
+fluent_bit:
+  enabled: false
+  
+  image:
+    repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
+    digest: sha256:7d727245767ae632eb296c2ff4d206bf2e205b5f244c1f37b8fdd61f9fb33985
+    pullPolicy: IfNotPresent
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+  flush: 5
+  metricsPort: 2020
+  logLevel: info
+  # default values 
+  logStorage:
+    sizeLimit: "1Gi"
+  stateStorage:
+    sizeLimit: "500Mi"

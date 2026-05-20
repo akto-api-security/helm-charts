@@ -1,0 +1,693 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-mini-runtime
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.mini_runtime.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.keel.keel.enabled }}
+    keel.sh/policy: force
+    keel.sh/match-tag: "true"
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@every 60m"
+    keel.sh/monitorContainers: "runtime"
+    {{- end }}
+spec:
+  replicas: {{ .Values.mini_runtime.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-mini-runtime
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-mini-runtime
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.mini_runtime.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.kafka1.useSasl }}
+      initContainers:
+      - name: generate-jaas-config
+        image: {{ .Values.busybox.image.repository }}@{{ .Values.busybox.image.digest }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            mkdir -p /etc/kafka/secrets
+            {{- if eq .Values.mini_runtime.kafka1.env.saslMechanism "PLAIN" }}
+            cat > /etc/kafka/secrets/kafka_server_jaas.conf <<EOF
+            KafkaServer {
+              org.apache.kafka.common.security.plain.PlainLoginModule required
+              username="${KAFKA_SASL_USERNAME}"
+              password="${KAFKA_SASL_PASSWORD}"
+              user_${KAFKA_SASL_USERNAME}="${KAFKA_SASL_PASSWORD}";
+            };
+            EOF
+            {{- else }}
+            cat > /etc/kafka/secrets/kafka_server_jaas.conf <<EOF
+            KafkaServer {
+              org.apache.kafka.common.security.scram.ScramLoginModule required
+              username="${KAFKA_SASL_USERNAME}"
+              password="${KAFKA_SASL_PASSWORD}";
+            };
+            EOF
+            {{- end }}
+            echo "JAAS config generated successfully"
+        env:
+        {{- if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
+        - name: KAFKA_SASL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.username }}
+        - name: KAFKA_SASL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.password }}
+        {{- else }}
+        - name: KAFKA_SASL_USERNAME
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslUsername }}
+        - name: KAFKA_SASL_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslPassword }}
+        {{- end }}
+        volumeMounts:
+        - name: kafka-jaas-config
+          mountPath: /etc/kafka/secrets
+      {{- end }}
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: AKTO_ACCOUNT_NAME
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoAccountName }}
+        - name: IS_KUBERNETES
+          value: "true"
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: AKTO_CONFIG_NAME
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoConfigName }}
+        - name: AKTO_INSTANCE_TYPE
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoInstanceType }}
+        - name: AKTO_KAFKA_BROKER_MAL
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerMal }}{{ end }}
+        - name: AKTO_KAFKA_BROKER_URL
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaBrokerUrl }}{{ end }}
+        - name: AKTO_KAFKA_GROUP_ID_CONFIG
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaGroupIdConfig
+            }}
+        - name: AKTO_KAFKA_MAX_POLL_RECORDS_CONFIG
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaMaxPollRecordsConfig
+            }}
+        - name: AKTO_KAFKA_TOPIC_NAME
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoKafkaTopicName
+            }}
+        - name: AKTO_TRAFFIC_BATCH_SIZE
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoTrafficBatchSize
+            }}
+        - name: AKTO_TRAFFIC_BATCH_TIME_SECS
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoTrafficBatchTimeSecs
+            }}
+        - name: PUPPETEER_REPLAY_SERVICE_URL
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.puppeteerReplayServiceUrl
+            }}
+        - name: AKTO_LOG_LEVEL
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoLogLevel }}
+        - name: AKTO_RUN_MCP_JOBS
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoRunMcpJobs }}
+        - name: SEND_TO_THREAT_ENABLED
+          value: {{ quote (.Values.mini_runtime.aktoApiSecurityRuntime.env.sendToThreatEnabled | default "true") }}
+        - name: AKTO_MONGO_CONN
+          value: {{ quote .Values.mongo.aktoMongoConn }}
+        - name: USE_HOSTNAME
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.useHostName}}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorUrl}}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+            {{- if .Values.mini_runtime.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken }}
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ (tpl .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret .) | default (printf "%s-mini-runtime" (include "akto.fullname" .) ) }}
+            {{- else }}
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken }}
+            {{- end }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if or .Values.mini_runtime.kafka1.useSasl (and .Values.mini_runtime.useExternalKafka .Values.mini_runtime.externalKafka.username) }}
+        - name: KAFKA_AUTH_ENABLED
+          value: "true"
+        - name: AKTO_KAFKA_SASL_ENABLED
+          value: "true"
+        - name: AKTO_KAFKA_SASL_MECHANISM
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.saslMechanism }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}{{ end }}
+        {{- if .Values.mini_runtime.useExternalKafka }}
+        - name: AKTO_KAFKA_SECURITY_PROTOCOL
+          value: {{ quote .Values.mini_runtime.externalKafka.securityProtocol }}
+        {{- end }}
+        {{- if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
+        - name: KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: password
+        {{- else }}
+        - name: KAFKA_USERNAME
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.username }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}
+        - name: KAFKA_PASSWORD
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
+        {{- end }}
+        {{- end }}
+        image: {{ .Values.mini_runtime.aktoApiSecurityRuntime.image.repository }}{{ if .Values.mini_runtime.aktoApiSecurityRuntime.image.digest }}@{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.digest }}{{ else }}:{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.tag | default .Chart.AppVersion }}{{ end }}
+        imagePullPolicy: {{ .Values.mini_runtime.aktoApiSecurityRuntime.imagePullPolicy }}
+        name: akto-api-security-runtime
+        resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
+        volumeMounts:
+        {{- if .Values.fluent_bit.enabled }}
+        - name: log-storage
+          mountPath: /var/log/app
+        {{- end }}
+      
+      {{- if .Values.fluent_bit.enabled }}
+      - name: fluent-bit
+        image: {{ .Values.fluent_bit.image.repository }}{{ if .Values.fluent_bit.image.digest }}@{{ .Values.fluent_bit.image.digest }}{{ else }}:{{ .Values.fluent_bit.image.tag | default "latest" }}{{ end }}
+        imagePullPolicy: {{ .Values.fluent_bit.image.pullPolicy }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          limits:
+            cpu: {{ .Values.fluent_bit.resources.limits.cpu | default "100m" }}
+            memory: {{ .Values.fluent_bit.resources.limits.memory | default "128Mi" }}
+          requests:
+            cpu: {{ .Values.fluent_bit.resources.requests.cpu | default "50m" }}
+            memory: {{ .Values.fluent_bit.resources.requests.memory | default "64Mi" }}
+        volumeMounts:
+        - name: log-storage
+          mountPath: /var/log/app
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+        - name: fluent-bit-state
+          mountPath: /var/fluent-bit/state
+      {{- end }}
+
+      {{- if not .Values.mini_runtime.useExternalKafka }}
+      - env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+            {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 1).port }}, LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.sasl 0).port }}
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 0).port }},LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.tls 1).port }}
+            {{- else }}
+              LISTENER_DOCKER_EXTERNAL_LOCALHOST://localhost:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://{{ .Release.Name }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}
+            {{- end }}
+        - name: KAFKA_BROKER_ID
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaBrokerId }}
+        - name: KAFKA_CLEANUP_POLICY
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaCleanupPolicy }}
+        - name: KAFKA_CREATE_TOPICS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaCreateTopics }}
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaAdvertisedListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaInterBrokerListenerName }}
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              LISTENER_DOCKER_EXTERNAL_DIFFHOST
+            {{- else }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaInterBrokerListenerName }}
+            {{- end }}
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: >-
+            {{- if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSaslTls }}
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSasl }}
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMapSsl }}
+            {{- else }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListenerSecurityProtocolMap }}
+            {{- end }}
+        - name: KAFKA_PROCESS_ROLES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaProcessRoles }}
+        - name: KAFKA_NODE_ID
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaNodeId }}
+        - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaControllerQuorumVoters }}
+        - name: KAFKA_CONTROLLER_LISTENER_NAMES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaControllerListenerNames }}
+        - name: KAFKA_LISTENERS
+          value: >-
+            {{- if .Values.mini_runtime.kafka1.env.kafkaListeners }}
+              {{ .Values.mini_runtime.kafka1.env.kafkaListeners }}
+            {{- else if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.useTls }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://0.0.0.0:9093
+            {{- else if .Values.mini_runtime.kafka1.useSasl }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_LOCALHOST_SASL://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_SASL://0.0.0.0:9092
+            {{- else if .Values.mini_runtime.kafka1.useTls }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_LOCALHOST://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST_ENCRYPTED://0.0.0.0:9093
+            {{- else }}
+              CONTROLLER://0.0.0.0:9094,LISTENER_DOCKER_EXTERNAL_LOCALHOST://0.0.0.0:29092,LISTENER_DOCKER_EXTERNAL_DIFFHOST://0.0.0.0:9092
+            {{- end }}
+      
+        - name: KAFKA_LOG_CLEANER_ENABLE
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogCleanerEnable }}
+        - name: KAFKA_LOG_RETENTION_BYTES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionBytes }}
+        - name: KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionCheckIntervalMs }}
+        - name: KAFKA_LOG_RETENTION_HOURS
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogRetentionHours }}
+        - name: KAFKA_LOG_SEGMENT_BYTES
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaLogSegmentBytes }}
+        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaOffsetsTopicReplicationFactor
+            }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaTransactionStateLogMinIsr }}
+        - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaTransactionStateLogReplicationFactor
+            }}
+        - name: CLUSTER_ID
+          value: {{ quote .Values.mini_runtime.kafka1.env.kafkaClusterId }}
+
+        {{- if .Values.mini_runtime.kafka1.useTls }}
+        - name: KAFKA_SSL_KEYSTORE_LOCATION
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeystoreLocation }}
+        - name: KAFKA_SSL_KEYSTORE_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeystorePassword }}
+        - name: KAFKA_SSL_KEY_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslKeyPassword }}
+        - name: KAFKA_SSL_TRUSTSTORE_LOCATION
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslTruststoreLocation }}
+        - name: KAFKA_SSL_TRUSTSTORE_PASSWORD
+          value: {{ quote .Values.mini_runtime.kafka1.env.sslTruststorePassword }}
+        {{- end }}
+
+        {{- if .Values.mini_runtime.kafka1.useSasl }}
+        - name: KAFKA_OPTS
+          value: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+        - name: KAFKA_SASL_ENABLED_MECHANISMS
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}
+        - name: KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}
+        {{- end }}
+
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if and .Values.mini_runtime.kafka1.useSasl (or (eq .Values.mini_runtime.kafka1.env.saslMechanism "SCRAM-SHA-256") (eq .Values.mini_runtime.kafka1.env.saslMechanism "SCRAM-SHA-512")) }}
+        - name: KAFKA_SCRAM_USERNAME
+          {{- if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: username
+          {{- else }}
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslUsername }}
+          {{- end }}
+        - name: KAFKA_SCRAM_PASSWORD
+          {{- if .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: password
+          {{- else }}
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslPassword }}
+          {{- end }}
+        - name: KAFKA_SCRAM_MECHANISM
+          value: {{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}
+        {{- end }}
+        image: {{ .Values.mini_runtime.kafka1.image.repository }}{{ if .Values.mini_runtime.kafka1.image.digest }}@{{ .Values.mini_runtime.kafka1.image.digest }}{{ else }}:{{ .Values.mini_runtime.kafka1.image.tag | default .Chart.AppVersion }}{{ end }}
+        {{- if .Values.mini_runtime.kafka1.autoFormatWithScram }}
+        command:
+          - bash
+          - -c
+          - |
+            # Auto-format storage with SCRAM credentials on first deployment
+            if [ ! -f /var/lib/kafka/data/.kafka-formatted ]; then
+              echo "========================================================================"
+              echo "FIRST TIME DEPLOYMENT - Formatting Kafka storage with SCRAM user"
+              echo "========================================================================"
+              echo "Cluster ID: ${CLUSTER_ID}"
+              echo "SCRAM Username: ${KAFKA_SCRAM_USERNAME}"
+              echo "SCRAM Mechanism: ${KAFKA_SCRAM_MECHANISM}"
+              echo ""
+
+              # Generate server.properties using Confluent's configure script
+              echo "Generating Kafka configuration..."
+              /etc/confluent/docker/configure
+
+              # Format storage with SCRAM credentials
+              echo "Formatting storage with SCRAM user..."
+              kafka-storage format \
+                --config /etc/kafka/kafka.properties \
+                --cluster-id "${CLUSTER_ID}" \
+                --add-scram "${KAFKA_SCRAM_MECHANISM}=[name=${KAFKA_SCRAM_USERNAME},password=${KAFKA_SCRAM_PASSWORD}]" || {
+                  echo "ERROR: Failed to format storage with SCRAM"
+                  exit 1
+                }
+
+              # Mark as formatted
+              touch /var/lib/kafka/data/.kafka-formatted
+              echo ""
+              echo "SUCCESS: Storage formatted with SCRAM user!"
+              echo "========================================================================"
+            else
+              echo "========================================================================"
+              echo "Storage already formatted - skipping format step"
+              echo "========================================================================"
+            fi
+
+            echo ""
+            echo "Starting Kafka broker with SASL authentication..."
+            echo "========================================================================"
+
+            # Start Kafka using the default entrypoint
+            exec /etc/confluent/docker/run
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.mini_runtime.kafka1.useSasl }}
+        - name: kafka-jaas-config
+          mountPath: /etc/kafka/secrets
+        {{- end }}
+        {{- if .Values.mini_runtime.kafka1.useTls }}
+        - name: kafka-certs
+          mountPath: {{ quote .Values.mini_runtime.kafka1.env.sslBaseMountPath }}
+        {{- end }}
+
+        name: kafka1
+        ports:
+        - containerPort: 9092
+        - containerPort: 9093
+        - containerPort: 29092
+        - containerPort: 9999
+        resources: {{- toYaml .Values.mini_runtime.kafka1.resources | nindent 10 }}
+      {{- end }}
+
+      restartPolicy: Always
+      volumes:
+      {{- if .Values.fluent_bit.enabled }}
+      - name: log-storage
+        emptyDir:
+          sizeLimit: {{ .Values.fluent_bit.logStorage.sizeLimit }}
+      - name: fluent-bit-config
+        configMap:
+          name: {{ include "akto.fullname" . }}-fluent-bit
+      - name: fluent-bit-state
+        emptyDir:
+          sizeLimit: {{ .Values.fluent_bit.stateStorage.sizeLimit }}
+      {{- end }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.kafka1.useSasl }}
+      - name: kafka-jaas-config
+        emptyDir: {}
+      {{- end }}
+      {{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.kafka1.useTls }}
+      - name: kafka-certs
+        secret:
+          secretName: {{ quote .Values.mini_runtime.kafka1.env.sslSecretName }}
+      {{- end }}
+
+---
+{{ if .Values.keel.keel.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-keel
+  labels:
+    app: keel
+  {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.keel.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.keel.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-keel
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-keel
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.keel.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - command:
+        - /bin/keel
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AWS_ACCESS_KEY_ID
+          value: {{ quote .Values.keel.keel.env.awsAccessKeyId }}
+        - name: AWS_SECRET_ACCESS_KEY
+          value: {{ quote .Values.keel.keel.env.awsSecretAccessKey }}
+        - name: AWS_REGION
+          value: {{ quote .Values.keel.keel.env.awsRegion }}
+        - name: WEBHOOK_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.webhookEndpoint }}
+        - name: MATTERMOST_ENDPOINT
+          value: {{ quote .Values.keel.keel.env.mattermostEndpoint }}
+        - name: HIPCHAT_TOKEN
+          value: {{ quote .Values.keel.keel.env.hipchatToken }}
+        - name: HIPCHAT_CHANNELS
+          value: {{ quote .Values.keel.keel.env.hipchatChannels }}
+        - name: HIPCHAT_APPROVALS_CHANNEL
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsChannel }}
+        - name: HIPCHAT_APPROVALS_BOT_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsBotName }}
+        - name: HIPCHAT_APPROVALS_USER_NAME
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsUserName }}
+        - name: HIPCHAT_APPROVALS_PASSWORT
+          value: {{ quote .Values.keel.keel.env.hipchatApprovalsPasswort }}
+        - name: NOTIFICATION_LEVEL
+          value: {{ quote .Values.keel.keel.env.notificationLevel }}
+        - name: INSECURE_REGISTRY
+          value: {{ quote .Values.keel.keel.env.insecureRegistry }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.keel.keel.image.repository }}{{ if .Values.keel.keel.image.digest }}@{{ .Values.keel.keel.image.digest }}{{ else }}:{{ .Values.keel.keel.image.tag | default .Chart.AppVersion }}{{ end }}
+        imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9300
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+        name: keel
+        ports:
+        - containerPort: 9300
+        resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
+      serviceAccountName: {{ include "akto.fullname" . }}-keel
+{{ end }}
+
+{{ if .Values.threat_client.aktoApiSecurityThreatClient.env.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "akto.fullname" . }}-threat-client
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.threat_client.deploymentAnnotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .Values.keel.keel.enabled }}
+    keel.sh/policy: force
+    keel.sh/match-tag: "true"
+    keel.sh/trigger: poll
+    keel.sh/pollSchedule: "@every 60m"
+    {{- end }}
+spec:
+  replicas: {{ .Values.threat_client.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "akto.fullname" . }}-threat-client
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "akto.fullname" . }}-threat-client
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+      annotations:
+        {{- with .Values.threat_client.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: RUNTIME_MODE
+          value: "hybrid"
+        - name: AKTO_THREAT_DETECTION_POSTGRES
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUrl }}
+        - name: AKTO_THREAT_DETECTION_POSTGRES_USER
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresUser }}
+        - name: AKTO_THREAT_DETECTION_POSTGRES_PASSWORD
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
+            }}
+        - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
+        - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
+        - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
+          value: "redis://{{ include "akto.fullname" . }}-redis:6379"
+
+        - name: AKTO_THREAT_PROTECTION_BACKEND_TOKEN
+            {{- if .Values.mini_runtime.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken }}
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ (tpl .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret .) | default (printf "%s-mini-runtime" (include "akto.fullname" .) ) }}
+            {{- else }}
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken }}
+            {{- end }}
+
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+            {{- if .Values.mini_runtime.aktoApiSecurityRuntime.env.useSecretsForDatabaseAbstractorToken }}
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ (tpl .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorTokenSecrets.existingSecret .) | default (printf "%s-mini-runtime" (include "akto.fullname" .) ) }}
+            {{- else }}
+          value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken }}
+            {{- end }}
+        - name: AKTO_LOG_LEVEL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aktoLogLevel }}
+        - name: AKTO_THREAT_PROTECTION_BACKEND_URL
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.backendUrl }}
+        - name: AGGREGATION_RULES_ENABLED
+          value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.aggregationRulesEnabled }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if or .Values.mini_runtime.kafka1.useSasl (and .Values.mini_runtime.useExternalKafka .Values.mini_runtime.externalKafka.username) }}
+        - name: AKTO_KAFKA_SASL_ENABLED
+          value: "true"
+        - name: AKTO_KAFKA_SASL_MECHANISM
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.saslMechanism }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslMechanism }}{{ end }}
+        - name: KAFKA_AUTH_ENABLED
+          value: "true"
+        {{- if .Values.mini_runtime.useExternalKafka }}
+        - name: AKTO_KAFKA_SECURITY_PROTOCOL
+          value: {{ quote .Values.mini_runtime.externalKafka.securityProtocol }}
+        {{- end }}
+        {{- if and .Values.mini_runtime.kafka1.useSasl .Values.mini_runtime.kafka1.env.useSecretsForSaslCredentials }}
+        - name: KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: password
+        - name: AKTO_KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: AKTO_KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.mini_runtime.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-runtime-sasl" (include "akto.fullname" .)) }}
+              key: password
+        {{- else }}
+        - name: KAFKA_USERNAME
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.username }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}
+        - name: KAFKA_PASSWORD
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
+        - name: AKTO_KAFKA_USERNAME
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.username }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslUsername }}{{ end }}
+        - name: AKTO_KAFKA_PASSWORD
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.password }}{{ else }}{{ quote .Values.mini_runtime.kafka1.env.saslPassword }}{{ end }}
+        {{- end }}
+        {{- end}}
+        image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}{{ if .Values.threat_client.aktoApiSecurityThreatClient.image.digest }}@{{ .Values.threat_client.aktoApiSecurityThreatClient.image.digest }}{{ else }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag | default .Chart.AppVersion }}{{ end }}
+        imagePullPolicy: {{ .Values.threat_client.aktoApiSecurityThreatClient.imagePullPolicy }}
+        name: akto-api-security-threat-client
+        resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}
+      restartPolicy: Always
+{{ end }}
