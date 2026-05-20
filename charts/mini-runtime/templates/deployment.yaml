@@ -609,9 +609,9 @@ spec:
           value: {{ quote .Values.threat_client.aktoApiSecurityThreatClient.env.postgresPassword
             }}
         - name: AKTO_TRAFFIC_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
         - name: AKTO_INTERNAL_KAFKA_BOOTSTRAP_SERVER
-          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}akto-mini-runtime-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
+          value: {{ if .Values.mini_runtime.useExternalKafka }}{{ quote .Values.mini_runtime.externalKafka.brokerUrl }}{{ else }}{{ include "akto.fullname" . }}-mini-runtime.{{ .Release.Namespace }}.svc.cluster.local:{{ (index .Values.ports.default 0).port }}{{ end }}
         - name: AKTO_THREAT_DETECTION_LOCAL_REDIS_URI
           value: "redis://{{ include "akto.fullname" . }}-redis:6379"
 
