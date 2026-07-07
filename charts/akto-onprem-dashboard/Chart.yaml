@@ -1,0 +1,19 @@
+apiVersion: v2
+name: akto-onprem-dashboard
+description: Helm chart for deploying Akto Dashboard on-prem with Azure Cosmos DB and Azure Key Vault
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+home: https://www.akto.io
+icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+sources:
+  - https://github.com/akto-api-security/helm-charts
+keywords:
+  - akto
+  - api
+  - api security
+  - onprem
+  - cosmos
+maintainers:
+  - name: Akto
+    email: support@akto.io

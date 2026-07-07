@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-dashboard
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  type: {{ .Values.dashboard.type }}
+  selector:
+    app: {{ include "akto.fullname" . }}-dashboard
+  {{- include "akto.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.dashboard.ports | toYaml | nindent 2 -}}

@@ -1,0 +1,67 @@
+mongo:
+  secretName: akto-secrets
+  secretKey: aktoMongoConn
+  secretProviderClass: akto-keyvault
+
+dashboard:
+  aktoApiSecurityDashboard:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      aktoInstanceType: DASHBOARD
+      aktoKafkaBrokerMal: localhost:29092
+      aktoKafkaBrokerUrl: 127.0.0.1:29092
+      aktoKafkaGroupIdConfig: asdf
+      aktoKafkaMaxPollRecordsConfig: "100"
+      aktoKafkaTopicName: akto.api.logs
+      aktoTrafficBatchSize: "100"
+      aktoTrafficBatchTimeSecs: "10"
+      puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
+    image:
+      repository: aktosecurity/akto-api-security-dashboard
+      tag: latest
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 1
+        memory: "4Gi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+  ports:
+  - port: 8080
+    targetPort: 8080
+  replicas: 1
+  type: LoadBalancer
+
+keel:
+  serviceAccount:
+    annotations: {}
+  keel:
+    env:
+      awsAccessKeyId: ""
+      awsRegion: ""
+      awsSecretAccessKey: ""
+      insecureRegistry: "true"
+      mattermostEndpoint: ""
+      notificationLevel: info
+      webhookEndpoint: ""
+    image:
+      repository: keelhq/keel
+      tag: latest
+    imagePullPolicy: Always
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  ports:
+  - name: keel
+    port: 9300
+    protocol: TCP
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local
