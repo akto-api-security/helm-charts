@@ -324,6 +324,37 @@ entries:
     version: 0.1.0
   akto-dashboard:
   - apiVersion: v2
+    appVersion: 0.1.6
+    created: "2026-07-07T13:25:12.624826746Z"
+    dependencies:
+    - condition: csiDriver.install
+      name: secrets-store-csi-driver
+      repository: https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+      version: 1.4.x
+    - condition: csiDriver.install
+      name: csi-secrets-store-provider-azure
+      repository: https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+      version: 1.5.x
+    description: Helm chart for installing Akto
+    digest: 2bd7a41abb4e0dc0f8bac379437260903f015bd9f305233e34fcb2240a462188
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-dashboard
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup-dashboard
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-dashboard-0.1.6/akto-dashboard-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     appVersion: 0.1.5
     created: "2025-04-24T13:33:34.356744503Z"
     description: Helm chart for installing Akto
@@ -4351,4 +4382,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-03T09:19:23.031328101Z"
+generated: "2026-07-07T13:25:12.62508373Z"
