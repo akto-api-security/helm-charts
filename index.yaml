@@ -279,6 +279,45 @@ entries:
     version: 0.1.0
   akto-ai-guardrails-v2:
   - apiVersion: v2
+    appVersion: 0.1.2
+    created: "2026-07-16T02:54:49.089853728Z"
+    dependencies:
+    - alias: ingestion
+      condition: ingestion.enabled
+      name: data-ingestion-service
+      repository: file://../data-ingestion-service
+      version: 0.1.10-sha
+    - condition: csiDriver.install
+      name: secrets-store-csi-driver
+      repository: https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+      version: 1.4.x
+    - condition: csiDriver.install
+      name: csi-secrets-store-provider-azure
+      repository: https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+      version: 1.5.x
+    description: Helm chart for deploying the full Akto AI Guardrails stack (data
+      ingestion, guardrails service, kafka, redis, embedder, agent guard, anonymizer)
+    digest: fd775e026e4d6b8e3aae88d91022d0508b6ce31c611d4963aeada98c7fb48ac7
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - ai
+    - guardrails
+    - security
+    - llm
+    - agent-guard
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-ai-guardrails-v2
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-ai-guardrails-v2
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-v2-0.1.2/akto-ai-guardrails-v2-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 0.1.1
     created: "2026-07-15T17:28:40.5339305Z"
     dependencies:
@@ -4346,6 +4385,28 @@ entries:
     version: 0.1.0
   data-ingestion-service:
   - apiVersion: v2
+    appVersion: 0.1.10-sha
+    created: "2026-07-16T02:54:49.23077313Z"
+    description: Helm chart for Akto Data Ingestion Service
+    digest: 2c07bdf61e68c96591717e39d8e210c08ae4f5cb5832862f5ce15dee2c84bfcb
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - data ingestion
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: data-ingestion-service
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/data-ingestion-service
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/data-ingestion-service-0.1.10-sha/data-ingestion-service-0.1.10-sha.tgz
+    version: 0.1.10-sha
+  - apiVersion: v2
     appVersion: 0.1.9-sha
     created: "2026-07-15T17:28:40.685699328Z"
     description: Helm chart for Akto Data Ingestion Service
@@ -4672,4 +4733,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-15T19:29:38.386057878Z"
+generated: "2026-07-16T02:54:49.231485593Z"
