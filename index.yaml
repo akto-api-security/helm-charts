@@ -837,6 +837,28 @@ entries:
     version: 0.1.4
   akto-dbabs:
   - apiVersion: v2
+    appVersion: 0.1.9
+    created: "2026-07-22T07:34:29.275505552Z"
+    description: Helm chart for installing Akto
+    digest: 0b88755352fe8c08b92d3d84db29869efaf5db9adbb6458cd5c87ca5e447d73c
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-dbabs
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-setup-database-abstractor
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-dbabs-0.1.9/akto-dbabs-0.1.9.tgz
+    version: 0.1.9
+  - apiVersion: v2
     appVersion: 0.1.8
     created: "2026-07-21T14:20:23.268263014Z"
     description: Helm chart for installing Akto
@@ -5043,4 +5065,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-21T14:20:23.268919019Z"
+generated: "2026-07-22T07:34:29.277232967Z"
