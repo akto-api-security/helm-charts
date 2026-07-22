@@ -279,6 +279,41 @@ entries:
     version: 0.1.0
   akto-ai-guardrails-v2:
   - apiVersion: v2
+    appVersion: 0.2.1
+    created: "2026-07-22T10:25:49.406296974Z"
+    dependencies:
+    - alias: ingestion
+      condition: ingestion.enabled
+      name: data-ingestion-service
+      repository: file://../data-ingestion-service
+      version: 0.1.10-sha
+    - condition: csiDriver.install
+      name: csi-secrets-store-provider-azure
+      repository: https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+      version: 1.5.x
+    description: Helm chart for deploying the full Akto AI Guardrails stack (data
+      ingestion, guardrails service, kafka, redis, embedder, agent guard, anonymizer)
+    digest: 848a9eaf437ea7b9d35d1528332014d772f7b675ed67d057a95ed6502b32e144
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - ai
+    - guardrails
+    - security
+    - llm
+    - agent-guard
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-ai-guardrails-v2
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-ai-guardrails-v2
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-v2-0.2.1/akto-ai-guardrails-v2-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
     appVersion: 0.2.0
     created: "2026-07-21T14:20:22.998265976Z"
     dependencies:
@@ -5065,4 +5100,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-22T07:34:29.277232967Z"
+generated: "2026-07-22T10:25:49.406641203Z"
