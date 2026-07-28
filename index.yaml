@@ -4736,6 +4736,28 @@ entries:
     version: 1.42.12
   akto-threat-backend:
   - apiVersion: v2
+    appVersion: 0.1.5
+    created: "2026-07-28T05:53:33.872197427Z"
+    description: Helm chart for installing Akto threat backend
+    digest: ea444ac00e567fe7dd852737e710ee313f41d3b2f79e99594d45a5512261d691
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-threat-backend
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-threat-backend
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-backend-0.1.5/akto-threat-backend-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
     appVersion: 0.1.4
     created: "2026-07-14T13:48:52.280535589Z"
     description: Helm chart for installing Akto threat backend
@@ -5332,4 +5354,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-28T05:22:51.794833292Z"
+generated: "2026-07-28T05:53:33.872705728Z"
