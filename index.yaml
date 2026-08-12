@@ -973,6 +973,30 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-aws-api-gateway-connector-0.1.0/akto-aws-api-gateway-connector-0.1.0.tgz
     version: 0.1.0
+  akto-central-setup:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-08-12T21:11:05.80125009Z"
+    description: Akto central cloud - dashboard, database abstractor and threat backend
+      in a single chart
+    digest: 0fc0de3fed1956075ee788ae34569279cc1a9ace0916c7867445efd783f36082
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-central-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-central-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-central-setup-1.0.0/akto-central-setup-1.0.0.tgz
+    version: 1.0.0
   akto-dashboard:
   - apiVersion: v2
     appVersion: 0.1.7
@@ -4531,6 +4555,30 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-protection-0.1.0/akto-protection-0.1.0.tgz
     version: 0.1.0
+  akto-regional-setup:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-08-12T21:11:06.058166112Z"
+    description: Akto regional cloud - mini-runtime, threat client, data ingestion
+      and AI guardrails in a single chart
+    digest: fcdae066e6f5ee6b35d23e914ac15bfa0308d835e6d59e674e228926b2e8d4fd
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - guardrails
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-regional-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-regional-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-regional-setup-1.0.0/akto-regional-setup-1.0.0.tgz
+    version: 1.0.0
   akto-runtime:
   - apiVersion: v2
     appVersion: 0.1.8
@@ -5398,4 +5446,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-31T16:17:20.89036692Z"
+generated: "2026-08-12T21:11:06.06039514Z"
