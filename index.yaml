@@ -279,6 +279,41 @@ entries:
     version: 0.1.0
   akto-ai-guardrails-v2:
   - apiVersion: v2
+    appVersion: 0.3.0
+    created: "2026-08-24T12:07:12.044023562Z"
+    dependencies:
+    - alias: ingestion
+      condition: ingestion.enabled
+      name: data-ingestion-service
+      repository: file://../data-ingestion-service
+      version: 0.1.11-sha
+    - condition: csiDriver.install
+      name: csi-secrets-store-provider-azure
+      repository: https://azure.github.io/secrets-store-csi-driver-provider-azure/charts
+      version: 1.5.x
+    description: Helm chart for deploying the full Akto AI Guardrails stack (data
+      ingestion, guardrails service, kafka, redis, embedder, agent guard, anonymizer)
+    digest: 93e0eb6cb276262f9ae3f6b004e96851642ea55233de746d19fe985aec6a7022
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - ai
+    - guardrails
+    - security
+    - llm
+    - agent-guard
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-ai-guardrails-v2
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-ai-guardrails-v2
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-ai-guardrails-v2-0.3.0/akto-ai-guardrails-v2-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     appVersion: 0.2.7
     created: "2026-07-28T05:22:51.794323202Z"
     dependencies:
@@ -4763,6 +4798,29 @@ entries:
     version: 0.1.0
   akto-regional-setup:
   - apiVersion: v2
+    appVersion: 1.2.0
+    created: "2026-08-24T12:07:12.268564916Z"
+    description: Akto regional cloud - mini-runtime, threat client, data ingestion
+      and AI guardrails in a single chart
+    digest: bb865c3b10be86c458d682889ead21b2b2400320a48ec77a781ac9a870ea76c0
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - guardrails
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-regional-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-regional-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-regional-setup-1.2.0/akto-regional-setup-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
     appVersion: 1.1.9
     created: "2026-08-22T19:39:09.32783627Z"
     description: Akto regional cloud - mini-runtime, threat client, data ingestion
@@ -5373,6 +5431,29 @@ entries:
     version: 0.1.0
   akto-threat-client:
   - apiVersion: v2
+    appVersion: 0.2.0
+    created: "2026-08-24T12:07:12.496569555Z"
+    description: Helm chart for installing Akto's threat detection client, with a
+      bundled Kafka broker
+    digest: cca8bf0f3e612b7bb8cf4a086d05e3c4a6675b3c1f426f052f0f8436f81a420c
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - threat detection
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-threat-client
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-threat-client
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-threat-client-0.2.0/akto-threat-client-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.1.0
     created: "2026-07-15T19:29:38.38568534Z"
     description: Helm chart for installing Akto's threat detection client, with a
@@ -5836,4 +5917,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-22T19:39:09.328290624Z"
+generated: "2026-08-24T12:07:12.498663617Z"
