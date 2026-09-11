@@ -1481,6 +1481,28 @@ entries:
     version: 0.1.4
   akto-hybrid-redact:
   - apiVersion: v2
+    appVersion: 1.44.4
+    created: "2026-09-11T07:41:24.06314707Z"
+    description: Helm chart for installing Akto
+    digest: c5169f0d21fa91310c6b38224080916c820f202a8249c2911a1dfb8ae5031e22
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-hybrid-redact
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/hybrid-redact
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-hybrid-redact-1.44.4/akto-hybrid-redact-1.44.4.tgz
+    version: 1.44.4
+  - apiVersion: v2
     appVersion: 1.44.3
     created: "2026-05-18T04:27:05.855840404Z"
     description: Helm chart for installing Akto
@@ -5986,4 +6008,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-09T06:33:19.841432998Z"
+generated: "2026-09-11T07:41:24.06380226Z"
