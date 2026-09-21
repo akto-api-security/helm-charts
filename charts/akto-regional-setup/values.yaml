@@ -191,16 +191,18 @@ miniRuntime:
   enabled: true
   replicas: 1
 
-  # Enabled per this deployment's agreed sizing (client resource sheet), despite
-  # the risk below - accepted knowingly, not the chart's general recommendation.
+  # OFF by default, and safe to turn on only with an external Kafka.
   # The bundled Kafka broker is a per-pod sidecar, not a shared cluster - it's
   # also the regional traffic bus other components read/write via this
   # Service's DNS name. Scaling past 1 replica splits that bus across N
   # independent single-node brokers behind one ClusterIP, so producers and
-  # consumers can land on different, inconsistent brokers, unless
-  # miniRuntime.external.enabled=true (a real external Kafka cluster).
+  # consumers land on different, inconsistent brokers and traffic is parsed
+  # against partial state.
+  #
+  # Set miniRuntime.external.enabled=true (a real external Kafka cluster) first,
+  # and every replica then shares one bus and scaling is safe.
   autoscaling:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     targetCPUUtilizationPercentage: 70
