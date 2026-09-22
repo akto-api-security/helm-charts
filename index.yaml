@@ -1010,6 +1010,29 @@ entries:
     version: 0.1.0
   akto-central-setup:
   - apiVersion: v2
+    appVersion: 1.2.0
+    created: "2026-09-22T19:58:23.11071017Z"
+    description: Akto central cloud - dashboard, database abstractor and threat backend
+      in a single chart
+    digest: 2db8114350da250d6610e1eb2c51b248fb98c8959a87f21850b11da2091dc02b
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-central-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-central-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-central-setup-1.2.0/akto-central-setup-1.2.0.tgz
+    version: 1.2.0
+  - apiVersion: v2
     appVersion: 1.1.10
     created: "2026-09-09T06:33:19.841006014Z"
     description: Akto central cloud - dashboard, database abstractor and threat backend
@@ -6119,4 +6142,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-21T14:55:10.513574396Z"
+generated: "2026-09-22T19:58:23.110994429Z"
