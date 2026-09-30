@@ -1,4 +1,17 @@
 {{- if .Values.agentGuard.enabled }}
+{{- if (.Values.agentGuard.serviceAccount | default dict).create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "akto-regional-setup.agentGuard.serviceAccountName" . }}
+  labels:
+    {{- include "akto-regional-setup.componentLabels" (list . "agent-guard") | nindent 4 }}
+  {{- with .Values.agentGuard.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+---
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,7 +32,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "akto-regional-setup.serviceAccountName" . }}
+      serviceAccountName: {{ include "akto-regional-setup.agentGuard.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

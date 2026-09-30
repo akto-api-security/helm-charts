@@ -596,7 +596,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.1.6"
+    tag: "a-feature-bedrock-ag-support"
     pullPolicy: Always
 
   service:
@@ -637,12 +637,36 @@ agentGuard:
     anthropicModel: ""
     openaiModel: ""
     openaiCompatibleBaseUrl: ""
+    # AWS Bedrock ("bedrock" provider, Converse API). Region is required;
+    # model is the default model id for modelConfigs entries that set none
+    # (foundation model id, cross-region inference profile like
+    # us.anthropic.claude-haiku-4-5-20251001-v1:0, or an ARN). No credential
+    # values: on EKS agent-guard uses its pod IAM role - see
+    # agentGuard.serviceAccount below.
+    bedrockRegion: ""
+    bedrockModel: ""
     # Routes requests between the providers above (fast filter, fallback,
     # final arbiter - roles, timeouts, thresholds). Must be set together with
     # whichever provider credentials you sync below, or agent-guard's
     # built-in fallback - hardcoded to Vertex providers - tries Vertex,
     # fails, and never touches the providers configured above.
     defaultModelConfigJson: ""
+
+  # Dedicated ServiceAccount, so an IAM role for Bedrock is granted to
+  # agent-guard only (not every component on the shared serviceAccount above).
+  # create: false + blank name = keep using the shared one.
+  #
+  # Bedrock on EKS, no keys - pick one:
+  #   IRSA:          create: true, annotations:
+  #                    eks.amazonaws.com/role-arn: arn:aws:iam::<acct>:role/<role>
+  #   Pod Identity:  create: true (or a fixed name), then associate the role
+  #                  with <namespace>/<this SA name> via
+  #                  `aws eks create-pod-identity-association`.
+  # Either way EKS injects the AWS_* env vars agent-guard reads its role from.
+  serviceAccount:
+    create: false
+    name: ""
+    annotations: {}
 
   resources:
     requests:
@@ -686,6 +710,11 @@ agentGuard:
   # NOTE: reaching these providers is OUTBOUND traffic. With networkPolicy
   # enabled you must allowlist them under
   # networkPolicy.components.agentGuard.egressAllowlist.
+  #
+  # Bedrock via pod IAM role needs egress to bedrock-runtime.<region> and (IRSA)
+  # sts.<region> - VPC interface endpoints put both on private IPs, which the
+  # RFC1918 defaults already allow - plus, for Pod Identity, the node-local
+  # agent: egressAllowlist: [{cidr: 169.254.170.23/32, ports: [{port: 80, protocol: TCP}]}]
 
 # =============================================================================
 # 6. Anonymizer - PII masking used by Agent Guard.

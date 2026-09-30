@@ -66,6 +66,23 @@ app.kubernetes.io/component: {{ $component }}
 {{- end }}
 
 {{/*
+Agent-guard's own ServiceAccount, so an IAM role for model access (Bedrock via
+IRSA / EKS Pod Identity) is granted to agent-guard alone rather than to every
+component sharing the release ServiceAccount. Falls back to that shared one
+when agentGuard.serviceAccount is neither created nor named.
+*/}}
+{{- define "akto-regional-setup.agentGuard.serviceAccountName" -}}
+{{- $sa := .Values.agentGuard.serviceAccount | default dict }}
+{{- if $sa.create }}
+{{- default (include "akto-regional-setup.componentName" (list . "agent-guard")) $sa.name }}
+{{- else if $sa.name }}
+{{- $sa.name }}
+{{- else }}
+{{- include "akto-regional-setup.serviceAccountName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Renders "repository@digest" when a digest is set, else "repository:tag".
 Usage: {{ include "akto-regional-setup.image" .Values.miniRuntime.image }}
 */}}
@@ -272,6 +289,8 @@ Vault. (env var name, agentGuard.env key name) pairs.
   (list "ANTHROPIC_MODEL" "anthropicModel")
   (list "OPENAI_MODEL" "openaiModel")
   (list "OPENAI_COMPATIBLE_BASE_URL" "openaiCompatibleBaseUrl")
+  (list "BEDROCK_REGION" "bedrockRegion")
+  (list "BEDROCK_MODEL" "bedrockModel")
   (list "DEFAULT_MODEL_CONFIG_JSON" "defaultModelConfigJson")
 -}}
 {{- range $pairs }}
