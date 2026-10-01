@@ -291,6 +291,7 @@ Vault. (env var name, agentGuard.env key name) pairs.
   (list "OPENAI_COMPATIBLE_BASE_URL" "openaiCompatibleBaseUrl")
   (list "BEDROCK_REGION" "bedrockRegion")
   (list "BEDROCK_MODEL" "bedrockModel")
+  (list "BEDROCK_CREDENTIALS_REFRESH_MARGIN_SEC" "bedrockCredentialsRefreshMarginSec")
   (list "DEFAULT_MODEL_CONFIG_JSON" "defaultModelConfigJson")
 -}}
 {{- range $pairs }}

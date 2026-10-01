@@ -596,7 +596,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "a-feature-bedrock-ag-support"
+    tag: "1.2.0"
     pullPolicy: Always
 
   service:
@@ -645,6 +645,9 @@ agentGuard:
     # agentGuard.serviceAccount below.
     bedrockRegion: ""
     bedrockModel: ""
+    # Seconds before expiry that agent-guard refreshes its pod IAM-role
+    # credentials. Blank = 1800 (30 min); capped at half their lifetime.
+    bedrockCredentialsRefreshMarginSec: ""
     # Routes requests between the providers above (fast filter, fallback,
     # final arbiter - roles, timeouts, thresholds). Must be set together with
     # whichever provider credentials you sync below, or agent-guard's
