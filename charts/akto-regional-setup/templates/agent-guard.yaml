@@ -65,6 +65,10 @@ spec:
         - name: SLACK_WEBHOOK_URL
           value: {{ quote . }}
         {{- end }}
+        {{- with .Values.agentGuard.env.scannerResponseFormat }}
+        - name: SCANNER_RESPONSE_FORMAT
+          value: {{ quote . }}
+        {{- end }}
         {{- include "akto-regional-setup.agentGuard.secretEnv" . | nindent 8 }}
         {{- include "akto-regional-setup.agentGuard.providerEnv" . | nindent 8 }}
         {{- include "akto-regional-setup.probes" (list .Values.agentGuard .Values.agentGuard.service.targetPort) | nindent 8 }}

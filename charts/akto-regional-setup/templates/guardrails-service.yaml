@@ -36,6 +36,10 @@ meaningless outside this file.
 - name: EMBEDDER_URL
   value: {{ include "akto-regional-setup.embedder.url" . | quote }}
 {{- end }}
+- name: GUARDRAILS_COMPACT_CUSTOM_RULES
+  value: {{ quote .Values.guardrailsService.env.compactCustomRules }}
+- name: GUARDRAILS_GENERATE_REASON
+  value: {{ quote .Values.guardrailsService.env.generateReason }}
 {{- with .Values.guardrailsService.env.rsaPublicKey }}
 - name: RSA_PUBLIC_KEY
   value: {{ quote . }}
