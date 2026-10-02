@@ -488,7 +488,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.14.8"
+    tag: "2.40.3"
     pullPolicy: Always
 
   env:
@@ -515,6 +515,13 @@ guardrailsService:
     scannerApiUrl: ""
     # PUBLIC JWT verification key.
     rsaPublicKey: ""
+    # Shorter LLM prompts for lower latency. compactCustomRules switches
+    # custom-rule, PII-LLM and redaction checks to compact prompts that answer
+    # without a reason; generateReason backfills that reason in the background
+    # before the threat report is sent. Keep both on together - compact
+    # without generateReason sends threat reports with no reason.
+    compactCustomRules: "true"
+    generateReason: "true"
 
   http:
     enabled: true
@@ -596,7 +603,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.2.0"
+    tag: "1.2.1"
     pullPolicy: Always
 
   service:
@@ -605,6 +612,11 @@ agentGuard:
 
   env:
     slackWebhookUrl: ""
+    # Compact answer contract for every scanner model (incl. the final
+    # arbiter) - fewer output tokens, lower latency. Scanners without an
+    # "abcd" template stay on JSON. "json" forces the full JSON verdict
+    # everywhere; blank leaves each model's own responseFormat in charge.
+    scannerResponseFormat: "abcd"
 
     # Model-provider config - base URLs, deployment/model names, GCP
     # project/location/endpoint identifiers, dedicated-DNS hosts, and the
