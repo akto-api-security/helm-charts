@@ -40,7 +40,7 @@ mini_runtime:
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.74.6_local
+      tag: 1.74.7_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -97,7 +97,7 @@ testing:
       publicKey: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.74.4_local
+      tag: 1.74.7_local
     resources:
       requests:
         cpu: "200m"
