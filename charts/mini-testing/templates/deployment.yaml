@@ -301,17 +301,66 @@ spec:
             value: {{ quote .Values.testing.agentTesting.env.nodeTlsRejectUnauthorized }}
           - name: USE_SESSION_MANAGEMENT
             value: {{ quote .Values.testing.agentTesting.env.useSessionManagement }}
-          - name: AKTO_UTILITY_SERVER 
+          - name: AKTO_UTILITY_SERVER
             value: {{ quote .Values.testing.agentTesting.env.aktoUtilityServer }}
-          - name: ANTHROPIC_API_KEY
-            {{- if .Values.testing.agentTesting.env.useSecretsForAnthropicApiKey }}
-            valueFrom:
-              secretKeyRef:
-                key: token
-                name: {{ (tpl .Values.testing.agentTesting.env.anthropicApiKeySecrets.existingSecret .) | default (printf "%s-agent-testing" (include "akto.fullname" .) ) }}
-            {{- else }}
-            value: {{ quote .Values.testing.agentTesting.env.anthropicApiKey }}
-            {{- end }}
+          {{- $llm := .Values.testing.agentTesting.env.llm }}
+          {{- $sec := printf "%s-agent-testing" (include "akto.fullname" .) }}
+          {{- with $llm.provider }}
+          - name: LLM_PROVIDER
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.azure.endpoint }}
+          - name: AZURE_OPENAI_ENDPOINT
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.azure.model }}
+          - name: AZURE_OPENAI_MODEL
+            value: {{ quote . }}
+          {{- end }}
+          {{- include "akto.agentTesting.credEnv" (list "AZURE_OPENAI_API_KEY" $llm.azure.apiKey $llm.azure.existingSecret $llm.azure.existingSecretKey $sec) | nindent 10 }}
+          {{- with $llm.vertex.projectId }}
+          - name: VERTEX_PROJECT_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.vertex.location }}
+          - name: VERTEX_LOCATION
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.vertex.endpointId }}
+          - name: VERTEX_ENDPOINT_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.vertex.endpointDomain }}
+          - name: VERTEX_ENDPOINT_DOMAIN
+            value: {{ quote . }}
+          {{- end }}
+          {{- include "akto.agentTesting.credEnv" (list "GOOGLE_CREDENTIALS_JSON" $llm.vertex.credentialsJson $llm.vertex.existingSecret $llm.vertex.existingSecretKey $sec) | nindent 10 }}
+          {{- with $llm.anthropic.agentModelId }}
+          - name: ANTHROPIC_AGENT_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- include "akto.agentTesting.anthropicEnv" . | nindent 10 }}
+          {{- with $llm.bedrock.awsRegion }}
+          - name: AWS_REGION
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.bedrock.inferenceProfilePrefix }}
+          - name: BEDROCK_INFERENCE_PROFILE_PREFIX
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.bedrock.sonnetModelId }}
+          - name: BEDROCK_SONNET_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.bedrock.haikuModelId }}
+          - name: BEDROCK_HAIKU_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.bedrock.agentModelId }}
+          - name: BEDROCK_AGENT_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- include "akto.agentTesting.credEnv" (list "AWS_BEARER_TOKEN_BEDROCK" $llm.bedrock.bearerToken $llm.bedrock.existingSecret $llm.bedrock.existingSecretKey $sec) | nindent 10 }}
         resources: {{- toYaml .Values.testing.agentTesting.resources | nindent 10 }}
       {{- end }}
     {{ if eq .Values.testing.aktoApiSecurityTesting.env.newTestingEnabled "true" }}

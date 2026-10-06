@@ -139,14 +139,49 @@ testing:
       nodeTlsRejectUnauthorized: "0"
       useSessionManagement: true
       aktoUtilityServer: "http://localhost:8001"
+      # DEPRECATED - use llm.anthropic.* below. Still honoured, and still
+      # writes the key in plaintext when useSecretsForAnthropicApiKey is false.
+      # Ignored if llm.anthropic.apiKey or llm.anthropic.existingSecret is set.
       useSecretsForAnthropicApiKey: false
       anthropicApiKey: ""
-      # If using secrets, place key here.
       anthropicApiKeySecrets:
-        # Name of an existing secret containing the Anthropic API key
         existingSecret: ""
-        # Token to use if existingSecret is not provided
         anthropicSecretKey: ""
+      llm:
+        # bedrock | vertex | azure | anthropic. Blank lets the service
+        # auto-detect from whichever credentials are set.
+        provider: ""
+        # Every credential below: set existingSecret to read from a Secret you
+        # manage, or set the value inline and the chart creates one for you.
+        azure:
+          endpoint: ""
+          model: ""
+          apiKey: ""
+          existingSecret: ""
+          existingSecretKey: azureOpenAiApiKey
+        vertex:
+          projectId: ""
+          location: ""
+          endpointId: ""
+          endpointDomain: ""
+          credentialsJson: ""
+          existingSecret: ""
+          existingSecretKey: googleCredentialsJson
+        anthropic:
+          agentModelId: ""
+          apiKey: ""
+          existingSecret: ""
+          existingSecretKey: anthropicApiKey
+        bedrock:
+          awsRegion: ""
+          inferenceProfilePrefix: ""
+          sonnetModelId: ""
+          haikuModelId: ""
+          agentModelId: ""
+          # Optional - omit to use the pod's IAM role (IRSA).
+          bearerToken: ""
+          existingSecret: ""
+          existingSecretKey: awsBearerTokenBedrock
     resources:
       requests:
         cpu: "250m"
