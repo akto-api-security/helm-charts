@@ -139,6 +139,14 @@ testing:
       nodeTlsRejectUnauthorized: "0"
       useSessionManagement: true
       aktoUtilityServer: "http://localhost:8001"
+      # DEPRECATED - use llm.anthropic.* below. Still honoured, and still
+      # writes the key in plaintext when useSecretsForAnthropicApiKey is false.
+      # Ignored if llm.anthropic.apiKey or llm.anthropic.existingSecret is set.
+      useSecretsForAnthropicApiKey: false
+      anthropicApiKey: ""
+      anthropicApiKeySecrets:
+        existingSecret: ""
+        anthropicSecretKey: ""
       llm:
         # bedrock | vertex | azure | anthropic. Blank lets the service
         # auto-detect from whichever credentials are set.
