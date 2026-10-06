@@ -23,6 +23,8 @@ testing:
         existingSecret: ""
         # Token to use if existingSecret is not provided
         token: ""
+      # Set to "true" when running multiple testing pods
+      concurrentTesting: "false"
       blockLogs: "false"
       aktoLogLevel: WARN
       # StatefulSet name; pods become <miniTestingName>-0, -1, ... and each pod
@@ -61,6 +63,23 @@ testing:
       limits:
         cpu: 1
         memory: "4Gi"
+
+  # Kafka runs outside this chart. Set kafkaBrokerUrl above to the broker, and
+  # use these values for SASL credentials the testing container uses to connect.
+  kafka1:
+    useSasl: true
+    env:
+      useSecretsForSaslCredentials: false
+      saslCredentialsSecrets:
+        # Name of an existing secret with "username" and "password" keys.
+        # Leave empty to let the chart create the secret from the values below.
+        existingSecret: ""
+        username: ""
+        password: ""
+      saslUsername: ""
+      saslPassword: ""
+      # SASL mechanism: PLAIN, SCRAM-SHA-256, or SCRAM-SHA-512
+      saslMechanism: "SCRAM-SHA-512"
 
   # Per-pod persistent volume. The app writes its json file(s) under mountPath
   # (equivalent of `./testing-info:/app/testing-info` in docker compose).

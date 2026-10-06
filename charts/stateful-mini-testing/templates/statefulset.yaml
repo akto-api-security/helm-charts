@@ -1,3 +1,6 @@
+{{- if and .Values.testing.kafka1.useSasl (not .Values.testing.kafka1.env.useSecretsForSaslCredentials) }}
+{{- $_ := required "testing.kafka1.env.saslUsername and saslPassword are required when kafka SASL is enabled" (and .Values.testing.kafka1.env.saslUsername .Values.testing.kafka1.env.saslPassword) }}
+{{- end }}
 {{ if .Values.keel.keel.enabled }}
 apiVersion: apps/v1
 kind: Deployment
@@ -130,8 +133,13 @@ spec:
             {{- end }}
         - name: AKTO_KAFKA_BROKER_URL
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.kafkaBrokerUrl}}
+        # used by the testing kafka producer/consumer
+        - name: KAFKA_BROKER_URL
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.kafkaBrokerUrl}}
         - name: NEW_TESTING_ENABLED
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.newTestingEnabled}}
+        - name: CONCURRENT_TESTING
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.concurrentTesting }}
         - name: BLOCK_LOGS
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.blockLogs }}
         - name: AKTO_LOG_LEVEL
@@ -149,6 +157,45 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         - name: AUTO_SCALING_ENABLED
           value: "false"
+        {{- if .Values.testing.kafka1.useSasl }}
+        - name: KAFKA_AUTH_ENABLED
+          value: "true"
+        - name: AKTO_KAFKA_SASL_ENABLED
+          value: "true"
+        - name: AKTO_KAFKA_SASL_MECHANISM
+          value: {{ quote .Values.testing.kafka1.env.saslMechanism }}
+        {{- if .Values.testing.kafka1.env.useSecretsForSaslCredentials }}
+        - name: KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.testing.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-testing-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.testing.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-testing-sasl" (include "akto.fullname" .)) }}
+              key: password
+        - name: AKTO_KAFKA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.testing.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-testing-sasl" (include "akto.fullname" .)) }}
+              key: username
+        - name: AKTO_KAFKA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.testing.kafka1.env.saslCredentialsSecrets.existingSecret | default (printf "%s-mini-testing-sasl" (include "akto.fullname" .)) }}
+              key: password
+        {{- else }}
+        - name: KAFKA_USERNAME
+          value: {{ quote .Values.testing.kafka1.env.saslUsername }}
+        - name: KAFKA_PASSWORD
+          value: {{ quote .Values.testing.kafka1.env.saslPassword }}
+        - name: AKTO_KAFKA_USERNAME
+          value: {{ quote .Values.testing.kafka1.env.saslUsername }}
+        - name: AKTO_KAFKA_PASSWORD
+          value: {{ quote .Values.testing.kafka1.env.saslPassword }}
+        {{- end }}
+        {{- end }}
         image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.aktoApiSecurityTesting.image.tag
           | default .Chart.AppVersion }}
         name: akto-api-security-testing
