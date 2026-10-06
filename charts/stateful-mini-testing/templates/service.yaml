@@ -1,0 +1,12 @@
+# Headless service required by the StatefulSet for stable pod identity
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "akto.fullname" . }}-service
+  labels:
+    app: {{ include "akto.fullname" . }}
+    {{- include "akto.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app: {{ include "akto.fullname" . }}

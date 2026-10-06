@@ -1,0 +1,110 @@
+ ""
+
+testing:
+  aktoApiSecurityTesting:
+    env:
+      aktoAccountName: Helios
+      aktoConfigName: staging
+      newTestingEnabled: "true"
+      kafkaBrokerUrl: localhost:29092
+      puppeteerReplayServiceUrl: http://localhost:3000
+      databaseAbstractorUrl: https://cyborg.akto.io
+      automatedAgentBaseUrl: http://localhost:8000
+      # If you want to use secrets to store database abstractor token. default: false
+      useSecretsForDatabaseAbstractorToken: false
+      # If not using secrets, place token here.
+      databaseAbstractorToken: ""
+      # If using secrets, place token here.
+      databaseAbstractorTokenSecrets: 
+        # Name of an existing secret containing the Database Abstractor Token
+        existingSecret: ""
+        # Token to use if existingSecret is not provided
+        token: ""
+      blockLogs: "false"
+      aktoLogLevel: WARN
+      # StatefulSet name; pods become <miniTestingName>-0, -1, ... and each pod
+      # uses its own pod name as MINI_TESTING_NAME.
+      miniTestingName: "akto-external-testing"
+
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
+      tag: 1.72.6_local
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "500Mi"
+      limits:
+        cpu: 2
+        memory: "8Gi"
+
+  replicas: 1
+
+  aktoApiSecurityPuppeteerReplay:
+    env:
+      useSecretsForLogSenderApiKey: false
+      logSenderApiKey: ""
+      logSenderApiKeySecrets:
+        existingSecret: ""
+        token: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/akto-puppeteer-replay
+      tag: 1.49.4_latest
+    imagePullPolicy: Always
+    resources:
+      requests:
+        cpu: 1
+        memory: "2Gi"
+      limits:
+        cpu: 1
+        memory: "4Gi"
+
+  # Per-pod persistent volume. The app writes its json file(s) under mountPath
+  # (equivalent of `./testing-info:/app/testing-info` in docker compose).
+  persistence:
+    enabled: true
+    mountPath: /app/testing-info
+    size: 100Mi
+    storageClass: ""
+    accessModes:
+    - ReadWriteOnce
+
+keel:
+  keel:
+    env:
+      awsAccessKeyId: ""
+      awsRegion: ""
+      awsSecretAccessKey: ""
+      hipchatApprovalsBotName: ""
+      hipchatApprovalsChannel: ""
+      hipchatApprovalsPasswort: ""
+      hipchatApprovalsUserName: ""
+      hipchatChannels: ""
+      hipchatToken: ""
+      insecureRegistry: "true"
+      mattermostEndpoint: ""
+      notificationLevel: info
+      webhookEndpoint: ""
+    image:
+      repository: public.ecr.aws/aktosecurity/keelhq-keel
+      tag: akto_v1.0.0
+    imagePullPolicy: Always
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+    enabled: true
+  maxUnavailable: 1
+  ports:
+  - name: keel
+    port: 9300
+    protocol: TCP
+    targetPort: 9300
+  replicas: 1
+  serviceAccount:
+    annotations: {}
+  type: LoadBalancer
+kubernetesClusterDomain: cluster.local
