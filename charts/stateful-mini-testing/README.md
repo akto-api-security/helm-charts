@@ -70,14 +70,6 @@ The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.sas
 | Change the pod name prefix | `--set testing.aktoApiSecurityTesting.env.miniTestingName=<NAME>` |
 | Use a proxy | `--set tokens.env.proxyUri="<PROXY_URI>" --set tokens.env.noProxy="<NO_PROXY_URLS>"` |
 
-## Upgrade
-
-```bash
-helm repo update akto
-helm upgrade akto-stateful-mini-testing akto/akto-stateful-mini-testing -n <NAMESPACE> \
-  --reset-then-reuse-values
-```
-
 ## Uninstall
 
 ```bash
