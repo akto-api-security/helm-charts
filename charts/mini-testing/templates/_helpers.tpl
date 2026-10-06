@@ -59,3 +59,38 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+One LLM credential env var for agent-testing. Reads from existingSecret when
+given, else from the chart's own agent-testing Secret. Emits nothing when the
+credential is unset, so unused providers add no env.
+Args: (list envName inlineValue existingSecret secretKey fallbackSecretName)
+*/}}
+{{- define "akto.agentTesting.credEnv" -}}
+{{- $envName := index . 0 -}}
+{{- $inline := index . 1 -}}
+{{- $existing := index . 2 -}}
+{{- $key := index . 3 -}}
+{{- $fallback := index . 4 -}}
+{{- if or $inline $existing }}
+- name: {{ $envName }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $existing | default $fallback }}
+      key: {{ $key }}
+{{- end }}
+{{- end }}
+
+{{/*
+True when any agent-testing LLM credential is set inline, i.e. the chart needs
+to create its own Secret.
+*/}}
+{{- define "akto.agentTesting.needsSecret" -}}
+{{- $llm := .Values.testing.agentTesting.env.llm -}}
+{{- if or (and $llm.azure.apiKey (not $llm.azure.existingSecret))
+          (and $llm.vertex.credentialsJson (not $llm.vertex.existingSecret))
+          (and $llm.anthropic.apiKey (not $llm.anthropic.existingSecret))
+          (and $llm.bedrock.bearerToken (not $llm.bedrock.existingSecret)) -}}
+true
+{{- end -}}
+{{- end }}
