@@ -1,58 +1,81 @@
 # Akto stateful mini-testing
 
-Runs the Akto testing module in your Kubernetes cluster.
+Runs the Akto testing module in your Kubernetes cluster as a StatefulSet, connected to a Kafka broker that uses SASL.
 
 ## How it works
 
-This chart deploys the testing module as a Kubernetes **StatefulSet** instead of a regular Deployment. A StatefulSet gives every pod a stable identity: pods are named `akto-external-testing-0`, `akto-external-testing-1` and so on, and a pod keeps the same name when it restarts or moves to another node.
-
-Each testing pod needs to remember its own information between restarts. It stores this as a `.json` file in a `testing-info` folder (`/app/testing-info`). To make that possible, the chart creates a **PersistentVolumeClaim (PVC) for every pod**:
-
-- Each pod gets its own small volume (100Mi by default). Pods never share a volume.
-- When a pod restarts, it re-attaches to the same volume and picks up its file, so it is not treated as a new testing module.
-- If you run more pods (`testing.replicas`), each new pod gets its own new volume.
-- Volumes are not deleted automatically when you scale down or uninstall, so no data is lost by accident. See [Uninstall](#uninstall) to remove them.
-
-Your cluster needs a default storage class that can provision volumes. Most managed clusters (EKS, GKE, AKS) have one. To use a specific one, add `--set testing.persistence.storageClass=<STORAGE_CLASS>`. To change the volume size, add `--set testing.persistence.size=<SIZE>`.
+- **Stable pod names:** pods are named `akto-external-testing-0`, `-1`, and so on. A pod keeps its name when it restarts.
+- **One volume per pod:** each pod saves the state of its current test run in `/app/testing-info`. The chart creates a PersistentVolumeClaim (PVC) for every pod (100Mi by default). Pods never share a volume.
+- **Kafka runs separately:** the queue of test messages and the progress of each run live in a Kafka broker outside the testing pod. The pod connects to it using SASL.
+- **Restarts are safe:** a restarted pod re-attaches to its own volume, reconnects to Kafka and continues the run where it stopped.
+- Volumes are not deleted when you scale down or uninstall, so no data is lost by accident.
 
 ## Before you start
 
-1. A Kubernetes cluster where you can deploy
-2. [`helm`](https://helm.sh/docs/intro/install/) installed
-3. Your `AKTO_TOKEN`, found in the Akto dashboard under quick start > hybrid saas. See the [docs](https://docs.akto.io/traffic-connections/traffic-data-sources/hybrid-saas).
+1. A Kubernetes cluster where you can deploy, and [`helm`](https://helm.sh/docs/intro/install/) installed.
+2. A default storage class that can create volumes (most managed clusters have one).
+3. A Kafka broker with SASL enabled that the pod can reach. Use one that stores its data on a persistent volume. You need its address, the SASL mechanism (`PLAIN`, `SCRAM-SHA-256` or `SCRAM-SHA-512`), and a username and password.
+4. Your `AKTO_TOKEN`, found in the Akto dashboard under quick start > hybrid saas. See the [docs](https://docs.akto.io/traffic-connections/traffic-data-sources/hybrid-saas).
 
 ## Install
+
+1. Create a secret with the Kafka username and password:
+
+```bash
+kubectl create secret generic kafka-sasl-credentials -n <NAMESPACE> \
+  --from-literal=username=<KAFKA_USERNAME> \
+  --from-literal=password=<KAFKA_PASSWORD>
+```
+
+2. Install the chart:
 
 ```bash
 helm repo add akto https://akto-api-security.github.io/helm-charts
 
 helm install akto-stateful-mini-testing akto/akto-stateful-mini-testing -n <NAMESPACE> \
-  --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>"
+  --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>" \
+  --set testing.aktoApiSecurityTesting.env.kafkaBrokerUrl="<KAFKA_HOST>:<KAFKA_PORT>" \
+  --set testing.kafka1.env.saslMechanism="SCRAM-SHA-512" \
+  --set testing.kafka1.env.useSecretsForSaslCredentials=true \
+  --set testing.kafka1.env.saslCredentialsSecrets.existingSecret="kafka-sasl-credentials"
 ```
 
-To run more than one testing pod, add `--set testing.replicas=<COUNT>`.
-
-If you are behind a proxy, also add:
+3. Check that it is running:
 
 ```bash
-  --set tokens.env.proxyUri="<PROXY_URI>" \
-  --set tokens.env.noProxy="<NO_PROXY_URLS>"
+kubectl get pods -n <NAMESPACE>   # akto-external-testing-0 is Running
+kubectl get pvc -n <NAMESPACE>    # testing-info-akto-external-testing-0 is Bound
 ```
 
-Check that it is running:
+## Kafka credentials
 
-```bash
-kubectl get pods -n <NAMESPACE>
-```
+Pick one way to give the testing module the Kafka username and password:
 
-You should see a testing pod named `akto-external-testing-0` in the `Running` state.
+| Option | Flags |
+|---|---|
+| A secret you created (recommended). Keys: `username`, `password` | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.existingSecret=<SECRET>` |
+| Let the chart create the secret | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.username=<USER> --set testing.kafka1.env.saslCredentialsSecrets.password=<PASSWORD>` |
+| Pass the values directly | `--set testing.kafka1.env.saslUsername=<USER> --set testing.kafka1.env.saslPassword=<PASSWORD>` |
+
+The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.saslMechanism`. If your Kafka does not use SASL, set `testing.kafka1.useSasl=false`.
+
+## Options
+
+| Goal | Flag |
+|---|---|
+| Run more than one testing pod | `--set testing.replicas=<COUNT>` |
+| Run multiple tests in parallel | `--set testing.aktoApiSecurityTesting.env.concurrentTesting=true` |
+| Use a specific storage class | `--set testing.persistence.storageClass=<STORAGE_CLASS>` |
+| Change the volume size (default `100Mi`) | `--set testing.persistence.size=<SIZE>` |
+| Change the pod name prefix | `--set testing.aktoApiSecurityTesting.env.miniTestingName=<NAME>` |
+| Use a proxy | `--set tokens.env.proxyUri="<PROXY_URI>" --set tokens.env.noProxy="<NO_PROXY_URLS>"` |
 
 ## Upgrade
 
 ```bash
 helm repo update akto
 helm upgrade akto-stateful-mini-testing akto/akto-stateful-mini-testing -n <NAMESPACE> \
-  --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>"
+  --reset-then-reuse-values
 ```
 
 ## Uninstall
@@ -61,11 +84,21 @@ helm upgrade akto-stateful-mini-testing akto/akto-stateful-mini-testing -n <NAME
 helm uninstall akto-stateful-mini-testing -n <NAMESPACE>
 ```
 
-The saved data volumes are kept after uninstall. To delete them too:
+The volumes are kept. To delete them too:
 
 ```bash
 kubectl delete pvc -n <NAMESPACE> -l app=<RELEASE_NAME>-akto-stateful-mini-testing
 ```
+
+## Troubleshooting
+
+| Problem | What to check |
+|---|---|
+| Pod stays `Pending` | `kubectl describe pvc -n <NAMESPACE>`. There is probably no default storage class. |
+| Cannot connect to Kafka | Check `kafkaBrokerUrl` and that the pod can reach the broker. |
+| `SaslAuthenticationException` in the logs | The username, password or mechanism does not match the broker. |
+| `CreateContainerConfigError` | The secret in `existingSecret` is missing or lacks the `username` or `password` key. |
+| Run stays at 0% after a restart | Kafka lost its data. Use a Kafka with a persistent volume. |
 
 ## Support
 
