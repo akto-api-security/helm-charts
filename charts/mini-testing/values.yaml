@@ -35,7 +35,7 @@ testing:
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.72.6_local
+      tag: 1.74.8_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -101,7 +101,7 @@ testing:
         token: ""
     image:
       repository: public.ecr.aws/aktosecurity/akto-puppeteer-replay
-      tag: 1.49.4_latest
+      tag: 1.51.1_latest
     imagePullPolicy: Always
     resources:
       requests:
