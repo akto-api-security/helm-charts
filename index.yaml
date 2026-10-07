@@ -5571,6 +5571,30 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-source-code-analyser-0.1.5/akto-source-code-analyser-0.1.5.tgz
     version: 0.1.5
+  akto-stateful-mini-testing:
+  - apiVersion: v2
+    appVersion: 1.45.7
+    created: "2026-10-07T06:07:28.274022453Z"
+    description: Helm chart for installing Akto hybrid testing as a StatefulSet with
+      a PVC per pod
+    digest: eac5fc75601b41dea5b1a51f73dd655ed189769f40039259d68ed7680d7a9096
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-stateful-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/stateful-mini-testing
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-stateful-mini-testing-1.0.0/akto-stateful-mini-testing-1.0.0.tgz
+    version: 1.0.0
   akto-testing-db-layer:
   - apiVersion: v2
     appVersion: 1.42.17
@@ -6347,4 +6371,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-06T11:53:33.953910214Z"
+generated: "2026-10-07T06:07:28.274694314Z"
