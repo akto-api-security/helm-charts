@@ -359,7 +359,7 @@ threatClient:
 
   image:
     repository: public.ecr.aws/aktosecurity/akto-threat-detection
-    tag: "1.16.2"
+    tag: "1.18.1"
     digest: ""
     pullPolicy: Always
 
