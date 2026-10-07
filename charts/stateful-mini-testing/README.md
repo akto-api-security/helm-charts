@@ -53,7 +53,7 @@ By default the token is passed with `--set testing.aktoApiSecurityTesting.env.da
 
 | Option | Flags |
 |---|---|
-| A secret you created (recommended). Key: `token` | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret=<SECRET>` |
+| A secret you created. Key: `token` | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret=<SECRET>` |
 | Pass the token directly | `--set testing.aktoApiSecurityTesting.env.databaseAbstractorToken=<AKTO_TOKEN>` |
 
 ## Kafka credentials
@@ -62,7 +62,7 @@ Pick one way to give the testing module the Kafka username and password:
 
 | Option | Flags |
 |---|---|
-| A secret you created (recommended). Keys: `username`, `password` | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.existingSecret=<SECRET>` |
+| A secret you created. Keys: `username`, `password` | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.existingSecret=<SECRET>` |
 | Pass the values directly | `--set testing.kafka1.env.saslUsername=<USER> --set testing.kafka1.env.saslPassword=<PASSWORD>` |
 
 The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.saslMechanism`. If your Kafka does not use SASL, set `testing.kafka1.useSasl=false`.
