@@ -151,6 +151,8 @@ testing:
         # bedrock | vertex | azure | anthropic. Blank lets the service
         # auto-detect from whichever credentials are set.
         provider: ""
+        # Model roles, per provider below. analysis = validation/remediation,
+        # fast = extraction and the agent fallback, agent = the attack loop.
         # Every credential below: set existingSecret to read from a Secret you
         # manage, or set the value inline and the chart creates one for you.
         azure:
@@ -165,9 +167,14 @@ testing:
           endpointId: ""
           endpointDomain: ""
           credentialsJson: ""
+          analysisModelId: ""
+          fastModelId: ""
+          agentModelId: ""
           existingSecret: ""
           existingSecretKey: googleCredentialsJson
         anthropic:
+          analysisModelId: ""
+          fastModelId: ""
           agentModelId: ""
           apiKey: ""
           existingSecret: ""
@@ -175,8 +182,8 @@ testing:
         bedrock:
           awsRegion: ""
           inferenceProfilePrefix: ""
-          sonnetModelId: ""
-          haikuModelId: ""
+          analysisModelId: ""
+          fastModelId: ""
           agentModelId: ""
           # Optional - omit to use the pod's IAM role (IRSA).
           bearerToken: ""
