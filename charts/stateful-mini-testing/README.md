@@ -47,6 +47,16 @@ kubectl get pods -n <NAMESPACE>   # akto-external-testing-0 is Running
 kubectl get pvc -n <NAMESPACE>    # testing-info-akto-external-testing-0 is Bound
 ```
 
+## Database Abstractor Token
+
+By default the token is passed with `--set testing.aktoApiSecurityTesting.env.databaseAbstractorToken=<AKTO_TOKEN>`. You can use a Kubernetes secret instead:
+
+| Option | Flags |
+|---|---|
+| A secret you created (recommended). Key: `token` | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret=<SECRET>` |
+| Let the chart create the secret | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.token=<AKTO_TOKEN>` |
+| Pass the token directly | `--set testing.aktoApiSecurityTesting.env.databaseAbstractorToken=<AKTO_TOKEN>` |
+
 ## Kafka credentials
 
 Pick one way to give the testing module the Kafka username and password:
@@ -89,7 +99,7 @@ kubectl delete pvc -n <NAMESPACE> -l app=<RELEASE_NAME>-akto-stateful-mini-testi
 | Pod stays `Pending` | `kubectl describe pvc -n <NAMESPACE>`. There is probably no default storage class. |
 | Cannot connect to Kafka | Check `kafkaBrokerUrl` and that the pod can reach the broker. |
 | `SaslAuthenticationException` in the logs | The username, password or mechanism does not match the broker. |
-| `CreateContainerConfigError` | The secret in `existingSecret` is missing or lacks the `username` or `password` key. |
+| `CreateContainerConfigError` | The secret in `existingSecret` is missing or lacks a key (`username` and `password` for Kafka, `token` for the token). |
 | Run stays at 0% after a restart | Kafka lost its data. Use a Kafka with a persistent volume. |
 
 ## Support

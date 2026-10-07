@@ -1,5 +1,16 @@
-{{- if and .Values.testing.kafka1.useSasl (not .Values.testing.kafka1.env.useSecretsForSaslCredentials) }}
-{{- $_ := required "testing.kafka1.env.saslUsername and saslPassword are required when kafka SASL is enabled" (and .Values.testing.kafka1.env.saslUsername .Values.testing.kafka1.env.saslPassword) }}
+{{- if .Values.testing.kafka1.useSasl }}
+{{- if .Values.testing.kafka1.env.useSecretsForSaslCredentials }}
+{{- if not (or .Values.testing.kafka1.env.saslCredentialsSecrets.existingSecret (and .Values.testing.kafka1.env.saslCredentialsSecrets.username .Values.testing.kafka1.env.saslCredentialsSecrets.password)) }}
+{{- fail "Kafka SASL is enabled with secrets: set testing.kafka1.env.saslCredentialsSecrets.existingSecret, or both saslCredentialsSecrets.username and saslCredentialsSecrets.password" }}
+{{- end }}
+{{- else }}
+{{- $_ := required "testing.kafka1.env.saslUsername and saslPassword are required when Kafka SASL is enabled" (and .Values.testing.kafka1.env.saslUsername .Values.testing.kafka1.env.saslPassword) }}
+{{- end }}
+{{- end }}
+{{- if .Values.testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken }}
+{{- if not (or .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.token) }}
+{{- fail "useSecretsForDatabaseAbstractorToken is true: set databaseAbstractorTokenSecrets.existingSecret or databaseAbstractorTokenSecrets.token" }}
+{{- end }}
 {{- end }}
 {{ if .Values.keel.keel.enabled }}
 apiVersion: apps/v1
