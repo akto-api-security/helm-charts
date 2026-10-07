@@ -334,7 +334,27 @@ spec:
           - name: VERTEX_ENDPOINT_DOMAIN
             value: {{ quote . }}
           {{- end }}
+          {{- with $llm.vertex.analysisModelId }}
+          - name: VERTEX_CLAUDE_SONNET_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.vertex.fastModelId }}
+          - name: VERTEX_CLAUDE_HAIKU_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.vertex.agentModelId }}
+          - name: VERTEX_CLAUDE_AGENT_MODEL_ID
+            value: {{ quote . }}
+          {{- end }}
           {{- include "akto.agentTesting.credEnv" (list "GOOGLE_CREDENTIALS_JSON" $llm.vertex.credentialsJson $llm.vertex.existingSecret $llm.vertex.existingSecretKey $sec) | nindent 10 }}
+          {{- with $llm.anthropic.analysisModelId }}
+          - name: ANTHROPIC_SONNET_MODEL
+            value: {{ quote . }}
+          {{- end }}
+          {{- with $llm.anthropic.fastModelId }}
+          - name: ANTHROPIC_HAIKU_MODEL
+            value: {{ quote . }}
+          {{- end }}
           {{- with $llm.anthropic.agentModelId }}
           - name: ANTHROPIC_AGENT_MODEL_ID
             value: {{ quote . }}
@@ -348,11 +368,11 @@ spec:
           - name: BEDROCK_INFERENCE_PROFILE_PREFIX
             value: {{ quote . }}
           {{- end }}
-          {{- with $llm.bedrock.sonnetModelId }}
+          {{- with $llm.bedrock.analysisModelId }}
           - name: BEDROCK_SONNET_MODEL_ID
             value: {{ quote . }}
           {{- end }}
-          {{- with $llm.bedrock.haikuModelId }}
+          {{- with $llm.bedrock.fastModelId }}
           - name: BEDROCK_HAIKU_MODEL_ID
             value: {{ quote . }}
           {{- end }}
