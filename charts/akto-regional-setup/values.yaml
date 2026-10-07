@@ -603,7 +603,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.2.1"
+    tag: "1.2.2"
     pullPolicy: Always
 
   service:
@@ -740,7 +740,7 @@ anonymizer:
 
   image:
     repository: aktosecurity/akto-agent-guard-anonymizer
-    tag: "1.1.6"
+    tag: "1.2.2"
     pullPolicy: Always
 
   service:
@@ -791,7 +791,7 @@ embedder:
 
   image:
     repository: aktosecurity/akto-agent-guard-embedder
-    tag: "1.1.6"
+    tag: "1.2.2"
     pullPolicy: Always
 
   service:
