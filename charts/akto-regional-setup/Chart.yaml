@@ -2,8 +2,8 @@ apiVersion: v2
 name: akto-regional-setup
 description: Akto regional cloud - mini-runtime, threat client, data ingestion and AI guardrails in a single chart
 type: application
-version: 1.4.8
-appVersion: "1.4.8"
+version: 1.4.9
+appVersion: "1.4.9"
 home: https://www.akto.io
 icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
 sources:
