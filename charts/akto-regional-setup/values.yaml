@@ -358,7 +358,7 @@ threatClient:
   replicas: 1
 
   image:
-    repository: aktosecurity/akto-threat-detection
+    repository: public.ecr.aws/aktosecurity/akto-threat-detection
     tag: "1.18.7"
     digest: ""
     pullPolicy: Always
