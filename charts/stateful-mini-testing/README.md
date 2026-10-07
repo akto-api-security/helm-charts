@@ -54,7 +54,6 @@ By default the token is passed with `--set testing.aktoApiSecurityTesting.env.da
 | Option | Flags |
 |---|---|
 | A secret you created (recommended). Key: `token` | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret=<SECRET>` |
-| Let the chart create the secret | `--set testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken=true --set testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.token=<AKTO_TOKEN>` |
 | Pass the token directly | `--set testing.aktoApiSecurityTesting.env.databaseAbstractorToken=<AKTO_TOKEN>` |
 
 ## Kafka credentials
@@ -64,7 +63,6 @@ Pick one way to give the testing module the Kafka username and password:
 | Option | Flags |
 |---|---|
 | A secret you created (recommended). Keys: `username`, `password` | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.existingSecret=<SECRET>` |
-| Let the chart create the secret | `--set testing.kafka1.env.useSecretsForSaslCredentials=true --set testing.kafka1.env.saslCredentialsSecrets.username=<USER> --set testing.kafka1.env.saslCredentialsSecrets.password=<PASSWORD>` |
 | Pass the values directly | `--set testing.kafka1.env.saslUsername=<USER> --set testing.kafka1.env.saslPassword=<PASSWORD>` |
 
 The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.saslMechanism`. If your Kafka does not use SASL, set `testing.kafka1.useSasl=false`.
@@ -77,7 +75,6 @@ The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.sas
 | Run multiple tests in parallel | `--set testing.aktoApiSecurityTesting.env.concurrentTesting=true` |
 | Use a specific storage class | `--set testing.persistence.storageClass=<STORAGE_CLASS>` |
 | Change the volume size (default `100Mi`) | `--set testing.persistence.size=<SIZE>` |
-| Change the pod name prefix | `--set testing.aktoApiSecurityTesting.env.miniTestingName=<NAME>` |
 | Use a proxy | `--set tokens.env.proxyUri="<PROXY_URI>" --set tokens.env.noProxy="<NO_PROXY_URLS>"` |
 
 ## Uninstall
