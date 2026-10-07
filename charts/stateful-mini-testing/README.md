@@ -34,6 +34,7 @@ helm repo add akto https://akto-api-security.github.io/helm-charts
 
 helm install akto-stateful-mini-testing akto/akto-stateful-mini-testing -n <NAMESPACE> \
   --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>" \
+  --set testing.aktoApiSecurityTesting.env.databaseAbstractorUrl="<DATABASE_ABSTRACTOR_SERVICE_URL>" \
   --set testing.aktoApiSecurityTesting.env.kafkaBrokerUrl="<KAFKA_HOST>:<KAFKA_PORT>" \
   --set testing.kafka1.env.saslMechanism="SCRAM-SHA-512" \
   --set testing.kafka1.env.useSecretsForSaslCredentials=true \
@@ -71,6 +72,7 @@ The default mechanism is `SCRAM-SHA-512`. Change it with `testing.kafka1.env.sas
 
 | Goal | Flag |
 |---|---|
+| Set the Database Abstractor service URL | `--set testing.aktoApiSecurityTesting.env.databaseAbstractorUrl="<DATABASE_ABSTRACTOR_SERVICE_URL>"` |
 | Run more than one testing pod | `--set testing.replicas=<COUNT>` |
 | Run multiple tests in parallel | `--set testing.aktoApiSecurityTesting.env.concurrentTesting=true` |
 | Use a specific storage class | `--set testing.persistence.storageClass=<STORAGE_CLASS>` |
