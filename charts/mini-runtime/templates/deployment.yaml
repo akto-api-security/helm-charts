@@ -545,6 +545,7 @@ spec:
 {{ end }}
 
 {{ if .Values.threat_client.aktoApiSecurityThreatClient.env.enabled }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
