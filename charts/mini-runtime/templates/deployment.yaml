@@ -12,7 +12,7 @@ metadata:
     keel.sh/policy: force
     keel.sh/match-tag: "true"
     keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@every 15m"
+    keel.sh/pollSchedule: "@every 60m"
     keel.sh/monitorContainers: "runtime"
     {{- end }}
 spec:
@@ -560,7 +560,7 @@ metadata:
     keel.sh/policy: force
     keel.sh/match-tag: "true"
     keel.sh/trigger: poll
-    keel.sh/pollSchedule: "@every 15m"
+    keel.sh/pollSchedule: "@every 60m"
     {{- end }}
 spec:
   replicas: {{ .Values.threat_client.replicas }}
