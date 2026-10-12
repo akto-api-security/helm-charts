@@ -35,7 +35,7 @@ testing:
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.74.8_local
+      tag: 1.75.1_local
     imagePullPolicy: Always
     resources:
       requests:
@@ -138,7 +138,19 @@ testing:
       agenticMode: false
       nodeTlsRejectUnauthorized: "0"
       useSessionManagement: true
+      # Also serves the "red-teaming" model configured on the Akto dashboard;
+      # keep it pointing at the utility server in this pod.
       aktoUtilityServer: "http://localhost:8001"
+      # ---------------------------------------------------------------------
+      # LLM for red teaming: configure it in the Akto dashboard under
+      # Settings > Integrations > Agents, as a model named "red-teaming". No
+      # LLM values are needed here.
+      #
+      # OPTIONAL - everything below (anthropicApiKey*, llm.*) only sets an
+      # install-time LLM, kept for existing installs. A "red-teaming" model in
+      # Akto overrides its provider and credentials. The model is read at
+      # startup: restart the deployment after adding or changing it.
+      # ---------------------------------------------------------------------
       # DEPRECATED - use llm.anthropic.* below. Still honoured, and still
       # writes the key in plaintext when useSecretsForAnthropicApiKey is false.
       # Ignored if llm.anthropic.apiKey or llm.anthropic.existingSecret is set.

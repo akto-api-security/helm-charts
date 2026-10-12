@@ -40,6 +40,26 @@ Here are the steps to install Akto mini-testing via Helm charts -
    ```
 3. Run `kubectl get pods -n <NAMESPACE>` and verify you can see 1 mini-testing pod with 4 containers and 1 keel pod.
 
+### Enable AI red teaming
+
+1. In the Akto dashboard, go to **Settings > Integrations > Agents** and add the LLM that red teaming should use, with the name `red-teaming`. No LLM credentials are passed to Helm. The agent loop needs Anthropic, AWS Bedrock or Google Vertex AI.
+2. Install with the agent-testing container enabled:
+   ```bash
+   helm install akto-mini-testing akto/akto-mini-testing -n <NAMESPACE> \
+    --set testing.agentTesting.enabled=true \
+    --set testing.aktoApiSecurityTesting.env.databaseAbstractorToken="<AKTO_TOKEN>"
+   ```
+3. Check that the model is in use:
+   ```bash
+   kubectl logs deploy/akto-mini-testing -n <NAMESPACE> -c agent-testing | grep AktoModelConfig
+   ```
+4. The model is read at startup. After adding or changing it later, restart the deployment:
+   ```bash
+   kubectl rollout restart deploy/akto-mini-testing -n <NAMESPACE>
+   ```
+
+The `testing.agentTesting.env.llm.*` values are optional and only set an install-time LLM for existing installs; a `red-teaming` model in Akto overrides them. See "Install Scanning module in your Cloud" in Akto's agentic red teaming docs for the supported providers and their fields.
+
 ### Upgrading to new version
 
 1. Update helm repo
