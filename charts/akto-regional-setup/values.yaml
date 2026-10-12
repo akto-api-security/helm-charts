@@ -488,7 +488,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.40.6"
+    tag: "2.40.8"
     pullPolicy: Always
 
   env:
