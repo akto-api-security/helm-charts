@@ -6,3 +6,14 @@ To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
+{{- if .Values.testing.agentTesting.enabled }}
+
+AI red teaming uses the LLM configured in the Akto dashboard: add a model
+named "red-teaming" under Settings > Integrations > Agents. To check it's in use:
+
+  $ kubectl logs deploy/{{ include "akto.fullname" . }} -n {{ .Release.Namespace }} -c agent-testing | grep AktoModelConfig
+
+The model is read at startup. After adding or changing it, restart:
+
+  $ kubectl rollout restart deploy/{{ include "akto.fullname" . }} -n {{ .Release.Namespace }}
+{{- end }}
