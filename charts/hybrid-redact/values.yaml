@@ -40,7 +40,7 @@ mini_runtime:
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
-      tag: 1.74.7_local
+      tag: 1.75.1_local
     imagePullPolicy: Always
     resources:
       requests:
