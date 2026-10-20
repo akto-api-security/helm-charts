@@ -447,7 +447,7 @@ dataIngestion:
     blockLogs: "true"
     runtimeMode: ""
     # Require a signed JWT on inbound traffic.
-    authenticate: "false"
+    authenticate: "true"
     # PUBLIC key used to verify those JWTs - not a credential.
     rsaPublicKey: ""
     # Key inside global.keyVault.secretName holding the comma-separated list
