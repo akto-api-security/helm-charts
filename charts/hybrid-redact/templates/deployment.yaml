@@ -73,6 +73,8 @@ spec:
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.blockLogs}}
         - name: DATABASE_ABSTRACTOR_SERVICE_URL
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorUrl}}
+        - name: SENSITIVE_DATA_COUNTS_ENABLED
+          value: {{ .Values.mini_runtime.aktoApiSecurityRuntime.env.sensitiveDataCountsEnabled | default false | quote }}
         {{- include "akto.secretEnv" (dict "root" $ "env" "DATABASE_ABSTRACTOR_SERVICE_TOKEN" "key" "databaseAbstractorToken" "value" .Values.tokens.env.databaseAbstractorToken) | nindent 8 }}
         - name: TESTING_DB_LAYER_SERVICE_URL
           value: {{ quote .Values.tokens.env.testingDbLayerUrl}}
