@@ -131,3 +131,37 @@ keep their old behaviour exactly, including the plaintext one.
   value: {{ quote $env.anthropicApiKey }}
 {{- end }}
 {{- end }}
+
+{{/*
+Autoscaling mode. "keda" (default) scales through KEDA and Prometheus or
+Grafana Cloud; "orchestrator" runs mini-testing-orchestrator instead and needs
+neither. Each helper renders "true" or nothing.
+*/}}
+{{- define "akto.autoScaling.mode" -}}
+{{- $mode := default "keda" .Values.testing.autoScaling.mode -}}
+{{- if not (has $mode (list "keda" "orchestrator")) -}}
+{{- fail (printf "testing.autoScaling.mode must be \"keda\" or \"orchestrator\", got %q" $mode) -}}
+{{- end -}}
+{{- $mode -}}
+{{- end }}
+
+{{- define "akto.autoScaling.keda" -}}
+{{- if and .Values.testing.autoScaling.enabled (eq (include "akto.autoScaling.mode" .) "keda") }}true{{ end -}}
+{{- end }}
+
+{{- define "akto.autoScaling.orchestrator" -}}
+{{- if and .Values.testing.autoScaling.enabled (eq (include "akto.autoScaling.mode" .) "orchestrator") }}true{{ end -}}
+{{- end }}
+
+{{- define "akto.orchestrator.name" -}}
+{{- printf "%s-orchestrator" (include "akto.fullname" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/* Secret and key holding the token mini-testing pods require on their orchestrator endpoints. */}}
+{{- define "akto.orchestrator.tokenSecret" -}}
+{{- .Values.testing.autoScaling.orchestrator.controlToken.existingSecret | default (include "akto.orchestrator.name" .) }}
+{{- end }}
+
+{{- define "akto.orchestrator.tokenKey" -}}
+{{- .Values.testing.autoScaling.orchestrator.controlToken.existingSecretKey | default "token" }}
+{{- end }}

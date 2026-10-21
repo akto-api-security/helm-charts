@@ -1,4 +1,4 @@
-{{ if .Values.testing.autoScaling.enabled }}
+{{ if include "akto.autoScaling.keda" . }}
 apiVersion: v1
 kind: Service
 metadata:

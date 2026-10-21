@@ -85,14 +85,16 @@ metadata:
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 spec:
+  {{- if not (include "akto.autoScaling.orchestrator" .) }}
   replicas: {{ .Values.testing.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "akto.fullname" . }}
     {{- include "akto.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if and .Values.testing.autoScaling.enabled .Values.testing.grafanaCloud.enabled }}
+      {{- if and (include "akto.autoScaling.keda" .) .Values.testing.grafanaCloud.enabled }}
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: {{ quote .Values.testing.prometheusServer.port }}
@@ -203,6 +205,15 @@ spec:
         - name: PROMETHEUS_SERVER_PORT
           value: {{ quote .Values.testing.prometheusServer.port }}
         {{ end }}
+        {{- if include "akto.autoScaling.orchestrator" . }}
+        - name: ORCHESTRATOR_ENABLED
+          value: "true"
+        - name: ORCHESTRATOR_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "akto.orchestrator.tokenSecret" . }}
+              key: {{ include "akto.orchestrator.tokenKey" . }}
+        {{- end }}
         {{- if .Values.testing.kafka1.useSasl }}
         - name: KAFKA_AUTH_ENABLED
           value: "true"
@@ -242,8 +253,13 @@ spec:
           value: {{ quote .Values.testing.kafka1.env.saslPassword }}
         {{- end }}
         {{- end }}
+        {{- if include "akto.autoScaling.orchestrator" . }}
+        image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.autoScaling.orchestrator.testingImageTag
+          | default .Values.testing.aktoApiSecurityTesting.image.tag | default .Chart.AppVersion }}
+        {{- else }}
         image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.aktoApiSecurityTesting.image.tag
           | default .Chart.AppVersion }}
+        {{- end }}
         name: akto-api-security-testing
         {{ if .Values.testing.autoScaling.enabled }}
         ports:
