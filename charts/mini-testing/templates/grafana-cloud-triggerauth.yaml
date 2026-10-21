@@ -1,4 +1,4 @@
-{{ if and .Values.testing.autoScaling.enabled .Values.testing.grafanaCloud.enabled }}
+{{ if and (include "akto.autoScaling.keda" .) .Values.testing.grafanaCloud.enabled }}
 apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
 metadata:

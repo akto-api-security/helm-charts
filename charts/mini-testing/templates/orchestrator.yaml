@@ -1,0 +1,166 @@
+{{- if include "akto.autoScaling.orchestrator" . }}
+{{- $name := include "akto.orchestrator.name" . }}
+{{- $orch := .Values.testing.autoScaling.orchestrator }}
+{{- if not $orch.controlToken.existingSecret }}
+{{- /* Keep the generated token across upgrades; pods only read it at start. */}}
+{{- $existing := lookup "v1" "Secret" .Release.Namespace $name }}
+{{- $token := "" }}
+{{- if and $existing $existing.data (index $existing.data "token") }}
+{{- $token = index $existing.data "token" }}
+{{- else }}
+{{- $token = randAlphaNum 40 | b64enc }}
+{{- end }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $name }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+type: Opaque
+data:
+  token: {{ $token | quote }}
+---
+{{- end }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ $name }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+---
+# Namespace-scoped only: no ClusterRole, CRD or APIService is needed.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ $name }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+rules:
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  resourceNames: [{{ include "akto.fullname" . | quote }}]
+  verbs: ["get", "patch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "patch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["create"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  resourceNames: [{{ $name | quote }}]
+  verbs: ["get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ $name }}
+  labels:
+  {{- include "akto.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ $name }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $name }}
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+  {{- include "akto.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $name }}
+    {{- include "akto.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+      {{- include "akto.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ $name }}
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: orchestrator
+        image: {{ $orch.image.repository }}:{{ $orch.image.tag }}
+        imagePullPolicy: {{ $orch.imagePullPolicy }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: TARGET_DEPLOYMENT
+          value: {{ include "akto.fullname" . | quote }}
+        - name: MIN_REPLICAS
+          value: {{ quote .Values.testing.autoScaling.minReplicas }}
+        - name: MAX_REPLICAS
+          value: {{ quote .Values.testing.autoScaling.maxReplicas }}
+        - name: SCALE_UP_STEP
+          value: {{ quote $orch.scaleUpStep }}
+        - name: POLL_INTERVAL
+          value: {{ quote $orch.pollInterval }}
+        - name: SCALE_DOWN_DELAY
+          value: {{ quote $orch.scaleDownDelay }}
+        - name: POD_STATUS_PORT
+          value: {{ quote .Values.testing.prometheusServer.port }}
+        - name: LEASE_NAME
+          value: {{ $name | quote }}
+        - name: LOG_LEVEL
+          value: {{ quote $orch.logLevel }}
+        - name: NOT_READY_GRACE
+          value: {{ quote $orch.notReadyGrace }}
+        - name: STUCK_AFTER
+          value: {{ quote $orch.stuckAfter }}
+        # Events go to Akto's database abstractor next to the module's own testing logs.
+        - name: REPORT_TO_AKTO
+          value: {{ quote $orch.reportToAkto }}
+        - name: HEARTBEAT_ENABLED
+          value: {{ quote $orch.heartbeat }}
+        - name: MINI_TESTING_NAME
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingName }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_URL
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorUrl }}
+        - name: DATABASE_ABSTRACTOR_SERVICE_TOKEN
+          {{- if .Values.testing.aktoApiSecurityTesting.env.useSecretsForDatabaseAbstractorToken }}
+          valueFrom:
+            secretKeyRef:
+              key: token
+              name: {{ (tpl .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorTokenSecrets.existingSecret .) | default (printf "%s-mini-testing" (include "akto.fullname" .) ) }}
+          {{- else }}
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorToken }}
+          {{- end }}
+        - name: CONTROL_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "akto.orchestrator.tokenSecret" . }}
+              key: {{ include "akto.orchestrator.tokenKey" . }}
+        ports:
+        - name: health
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: health
+          initialDelaySeconds: 5
+          periodSeconds: 20
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        resources: {{- toYaml $orch.resources | nindent 10 }}
+{{- end }}

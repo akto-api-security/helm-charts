@@ -79,8 +79,56 @@ testing:
   replicas: 1
   autoScaling:
     enabled: false
+    # keda: scale with KEDA + Prometheus or Grafana Cloud (see kubePrometheus / grafanaCloud).
+    # orchestrator: scale with Akto's mini-testing-orchestrator. Needs no Prometheus, KEDA,
+    #   CRDs or cluster-wide RBAC; only a Role in this namespace. Requires a mini-testing
+    #   image with the orchestrator endpoints. kubePrometheus / grafanaCloud are ignored.
+    mode: keda
     minReplicas: 1
     maxReplicas: 10
+    orchestrator:
+      image:
+        repository: public.ecr.aws/aktosecurity/akto-mini-testing-orchestrator
+        tag: 1.0.0
+      imagePullPolicy: IfNotPresent
+      # mini-testing image tag used in orchestrator mode instead of
+      # testing.aktoApiSecurityTesting.image.tag; the orchestrator needs a
+      # mini-testing release with its endpoints. Set "" to use that tag instead.
+      testingImageTag: local
+      # How often pods are checked.
+      pollInterval: 15s
+      # How long pods must stay idle before they are drained and removed.
+      scaleDownDelay: 5m
+      # Pods added per poll while every pod is busy.
+      scaleUpStep: 1
+      # A pod not ready for longer than this counts as broken and may be removed,
+      # so one crashlooping pod can't hold extra pods up.
+      notReadyGrace: 10m
+      # Scaling held for longer than this (e.g. a pod unreachable, at max) is reported.
+      stuckAfter: 10m
+      # Send scaling events, stuck warnings and errors to Akto (the database
+      # abstractor, with the module's token): Settings > Logs > Mini Testing
+      # Orchestrator, or the module's testing logs on an older cyborg.
+      reportToAkto: true
+      # Register the orchestrator under Settings > Module Info with a heartbeat
+      # every 30s. Needs a dashboard and cyborg that know module type
+      # MINI_TESTING_ORCHESTRATOR; an older dashboard can't list modules once one
+      # is stored, so leave this off until both are released.
+      heartbeat: false
+      logLevel: INFO
+      # Token mini-testing pods require from the orchestrator. Generated and kept
+      # across upgrades when existingSecret is empty. Set existingSecret when
+      # deploying with a tool that cannot run Helm lookup (e.g. Argo CD).
+      controlToken:
+        existingSecret: ""
+        existingSecretKey: token
+      resources:
+        requests:
+          cpu: 20m
+          memory: 32Mi
+        limits:
+          cpu: 200m
+          memory: 128Mi
     customMetrics:
       type: prometheus
       pollingInterval: 30

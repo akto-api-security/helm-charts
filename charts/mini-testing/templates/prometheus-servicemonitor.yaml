@@ -1,4 +1,4 @@
-{{ if and .Values.testing.autoScaling.enabled .Values.testing.kubePrometheus.enabled }}
+{{ if and (include "akto.autoScaling.keda" .) .Values.testing.kubePrometheus.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
