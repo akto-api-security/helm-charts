@@ -52,6 +52,18 @@ Here are the steps to install Akto mini-runtime via Helm charts -
    helm upgrade akto-mini-runtime akto/akto-mini-runtime -n <namespace> --version <latest-version> --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<your-database-abstractor-token>"
    ```
 
+## Tagging collections with an environment (VPC_ID)
+
+Set `vpcId` to label every API collection this mini-runtime creates. The dashboard shows it as an env tag, e.g. `prod_env` appears as `env=prod_env`. Comma-separated values add one tag each.
+
+```bash
+helm install akto-mini-runtime akto/akto-mini-runtime -n <your-namespace> \
+  --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<your-database-abstractor-token>" \
+  --set-string mini_runtime.aktoApiSecurityRuntime.env.vpcId="prod_env"
+```
+
+Leave `vpcId` empty (the default) to not set `VPC_ID`.
+
 ## Configuring Annotations
 
 You can add custom Kubernetes annotations to Service, Deployment, and Pod resources for all components. This is useful for integrating with monitoring systems, logging, or other Kubernetes-native tools.

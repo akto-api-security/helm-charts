@@ -67,6 +67,10 @@ mini_runtime:
       aktoRunMcpJobs: "true"
       # Enable sending traffic to threat detection (runtime reads SEND_TO_THREAT_ENABLED env)
       sendToThreatEnabled: "false"
+      # Optional. Sets VPC_ID on the runtime; the value is stored on every API collection
+      # this runtime creates and shown in the dashboard as an env tag (e.g. "prod_env" -> env=prod_env).
+      # Comma-separated values add one tag each. Leave empty to not set VPC_ID.
+      vpcId: ""
       puppeteerReplayServiceUrl: http://akto-puppeteer-replay:3000
       useHostName: true
       databaseAbstractorUrl: https://cyborg.akto.io
