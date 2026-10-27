@@ -140,7 +140,7 @@ spec:
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoRunMcpJobs }}
         - name: SEND_TO_THREAT_ENABLED
           value: {{ quote (.Values.mini_runtime.aktoApiSecurityRuntime.env.sendToThreatEnabled | default "true") }}
-        {{- with .Values.mini_runtime.aktoApiSecurityRuntime.env.vpcId }}
+        {{- with (default "" .Values.mini_runtime.aktoApiSecurityRuntime.env.vpcId | toString | trim) }}
         - name: VPC_ID
           value: {{ quote . }}
         {{- end }}
