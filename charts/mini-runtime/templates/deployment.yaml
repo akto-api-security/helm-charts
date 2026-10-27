@@ -140,6 +140,10 @@ spec:
           value: {{ quote .Values.mini_runtime.aktoApiSecurityRuntime.env.aktoRunMcpJobs }}
         - name: SEND_TO_THREAT_ENABLED
           value: {{ quote (.Values.mini_runtime.aktoApiSecurityRuntime.env.sendToThreatEnabled | default "true") }}
+        {{- with .Values.mini_runtime.aktoApiSecurityRuntime.env.vpcId }}
+        - name: VPC_ID
+          value: {{ quote . }}
+        {{- end }}
         - name: AKTO_MONGO_CONN
           value: {{ quote .Values.mongo.aktoMongoConn }}
         - name: USE_HOSTNAME
