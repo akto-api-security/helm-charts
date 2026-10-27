@@ -190,6 +190,8 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.aktoLogLevel }}
         - name: MINI_TESTING_NAME
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingName }}
+        - name: MINI_TESTING_TASK_TIMEOUT_SECONDS
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingTaskTimeoutSeconds }}
         - name: PROXY_URI
           value: {{ quote .Values.tokens.env.proxyUri}}
         - name: NO_PROXY

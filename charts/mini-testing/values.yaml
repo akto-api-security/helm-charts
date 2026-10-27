@@ -32,6 +32,7 @@ testing:
       blockLogs: "false"
       aktoLogLevel: WARN
       miniTestingName: "akto-external-testing"
+      miniTestingTaskTimeoutSeconds: 300
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
