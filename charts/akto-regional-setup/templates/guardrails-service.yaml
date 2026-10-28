@@ -40,6 +40,20 @@ meaningless outside this file.
   value: {{ quote .Values.guardrailsService.env.compactCustomRules }}
 - name: GUARDRAILS_GENERATE_REASON
   value: {{ quote .Values.guardrailsService.env.generateReason }}
+- name: GUARDRAILS_REDACTION_CACHE_MAX_ENTRIES
+  value: {{ quote .Values.guardrailsService.env.redactionCacheMaxEntries }}
+- name: GUARDRAILS_REDACTION_CACHE_TTL_SEC
+  value: {{ quote .Values.guardrailsService.env.redactionCacheTtlSec }}
+- name: GUARDRAILS_REDACTION_CACHE_MAX_PAYLOAD_BYTES
+  value: {{ quote .Values.guardrailsService.env.redactionCacheMaxPayloadBytes }}
+- name: GUARDRAILS_REDACT_TIMEOUT_MS
+  value: {{ quote .Values.guardrailsService.env.redactTimeoutMs }}
+- name: GUARDRAILS_REDACT_CONCURRENCY
+  value: {{ quote .Values.guardrailsService.env.redactConcurrency }}
+- name: GUARDRAILS_REDACT_MAX_ITEMS
+  value: {{ quote .Values.guardrailsService.env.redactMaxItems }}
+- name: GUARDRAILS_REDACT_MAX_PAYLOAD_BYTES
+  value: {{ quote .Values.guardrailsService.env.redactMaxPayloadBytes }}
 {{- with .Values.guardrailsService.env.rsaPublicKey }}
 - name: RSA_PUBLIC_KEY
   value: {{ quote . }}

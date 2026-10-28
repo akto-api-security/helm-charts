@@ -85,6 +85,7 @@ and `kubectl set env` commands this chart exists to eliminate:
 | guardrails | `THREAT_DETECTION_API_URL` | `central.threatBackendUrl` + `/api/threat_detection/record_malicious_event` |
 | data-ingestion | `AKTO_KAFKA_BROKER_URL` | the mini-runtime broker in this release |
 | data-ingestion | `GUARDRAILS_SERVICE_URL` | the guardrails service in this release |
+| mini-runtime | `AKTO_GUARDRAIL_REDACTION_URL` | the guardrails service in this release (base URL, no `/api`); override with `miniRuntime.env.guardrailRedactionUrl` |
 | lambda-egress-proxy | `AKTO_VALIDATE_URL` | the data-ingestion service in this release + `lambdaEgressProxy.env.validatePath` (`/api/http-proxy`); override wholesale with `lambdaEgressProxy.env.dataIngestionServiceUrl` |
 | lambda-egress-proxy | `AKTO_AUTHORIZATION` | the Key Vault-synced Secret, via `secretKeyRef` - reuses `central.databaseAbstractorTokenKey` unless `lambdaEgressProxy.env.authorizationTokenKey` names its own key |
 | guardrails | `SCANNER_API_URL` | agent-guard in this release |
@@ -252,6 +253,8 @@ match, or clear it, before installing:
 | `global.accountName` / `configName` | `Helios` / `staging` | |
 | `global.aktoLogLevel` | `INFO` | Applied to every component |
 | `miniRuntime.enabled` | `true` | Hosts the traffic Kafka bus |
+| `miniRuntime.env.guardrailRedactionEnabled` | `"true"` | Redacts stored payloads via guardrails-service. Needs `guardrailsService.http.enabled` or an explicit `miniRuntime.env.guardrailRedactionUrl` |
+| `miniRuntime.env.guardrailRedactionSkipOnUnavailable` | `"true"` | `true` drops payloads that could not be redacted; `false` stores them unredacted, marked `UNAVAILABLE` |
 | `threatClient.enabled` | `true` | Own Kafka sidecar by default |
 | `dataIngestion.enabled` | `true` | |
 | `lambdaEgressProxy.enabled` | `false` | Opt-in. Also set `lambdaEgressProxy.mitmproxy.caKey` or the CA is regenerated on every restart |

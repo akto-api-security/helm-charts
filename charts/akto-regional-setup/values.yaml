@@ -210,7 +210,7 @@ miniRuntime:
 
   image:
     repository: aktosecurity/mini-runtime
-    tag: "1.72.15"
+    tag: "1.75.7"
     # Set digest to pin by sha256 instead of tag.
     digest: ""
     pullPolicy: Always
@@ -235,6 +235,22 @@ miniRuntime:
     # central.databaseAbstractorUrl (it serves this route too) - only set this
     # separately if agent-query-log ingestion should go somewhere else.
     agentQueryLogsServiceUrl: ""
+    # Redact stored payloads through guardrails-service (POST /api/redact/payloads).
+    guardrailRedactionEnabled: "true"
+    # Base URL, no /api. Blank auto-targets guardrailsService.http in this
+    # release; must be set if that is disabled.
+    guardrailRedactionUrl: ""
+    # true: a payload that could not be redacted is not stored at all. false:
+    # it is stored unredacted and marked UNAVAILABLE. Payloads masked at reduced
+    # strength (BASIC) are stored either way.
+    guardrailRedactionSkipOnUnavailable: "true"
+    # Tuning. Non-positive values fall back to the app default.
+    guardrailRedactionCallTimeoutMs: "8000"
+    guardrailRedactionConnectTimeoutMs: "1000"
+    guardrailRedactionBudgetMs: "20000"
+    guardrailRedactionChunkSize: "100"
+    guardrailRedactionMaxPayloadBytes: "262144"
+    guardrailRedactionQueueCapacity: "5000"
 
   resources:
     requests:
@@ -488,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.40.8"
+    tag: "2.41.8"
     pullPolicy: Always
 
   env:
@@ -522,6 +538,15 @@ guardrailsService:
     # without generateReason sends threat reports with no reason.
     compactCustomRules: "true"
     generateReason: "true"
+    # Payload redaction (/api/redact/payloads, called by mini-runtime).
+    # redactionCacheMaxEntries=0 turns the redaction cache off.
+    redactionCacheMaxEntries: "4096"
+    redactionCacheTtlSec: "300"
+    redactionCacheMaxPayloadBytes: "65536"
+    redactTimeoutMs: "6000"
+    redactConcurrency: "8"
+    redactMaxItems: "100"
+    redactMaxPayloadBytes: "262144"
 
   http:
     enabled: true
