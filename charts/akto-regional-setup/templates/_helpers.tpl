@@ -422,6 +422,19 @@ Guardrails service URL the ingestion service calls when guardrails is on.
 {{- end -}}
 {{- end }}
 
+{{/*
+Guardrails base URL (no /api) mini-runtime calls to redact stored payloads.
+*/}}
+{{- define "akto-regional-setup.miniRuntime.redactionUrl" -}}
+{{- if .Values.miniRuntime.env.guardrailRedactionUrl -}}
+{{- .Values.miniRuntime.env.guardrailRedactionUrl -}}
+{{- else if .Values.guardrailsService.http.enabled -}}
+{{- include "akto-regional-setup.guardrailsService.url" . -}}
+{{- else -}}
+{{- fail "miniRuntime.env.guardrailRedactionUrl must be set when guardrailRedactionEnabled=true and guardrailsService.http.enabled=false" -}}
+{{- end -}}
+{{- end }}
+
 {{- define "akto-regional-setup.dataIngestion.url" -}}
 {{- printf "http://%s:%v" (include "akto-regional-setup.svcHost" (list . "data-ingestion")) .Values.dataIngestion.service.port -}}
 {{- end }}

@@ -70,6 +70,27 @@ spec:
           value: {{ include "akto-regional-setup.central.databaseAbstractorUrl" . | quote }}
         - name: AGENT_QUERY_LOGS_SERVICE_URL
           value: {{ .Values.miniRuntime.env.agentQueryLogsServiceUrl | default (include "akto-regional-setup.central.databaseAbstractorUrl" .) | quote }}
+        - name: AKTO_GUARDRAIL_REDACTION_ENABLED
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionEnabled }}
+        {{- if eq (toString .Values.miniRuntime.env.guardrailRedactionEnabled) "true" }}
+        # Auto-wired to the guardrails service in this release.
+        - name: AKTO_GUARDRAIL_REDACTION_URL
+          value: {{ include "akto-regional-setup.miniRuntime.redactionUrl" . | quote }}
+        {{- end }}
+        - name: AKTO_GUARDRAIL_REDACTION_SKIP_ON_UNAVAILABLE
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionSkipOnUnavailable }}
+        - name: AKTO_GUARDRAIL_REDACTION_CALL_TIMEOUT_MS
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionCallTimeoutMs }}
+        - name: AKTO_GUARDRAIL_REDACTION_CONNECT_TIMEOUT_MS
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionConnectTimeoutMs }}
+        - name: AKTO_GUARDRAIL_REDACTION_BUDGET_MS
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionBudgetMs }}
+        - name: AKTO_GUARDRAIL_REDACTION_CHUNK_SIZE
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionChunkSize }}
+        - name: AKTO_GUARDRAIL_REDACTION_MAX_PAYLOAD_BYTES
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionMaxPayloadBytes }}
+        - name: AKTO_GUARDRAIL_REDACTION_QUEUE_CAPACITY
+          value: {{ quote .Values.miniRuntime.env.guardrailRedactionQueueCapacity }}
         {{- include "akto-regional-setup.central.tokenEnv" . | nindent 8 }}
         {{- include "akto-regional-setup.kafka.clientSaslEnv" (list . .Values.miniRuntime.external) | nindent 8 }}
         resources:
