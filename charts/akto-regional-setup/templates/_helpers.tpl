@@ -244,6 +244,9 @@ rest unsynced. (env var name, Key Vault key name) pairs.
   (list "ANTHROPIC_FOUNDRY_API_KEY" "anthropicFoundryApiKey")
   (list "ANTHROPIC_API_KEY" "anthropicApiKey")
   (list "OPENAI_API_KEY" "openaiApiKey")
+  (list "QWEN_VLLM_KEY" "qwenVllmKey")
+  (list "GEMMA_VLLM_KEY" "gemmaVllmKey")
+  (list "GEMMA_26B_VLLM_KEY" "gemma26bVllmKey")
 -}}
 {{- range $pairs }}
 - name: {{ index . 0 }}

@@ -628,7 +628,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.2.2"
+    tag: "1.3.4"
     pullPolicy: Always
 
   service:
@@ -745,7 +745,9 @@ agentGuard:
   # Keys expected in Key Vault (fixed - not configurable per-install):
   #   vertexAiSaKeyJson, qwen3guardSaKeyJson, gemmaVertexSaKeyJson,
   #   qwen3guardFoundryApiKey, gemmaFoundryApiKey, azureFoundryApiKey,
-  #   anthropicFoundryApiKey, anthropicApiKey, openaiApiKey
+  #   anthropicFoundryApiKey, anthropicApiKey, openaiApiKey,
+  #   qwenVllmKey, gemmaVllmKey, gemma26bVllmKey (self-hosted vLLM, read by
+  #   the qwen3guard_fast / gemma_fast / gemma_fast_arbiter providers)
   #
   # NOTE: reaching these providers is OUTBOUND traffic. With networkPolicy
   # enabled you must allowlist them under
