@@ -777,12 +777,14 @@ anonymizer:
   env:
     spacyModel: "en_core_web_sm"
 
+  # The image runs 4 uvicorn workers (ANONYMIZER_WORKERS=4); a 2-CPU limit
+  # throttles them under load. Keep the CPU limit >= the worker count.
   resources:
     requests:
-      cpu: 1
+      cpu: 2
       memory: 2Gi
     limits:
-      cpu: 2
+      cpu: 4
       memory: 4Gi
 
   autoscaling:
