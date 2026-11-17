@@ -504,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.42.7"
+    tag: "2.42.8"
     pullPolicy: Always
 
   env:
@@ -535,13 +535,11 @@ guardrailsService:
     # as text; images are OCR'd by agent-guard's /ocr with the FINAL_ARBITER
     # model of agentGuard.env.defaultModelConfigJson, so that model must accept
     # images (e.g. Gemma 4 on Bedrock Mantle, vLLM or Foundry) - otherwise
-    # images are let through uninspected. Files that were inspected and
-    # allowed are remembered in the guardrails Redis (REDIS_URL above) so the
-    # copies an agent re-sends every turn are not checked again.
+    # images are let through uninspected. Images go to the same agent-guard as
+    # scannerApiUrl. Files that were inspected and allowed are remembered in
+    # the guardrails Redis (REDIS_URL above) so the copies an agent re-sends
+    # every turn are not checked again.
     fileValidationEnabled: "true"
-    # Where images go for OCR (agent-guard /ocr). Blank auto-targets the same
-    # agent-guard as scannerApiUrl.
-    agentGuardEngineUrl: ""
     # PUBLIC JWT verification key.
     rsaPublicKey: ""
     # Shorter LLM prompts for lower latency. compactCustomRules switches

@@ -88,8 +88,7 @@ and `kubectl set env` commands this chart exists to eliminate:
 | mini-runtime | `AKTO_GUARDRAIL_REDACTION_URL` | the guardrails service in this release (base URL, no `/api`); override with `miniRuntime.env.guardrailRedactionUrl` |
 | lambda-egress-proxy | `AKTO_VALIDATE_URL` | the data-ingestion service in this release + `lambdaEgressProxy.env.validatePath` (`/api/http-proxy`); override wholesale with `lambdaEgressProxy.env.dataIngestionServiceUrl` |
 | lambda-egress-proxy | `AKTO_AUTHORIZATION` | the Key Vault-synced Secret, via `secretKeyRef` - reuses `central.databaseAbstractorTokenKey` unless `lambdaEgressProxy.env.authorizationTokenKey` names its own key |
-| guardrails | `SCANNER_API_URL` | agent-guard in this release |
-| guardrails | `AGENT_GUARD_ENGINE_URL` | agent-guard in this release (image OCR, `/ocr`); override with `guardrailsService.env.agentGuardEngineUrl` |
+| guardrails | `SCANNER_API_URL` | agent-guard in this release (text scans and image OCR) |
 | guardrails | `EMBEDDER_URL` | embedder in this release, when enabled |
 | agent-guard | `ANONYMIZER_URL` | anonymizer in this release |
 | threat-client | traffic bootstrap servers | its own broker, or mini-runtime's |
@@ -278,7 +277,6 @@ match, or clear it, before installing:
 | `lambdaEgressProxy.service.loadBalancerSourceRanges` | `[]` | CIDR strings allowed to connect. Empty = anywhere. Set this whenever `internal` is `false` |
 | `guardrailsService.http.enabled` | `true` | |
 | `guardrailsService.env.fileValidationEnabled` | `"true"` | File and image guardrails (`/api/validate/file`). Images need an image-capable `FINAL_ARBITER` |
-| `guardrailsService.env.agentGuardEngineUrl` | `""` → agent-guard in this release | Where images are sent for OCR |
 | `guardrailsService.kafka.enabled` | `true` | Auto-targets mini-runtime's broker unless `guardrailsKafka.enabled` |
 | `agentGuard.enabled` | `true` | |
 | `anonymizer.enabled` | `true` | |
