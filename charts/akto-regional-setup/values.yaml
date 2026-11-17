@@ -444,7 +444,7 @@ dataIngestion:
 
   image:
     repository: aktosecurity/data-ingestion-service
-    tag: "1.7.4"
+    tag: "1.7.6"
     digest: ""
     pullPolicy: Always
 
@@ -504,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.41.8"
+    tag: "2.42.9"
     pullPolicy: Always
 
   env:
@@ -529,6 +529,17 @@ guardrailsService:
     # Blank auto-targets agent-guard in this release. Required if agentGuard
     # is disabled.
     scannerApiUrl: ""
+    # File and image guardrails (/api/validate/file - the egress proxy, the
+    # browser extension and the CLI hooks send files there through
+    # data-ingestion). On by default; "false" turns it off. Documents are read
+    # as text; images are OCR'd by agent-guard's /ocr with the FINAL_ARBITER
+    # model of agentGuard.env.defaultModelConfigJson, so that model must accept
+    # images (e.g. Gemma 4 on Bedrock Mantle, vLLM or Foundry) - otherwise
+    # images are let through uninspected. Images go to the same agent-guard as
+    # scannerApiUrl. Files that were inspected and allowed are remembered in
+    # the guardrails Redis (REDIS_URL above) so the copies an agent re-sends
+    # every turn are not checked again.
+    fileValidationEnabled: "true"
     # PUBLIC JWT verification key.
     rsaPublicKey: ""
     # Shorter LLM prompts for lower latency. compactCustomRules switches
@@ -628,7 +639,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.3.4"
+    tag: "1.3.6"
     pullPolicy: Always
 
   service:

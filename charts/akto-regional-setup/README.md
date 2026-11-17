@@ -88,7 +88,7 @@ and `kubectl set env` commands this chart exists to eliminate:
 | mini-runtime | `AKTO_GUARDRAIL_REDACTION_URL` | the guardrails service in this release (base URL, no `/api`); override with `miniRuntime.env.guardrailRedactionUrl` |
 | lambda-egress-proxy | `AKTO_VALIDATE_URL` | the data-ingestion service in this release + `lambdaEgressProxy.env.validatePath` (`/api/http-proxy`); override wholesale with `lambdaEgressProxy.env.dataIngestionServiceUrl` |
 | lambda-egress-proxy | `AKTO_AUTHORIZATION` | the Key Vault-synced Secret, via `secretKeyRef` - reuses `central.databaseAbstractorTokenKey` unless `lambdaEgressProxy.env.authorizationTokenKey` names its own key |
-| guardrails | `SCANNER_API_URL` | agent-guard in this release |
+| guardrails | `SCANNER_API_URL` | agent-guard in this release (text scans and image OCR) |
 | guardrails | `EMBEDDER_URL` | embedder in this release, when enabled |
 | agent-guard | `ANONYMIZER_URL` | anonymizer in this release |
 | threat-client | traffic bootstrap servers | its own broker, or mini-runtime's |
@@ -203,6 +203,20 @@ entirely by setting both `guardrailsRedis.enabled=false` and
 `embedder.enabled=false` - the cache just stays off (fail-open) with neither
 configured.
 
+**File and image guardrails:** on by default. Files that the egress proxy,
+browser extension or CLI hooks send to data-ingestion's `/api/validate/file`
+are checked by guardrails-service: documents as text, images through
+agent-guard's `/ocr`. OCR uses the `FINAL_ARBITER` model of
+`agentGuard.env.defaultModelConfigJson`, so that model must accept image input
+(e.g. Gemma 4 on Bedrock Mantle, vLLM or Foundry); otherwise images are let
+through uninspected. Inspected, allowed files are remembered in the guardrails
+Redis, so the copies an agent re-sends every turn are not checked again. Turn
+it off with:
+
+```bash
+--set guardrailsService.env.fileValidationEnabled=false
+```
+
 **Model-provider config:** split by whether it's a credential. API
 keys/service-account key JSON go through Key Vault same as everything else -
 e.g. `openaiApiKey` (see the comment above `agentGuard.env` in `values.yaml`
@@ -262,6 +276,7 @@ match, or clear it, before installing:
 | `lambdaEgressProxy.service.internal` | `false` | `true` = private load balancer, callers must be inside the VPC. `false` = internet-facing. Scheme cannot be changed in place - see below |
 | `lambdaEgressProxy.service.loadBalancerSourceRanges` | `[]` | CIDR strings allowed to connect. Empty = anywhere. Set this whenever `internal` is `false` |
 | `guardrailsService.http.enabled` | `true` | |
+| `guardrailsService.env.fileValidationEnabled` | `"true"` | File and image guardrails (`/api/validate/file`). Images need an image-capable `FINAL_ARBITER` |
 | `guardrailsService.kafka.enabled` | `true` | Auto-targets mini-runtime's broker unless `guardrailsKafka.enabled` |
 | `agentGuard.enabled` | `true` | |
 | `anonymizer.enabled` | `true` | |
