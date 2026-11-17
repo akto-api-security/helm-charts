@@ -504,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.42.8"
+    tag: "2.42.9"
     pullPolicy: Always
 
   env:
