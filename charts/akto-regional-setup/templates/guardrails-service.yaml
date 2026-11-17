@@ -12,6 +12,11 @@ meaningless outside this file.
 # Auto-wired to agent-guard in this release.
 - name: SCANNER_API_URL
   value: {{ include "akto-regional-setup.guardrails.scannerUrl" . | quote }}
+# File and image guardrails; images are OCR'd by the same agent-guard (/ocr).
+- name: FILE_VALIDATION_ENABLED
+  value: {{ quote .Values.guardrailsService.env.fileValidationEnabled }}
+- name: AGENT_GUARD_ENGINE_URL
+  value: {{ default (include "akto-regional-setup.guardrails.scannerUrl" .) .Values.guardrailsService.env.agentGuardEngineUrl | quote }}
 - name: NHI_ENABLED
   value: {{ quote .Values.guardrailsService.env.nhiEnabled }}
 - name: NHI_SCAN_INTERVAL_MIN
