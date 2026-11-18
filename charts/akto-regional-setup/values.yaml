@@ -444,7 +444,7 @@ dataIngestion:
 
   image:
     repository: aktosecurity/data-ingestion-service
-    tag: "1.7.6"
+    tag: "1.8.0"
     digest: ""
     pullPolicy: Always
 
