@@ -210,11 +210,13 @@ spec:
         {{- if include "akto.autoScaling.orchestrator" . }}
         - name: ORCHESTRATOR_ENABLED
           value: "true"
+        {{- if .Values.testing.autoScaling.orchestrator.controlToken.existingSecret }}
         - name: ORCHESTRATOR_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ include "akto.orchestrator.tokenSecret" . }}
+              name: {{ .Values.testing.autoScaling.orchestrator.controlToken.existingSecret }}
               key: {{ include "akto.orchestrator.tokenKey" . }}
+        {{- end }}
         {{- end }}
         {{- if .Values.testing.kafka1.useSasl }}
         - name: KAFKA_AUTH_ENABLED

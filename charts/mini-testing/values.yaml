@@ -90,7 +90,7 @@ testing:
     orchestrator:
       image:
         repository: public.ecr.aws/aktosecurity/akto-mini-testing-orchestrator
-        tag: 1.0.0
+        tag: 1.0.1
       imagePullPolicy: IfNotPresent
       # mini-testing image tag used in orchestrator mode instead of
       # testing.aktoApiSecurityTesting.image.tag; the orchestrator needs a
@@ -117,9 +117,10 @@ testing:
       # is stored, so leave this off until both are released.
       heartbeat: false
       logLevel: INFO
-      # Token mini-testing pods require from the orchestrator. Generated and kept
-      # across upgrades when existingSecret is empty. Set existingSecret when
-      # deploying with a tool that cannot run Helm lookup (e.g. Argo CD).
+      # Token the mini-testing pods require from the orchestrator. By default both
+      # sides derive it from the database abstractor token, so nothing is
+      # generated and the rendered manifest is stable (Argo CD, helm template).
+      # Set existingSecret only to use a separate token of your own.
       controlToken:
         existingSecret: ""
         existingSecretKey: token

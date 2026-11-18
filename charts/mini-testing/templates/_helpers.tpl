@@ -157,11 +157,11 @@ neither. Each helper renders "true" or nothing.
 {{- printf "%s-orchestrator" (include "akto.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{/* Secret and key holding the token mini-testing pods require on their orchestrator endpoints. */}}
-{{- define "akto.orchestrator.tokenSecret" -}}
-{{- .Values.testing.autoScaling.orchestrator.controlToken.existingSecret | default (include "akto.orchestrator.name" .) }}
-{{- end }}
-
+{{/*
+Key in controlToken.existingSecret holding the token mini-testing pods require on
+their orchestrator endpoints. Without an existing secret, pods and orchestrator
+derive the same token from the database abstractor token.
+*/}}
 {{- define "akto.orchestrator.tokenKey" -}}
 {{- .Values.testing.autoScaling.orchestrator.controlToken.existingSecretKey | default "token" }}
 {{- end }}

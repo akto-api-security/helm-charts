@@ -1,26 +1,6 @@
 {{- if include "akto.autoScaling.orchestrator" . }}
 {{- $name := include "akto.orchestrator.name" . }}
 {{- $orch := .Values.testing.autoScaling.orchestrator }}
-{{- if not $orch.controlToken.existingSecret }}
-{{- /* Keep the generated token across upgrades; pods only read it at start. */}}
-{{- $existing := lookup "v1" "Secret" .Release.Namespace $name }}
-{{- $token := "" }}
-{{- if and $existing $existing.data (index $existing.data "token") }}
-{{- $token = index $existing.data "token" }}
-{{- else }}
-{{- $token = randAlphaNum 40 | b64enc }}
-{{- end }}
-apiVersion: v1
-kind: Secret
-metadata:
-  name: {{ $name }}
-  labels:
-  {{- include "akto.labels" . | nindent 4 }}
-type: Opaque
-data:
-  token: {{ $token | quote }}
----
-{{- end }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -143,11 +123,14 @@ spec:
           {{- else }}
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.databaseAbstractorToken }}
           {{- end }}
+        {{- /* Without a secret, the token is derived from the abstractor token above, as on the pods. */}}
+        {{- if $orch.controlToken.existingSecret }}
         - name: CONTROL_TOKEN
           valueFrom:
             secretKeyRef:
-              name: {{ include "akto.orchestrator.tokenSecret" . }}
+              name: {{ $orch.controlToken.existingSecret }}
               key: {{ include "akto.orchestrator.tokenKey" . }}
+        {{- end }}
         ports:
         - name: health
           containerPort: 8080
