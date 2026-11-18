@@ -639,7 +639,7 @@ agentGuard:
 
   image:
     repository: aktosecurity/akto-agent-guard-worker
-    tag: "1.3.6"
+    tag: "1.3.7"
     pullPolicy: Always
 
   service:
