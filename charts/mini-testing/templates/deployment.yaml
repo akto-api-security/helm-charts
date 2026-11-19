@@ -192,6 +192,10 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingName }}
         - name: MINI_TESTING_TASK_TIMEOUT_SECONDS
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.miniTestingTaskTimeoutSeconds }}
+        - name: AKTO_WS_REPLY_QUIET_MS
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.wsReplyQuietMs }}
+        - name: AKTO_WS_TEST_REPLY_QUIET_MS
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.wsTestReplyQuietMs }}
         - name: PROXY_URI
           value: {{ quote .Values.tokens.env.proxyUri}}
         - name: NO_PROXY
