@@ -33,10 +33,12 @@ testing:
       aktoLogLevel: WARN
       miniTestingName: "akto-external-testing"
       miniTestingTaskTimeoutSeconds: 300
+      wsReplyQuietMs: "15000"
+      wsTestReplyQuietMs: "15000"
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
-      tag: 1.75.7_local
+      tag: 1.76.3_local
     imagePullPolicy: Always
     resources:
       requests:
