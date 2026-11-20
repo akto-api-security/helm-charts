@@ -2620,6 +2620,28 @@ entries:
     version: 0.1.0
   akto-mini-runtime:
   - apiVersion: v2
+    appVersion: 0.7.26
+    created: "2026-11-20T10:08:37.02448555Z"
+    description: Helm chart for installing Akto hybrid runtime
+    digest: 136334700eb6ee67c05ddf07cf56214c5af3705d5c0d1123a03da35b6537a459
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-runtime
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-runtime
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-0.7.26/akto-mini-runtime-0.7.26.tgz
+    version: 0.7.26
+  - apiVersion: v2
     appVersion: 0.7.25
     created: "2026-10-27T07:33:41.231835109Z"
     description: Helm chart for installing Akto hybrid runtime
@@ -4403,6 +4425,28 @@ entries:
     - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-runtime-sha-0.7.22/akto-mini-runtime-sha-0.7.22.tgz
     version: 0.7.22
   akto-mini-testing:
+  - apiVersion: v2
+    appVersion: 1.47.4
+    created: "2026-11-20T10:08:37.192884079Z"
+    description: Helm chart for installing Akto hybrid testing
+    digest: 33e72aaeed6f6da804129fb8f72c61e138aa5603dc6c1a53512bee57eba40dea
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-mini-testing
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/mini-testing
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-mini-testing-1.47.4/akto-mini-testing-1.47.4.tgz
+    version: 1.47.4
   - apiVersion: v2
     appVersion: 1.47.3
     created: "2026-11-19T09:43:27.36628613Z"
@@ -7116,4 +7160,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-20T08:30:35.909712647Z"
+generated: "2026-11-20T10:08:37.193687442Z"
