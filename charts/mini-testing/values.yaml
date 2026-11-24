@@ -35,6 +35,8 @@ testing:
       miniTestingTaskTimeoutSeconds: 300
       wsReplyQuietMs: "15000"
       wsTestReplyQuietMs: "15000"
+      # Seconds a RUNNING test run can go without progress before another module restarts it. Keep below 1200.
+      trrsReclaimAfterSeconds: "300"
 
     image:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing

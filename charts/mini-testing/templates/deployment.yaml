@@ -196,6 +196,8 @@ spec:
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.wsReplyQuietMs }}
         - name: AKTO_WS_TEST_REPLY_QUIET_MS
           value: {{ quote .Values.testing.aktoApiSecurityTesting.env.wsTestReplyQuietMs }}
+        - name: TRRS_RECLAIM_AFTER_SECONDS
+          value: {{ quote .Values.testing.aktoApiSecurityTesting.env.trrsReclaimAfterSeconds }}
         - name: PROXY_URI
           value: {{ quote .Values.tokens.env.proxyUri}}
         - name: NO_PROXY
