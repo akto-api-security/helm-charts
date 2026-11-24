@@ -18,6 +18,10 @@ spec:
         app: {{ include "akto.fullname" . }}-keel
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.keel.keel.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - command:
         - /bin/keel
@@ -64,6 +68,10 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 10
         name: keel
+        {{- with .Values.keel.keel.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9300
         resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
@@ -104,10 +112,18 @@ spec:
         app: {{ include "akto.fullname" . }}
       {{- include "akto.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.testing.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if and (eq .Values.testing.aktoApiSecurityTesting.env.newTestingEnabled "true") .Values.testing.kafka1.useSasl }}
       initContainers:
       - name: generate-jaas-config
         image: {{ .Values.busybox.image.repository }}@{{ .Values.busybox.image.digest }}
+        {{- with .Values.testing.kafka1.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command: ["/bin/sh", "-c"]
         args:
           - |
@@ -269,6 +285,10 @@ spec:
           | default .Chart.AppVersion }}
         {{- end }}
         name: akto-api-security-testing
+        {{- with .Values.testing.aktoApiSecurityTesting.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         {{ if .Values.testing.autoScaling.enabled }}
         ports:
           - containerPort: {{ .Values.testing.prometheusServer.port }}
@@ -279,6 +299,10 @@ spec:
       - name: akto-api-security-puppeteer-replay
         image: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.repository }}:{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.imagePullPolicy }}
+        {{- with .Values.testing.aktoApiSecurityPuppeteerReplay.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         - name: LOG_SENDER_API_KEY
           {{- if .Values.testing.aktoApiSecurityPuppeteerReplay.env.useSecretsForLogSenderApiKey }}
@@ -295,6 +319,10 @@ spec:
       - name: ai-automated-testing
         image: {{ .Values.testing.aiAutomatedTesting.image.repository }}:{{ .Values.testing.aiAutomatedTesting.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.testing.aiAutomatedTesting.imagePullPolicy }}
+        {{- with .Values.testing.aiAutomatedTesting.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
           - containerPort: {{ .Values.testing.aiAutomatedTesting.port }}
         env:
@@ -312,6 +340,10 @@ spec:
       - name: agent-testing
         image: {{ .Values.testing.agentTesting.image.repository }}:{{ .Values.testing.agentTesting.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: {{ .Values.testing.agentTesting.imagePullPolicy }}
+        {{- with .Values.testing.agentTesting.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
           - containerPort: {{ .Values.testing.agentTesting.port }}
         env:
@@ -582,6 +614,10 @@ spec:
             exec /etc/confluent/docker/run
         {{- end }}
         name: kafka1
+        {{- with .Values.testing.kafka1.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9092
         - containerPort: 9093

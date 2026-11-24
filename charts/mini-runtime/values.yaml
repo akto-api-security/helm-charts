@@ -51,6 +51,9 @@ mini_runtime:
     # Security protocol: PLAINTEXT, SASL_PLAINTEXT, SASL_SSL, SSL
     securityProtocol: "SASL_SSL"
 
+  # Pod-level securityContext for the mini-runtime pod. Empty by default. See
+  # restricted-values.yaml for values that pass Pod Security "restricted".
+  podSecurityContext: {}
   aktoApiSecurityRuntime:
     env:
       aktoAccountName: Helios
@@ -88,6 +91,9 @@ mini_runtime:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-runtime
       tag: latest
     imagePullPolicy: Always
+    # Container securityContext, for example allowPrivilegeEscalation: false and
+    # capabilities.drop: [ALL]. Empty by default. See restricted-values.yaml.
+    securityContext: {}
     resources:
       requests:
         cpu: 1
@@ -146,6 +152,9 @@ mini_runtime:
     image:
       repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
       tag: 8.3.3-1-ubi9
+    # Container securityContext, also used for the generate-jaas-config init
+    # container when useSasl is true. Empty by default.
+    securityContext: {}
     resources:
       requests:
         cpu: 1.5
@@ -181,6 +190,9 @@ keel:
       repository: public.ecr.aws/aktosecurity/keelhq-keel
       tag: latest
     imagePullPolicy: IfNotPresent
+    # Pod-level and container securityContext for Keel. Empty by default.
+    podSecurityContext: {}
+    securityContext: {}
     enabled: true
     resources:
       limits:
@@ -221,6 +233,8 @@ ports:
 
 threat_client:
   replicas: 1
+  # Pod-level securityContext for the threat client pod. Empty by default.
+  podSecurityContext: {}
   aktoApiSecurityThreatClient:
     env:
       enabled: true
@@ -238,6 +252,8 @@ threat_client:
       repository: public.ecr.aws/aktosecurity/akto-threat-detection
       tag: latest
     imagePullPolicy: Always
+    # Container securityContext. Empty by default.
+    securityContext: {}
     resources:
       requests:
         cpu: 1.5
@@ -251,6 +267,9 @@ redis:
     repository: public.ecr.aws/aktosecurity/redis
     tag: latestV8.6.2
     pullPolicy: IfNotPresent
+  # Pod-level and container securityContext for Redis. Empty by default.
+  podSecurityContext: {}
+  securityContext: {}
   resources:
     requests:
       cpu: "500m"
@@ -270,6 +289,8 @@ fluent_bit:
     repository: public.ecr.aws/aktosecurity/akto-logging-sidecar
     tag: latest
     pullPolicy: IfNotPresent
+  # Container securityContext for the fluent-bit sidecar. Empty by default.
+  securityContext: {}
 
   resources:
     limits:

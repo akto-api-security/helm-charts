@@ -42,6 +42,9 @@ testing:
       repository: public.ecr.aws/aktosecurity/akto-api-security-mini-testing
       tag: 1.76.6_local
     imagePullPolicy: Always
+    # Container securityContext, for example allowPrivilegeEscalation: false and
+    # capabilities.drop: [ALL]. Empty by default. See restricted-values.yaml.
+    securityContext: {}
     resources:
       requests:
         cpu: "200m"
@@ -81,6 +84,9 @@ testing:
     # Secret name containing the read token
     secretName: grafana-cloud-tokens
 
+  # Pod-level securityContext for the testing pod. Empty by default. See
+  # restricted-values.yaml for values that pass Pod Security "restricted".
+  podSecurityContext: {}
   replicas: 1
   autoScaling:
     enabled: false
@@ -156,6 +162,8 @@ testing:
       repository: public.ecr.aws/aktosecurity/akto-puppeteer-replay
       tag: 1.51.1_latest
     imagePullPolicy: Always
+    # Container securityContext. Empty by default.
+    securityContext: {}
     resources:
       requests:
         cpu: 1
@@ -170,6 +178,8 @@ testing:
       repository: public.ecr.aws/aktosecurity/akto-ai-automated-testing
       tag: latest
     imagePullPolicy: Always
+    # Container securityContext. Empty by default.
+    securityContext: {}
     port: 8000
     resources:
       requests:
@@ -185,6 +195,8 @@ testing:
       repository: public.ecr.aws/aktosecurity/akto-agentic-testing
       tag: latest
     imagePullPolicy: Always
+    # Container securityContext. Empty by default.
+    securityContext: {}
     port: 5500
     env:
       nodeEnv: "production"
@@ -330,6 +342,9 @@ testing:
     image:
       repository: public.ecr.aws/aktosecurity/confluentinc-cp-kafka
       tag: 8.3.3-1-ubi9
+    # Container securityContext, also used for the generate-jaas-config init
+    # container when useSasl is true. Empty by default.
+    securityContext: {}
     resources:
       requests:
         cpu: 1
@@ -378,6 +393,9 @@ keel:
       repository: public.ecr.aws/aktosecurity/keelhq-keel
       tag: akto_v1.0.0
     imagePullPolicy: Always
+    # Pod-level and container securityContext for Keel. Empty by default.
+    podSecurityContext: {}
+    securityContext: {}
     resources:
       limits:
         cpu: 100m

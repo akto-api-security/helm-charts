@@ -1,0 +1,51 @@
+# Example values for namespaces that enforce the Pod Security "restricted"
+# profile (label pod-security.kubernetes.io/enforce=restricted) or similar
+# Kyverno / Gatekeeper policies. Use it on top of your own values:
+#
+#   helm install akto-mini-testing akto/akto-mini-testing -n <namespace> \
+#     -f my-values.yaml -f restricted-values.yaml
+#
+# The Akto images define no USER (they default to root), so runAsUser is set
+# to let the kubelet verify runAsNonRoot. 1000 is also the user of the Kafka
+# image. The orchestrator (autoScaling.mode: orchestrator) already sets its own
+# restricted securityContext.
+
+testing:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  aktoApiSecurityTesting:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  aktoApiSecurityPuppeteerReplay:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  aiAutomatedTesting:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  agentTesting:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  kafka1:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+# Keel runs as root and keeps its state in the container filesystem. Disable it
+# here, or keep it and set keel.keel.podSecurityContext / securityContext.
+keel:
+  keel:
+    enabled: false
