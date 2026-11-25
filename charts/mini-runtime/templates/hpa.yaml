@@ -1,14 +1,23 @@
-apiVersion: autoscaling/v1
+{{- $as := include "akto.runtime.autoscaling" . | fromYaml }}
+{{- if $as.enabled }}
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "akto.fullname" . }}-mini-runtime
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 spec:
-  maxReplicas: 2
-  minReplicas: 1
+  minReplicas: {{ $as.minReplicas }}
+  maxReplicas: {{ $as.maxReplicas }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "akto.fullname" . }}-mini-runtime
-  targetCPUUtilizationPercentage: 80
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $as.targetCPUUtilizationPercentage }}
+{{- end }}

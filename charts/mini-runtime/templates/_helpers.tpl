@@ -59,3 +59,16 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+mini_runtime.autoscaling with its defaults filled in, so that an upgrade with
+--reuse-values from a chart that had no such block keeps the HPA (as before).
+*/}}
+{{- define "akto.runtime.autoscaling" -}}
+{{- $as := .Values.mini_runtime.autoscaling | default dict -}}
+{{- toYaml (dict
+  "enabled" (dig "enabled" true $as)
+  "minReplicas" (dig "minReplicas" 1 $as)
+  "maxReplicas" (dig "maxReplicas" 2 $as)
+  "targetCPUUtilizationPercentage" (dig "targetCPUUtilizationPercentage" 80 $as)) -}}
+{{- end }}

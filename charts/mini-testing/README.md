@@ -266,11 +266,11 @@ helm upgrade --install akto-mini-testing akto/akto-mini-testing -n <your-namespa
 ```
 
 In this mode:
-- The mini-testing pods use the `local` image tag (`testing.autoScaling.orchestrator.testingImageTag`), because the orchestrator needs a recent mini-testing release.
+- The mini-testing pods use `testing.aktoApiSecurityTesting.image.tag`, the same as in the other modes. The orchestrator needs a mini-testing image with its endpoints, which the chart's default tag has. To run a different tag in this mode only, set `testing.autoScaling.orchestrator.testingImageTag`.
 - The orchestrator image is `public.ecr.aws/aktosecurity/akto-mini-testing-orchestrator:1.0.0`.
 - The `kubePrometheus` and `grafanaCloud` values are ignored, and no ScaledObject or ServiceMonitor is created.
 
-**Moving an existing install from KEDA:** run the upgrade above while no tests are running. The chart stops setting the replica count, so Kubernetes resets it to 1 once, and the orchestrator scales up from there. Afterwards, uninstall KEDA if nothing else uses it.
+**Moving an existing install from KEDA:** run the upgrade above while no tests are running. If the install is on a chart older than 1.47.6, the chart stops setting the replica count, so Kubernetes resets it to 1 once, and the orchestrator scales up from there. Afterwards, uninstall KEDA if nothing else uses it.
 
 #### Settings
 
@@ -285,7 +285,7 @@ Optional, under `testing.autoScaling.orchestrator`:
 | `stuckAfter` | `10m` | Scaling that stays held for longer than this (for example, a pod not answering, or every pod busy at `maxReplicas`) is reported, with a hint |
 | `reportToAkto` | `true` | Send scaling events, held-scaling warnings and errors to the Akto dashboard, using the module's token |
 | `heartbeat` | `false` | Show the orchestrator under **Settings → Module Info**, with its last heartbeat and current scaling state |
-| `testingImageTag` | `local` | mini-testing image tag used in this mode. Set it to `""` to use `testing.aktoApiSecurityTesting.image.tag` instead. |
+| `testingImageTag` | `""` | mini-testing image tag for this mode only. Empty uses `testing.aktoApiSecurityTesting.image.tag`. `local` follows the newest build. |
 | `image.tag` | `1.0.0` | Orchestrator image tag |
 | `controlToken.existingSecret` | `""` | Secret holding the token the mini-testing pods require from the orchestrator. If empty, the chart generates one and keeps it across upgrades. Set this when deploying with Argo CD or another tool that can't run Helm `lookup`. |
 
