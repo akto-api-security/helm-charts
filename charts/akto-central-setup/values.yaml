@@ -596,7 +596,7 @@ elasticsearch:
 
   image:
     repository: public.ecr.aws/aktosecurity/elasticsearch
-    tag: "9.5.3"
+    tag: "9.5.7"
     pullPolicy: Always
 
   service:
@@ -647,7 +647,7 @@ kibana:
 
   image:
     repository: public.ecr.aws/aktosecurity/kibana
-    tag: "9.5.3"
+    tag: "9.5.7"
     pullPolicy: Always
 
   service:
