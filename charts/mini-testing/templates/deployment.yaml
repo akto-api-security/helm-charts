@@ -54,8 +54,8 @@ spec:
           value: {{ quote .Values.keel.keel.env.insecureRegistry }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.keel.keel.image.repository }}:{{ .Values.keel.keel.image.tag
-          | default .Chart.AppVersion }}
+        image: {{ .Values.keel.keel.image.repository }}{{ if .Values.keel.keel.image.digest }}@{{ .Values.keel.keel.image.digest }}{{ else }}:{{ .Values.keel.keel.image.tag
+          | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.keel.keel.imagePullPolicy }}
         livenessProbe:
           httpGet:
@@ -261,7 +261,9 @@ spec:
           value: {{ quote .Values.testing.kafka1.env.saslPassword }}
         {{- end }}
         {{- end }}
-        {{- if include "akto.autoScaling.orchestrator" . }}
+        {{- if .Values.testing.aktoApiSecurityTesting.image.digest }}
+        image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}@{{ .Values.testing.aktoApiSecurityTesting.image.digest }}
+        {{- else if include "akto.autoScaling.orchestrator" . }}
         image: {{ .Values.testing.aktoApiSecurityTesting.image.repository }}:{{ .Values.testing.autoScaling.orchestrator.testingImageTag
           | default .Values.testing.aktoApiSecurityTesting.image.tag | default .Chart.AppVersion }}
         {{- else }}
@@ -277,7 +279,7 @@ spec:
         imagePullPolicy: {{ .Values.testing.aktoApiSecurityTesting.imagePullPolicy }}
         resources: {{- toYaml .Values.testing.aktoApiSecurityTesting.resources |  nindent 10 }}
       - name: akto-api-security-puppeteer-replay
-        image: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.repository }}:{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}
+        image: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.repository }}{{ if .Values.testing.aktoApiSecurityPuppeteerReplay.image.digest }}@{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.digest }}{{ else }}:{{ .Values.testing.aktoApiSecurityPuppeteerReplay.image.tag | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.testing.aktoApiSecurityPuppeteerReplay.imagePullPolicy }}
         env:
         - name: LOG_SENDER_API_KEY
@@ -293,7 +295,7 @@ spec:
           - containerPort: 3000
         resources: {{- toYaml .Values.testing.aktoApiSecurityPuppeteerReplay.resources |  nindent 10 }}
       - name: ai-automated-testing
-        image: {{ .Values.testing.aiAutomatedTesting.image.repository }}:{{ .Values.testing.aiAutomatedTesting.image.tag | default .Chart.AppVersion }}
+        image: {{ .Values.testing.aiAutomatedTesting.image.repository }}{{ if .Values.testing.aiAutomatedTesting.image.digest }}@{{ .Values.testing.aiAutomatedTesting.image.digest }}{{ else }}:{{ .Values.testing.aiAutomatedTesting.image.tag | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.testing.aiAutomatedTesting.imagePullPolicy }}
         ports:
           - containerPort: {{ .Values.testing.aiAutomatedTesting.port }}
@@ -310,7 +312,7 @@ spec:
         resources: {{- toYaml .Values.testing.aiAutomatedTesting.resources | nindent 10 }}
       {{- if .Values.testing.agentTesting.enabled }}
       - name: agent-testing
-        image: {{ .Values.testing.agentTesting.image.repository }}:{{ .Values.testing.agentTesting.image.tag | default .Chart.AppVersion }}
+        image: {{ .Values.testing.agentTesting.image.repository }}{{ if .Values.testing.agentTesting.image.digest }}@{{ .Values.testing.agentTesting.image.digest }}{{ else }}:{{ .Values.testing.agentTesting.image.tag | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.testing.agentTesting.imagePullPolicy }}
         ports:
           - containerPort: {{ .Values.testing.agentTesting.port }}
@@ -549,8 +551,8 @@ spec:
         - name: KAFKA_SCRAM_MECHANISM
           value: {{ quote .Values.testing.kafka1.env.saslMechanism }}
         {{- end }}
-        image: {{ .Values.testing.kafka1.image.repository }}:{{ .Values.testing.kafka1.image.tag
-          | default .Chart.AppVersion }}
+        image: {{ .Values.testing.kafka1.image.repository }}{{ if .Values.testing.kafka1.image.digest }}@{{ .Values.testing.kafka1.image.digest }}{{ else }}:{{ .Values.testing.kafka1.image.tag
+          | default .Chart.AppVersion }}{{ end }}
         {{- if .Values.testing.kafka1.autoFormatWithScram }}
         command:
           - bash

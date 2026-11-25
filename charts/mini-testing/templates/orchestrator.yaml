@@ -92,7 +92,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: orchestrator
-        image: {{ $orch.image.repository }}:{{ $orch.image.tag }}
+        image: {{ $orch.image.repository }}{{ if $orch.image.digest }}@{{ $orch.image.digest }}{{ else }}:{{ $orch.image.tag }}{{ end }}
         imagePullPolicy: {{ $orch.imagePullPolicy }}
         env:
         - name: NAMESPACE
