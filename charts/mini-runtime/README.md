@@ -52,6 +52,21 @@ Here are the steps to install Akto mini-runtime via Helm charts -
    helm upgrade akto-mini-runtime akto/akto-mini-runtime -n <namespace> --version <latest-version> --set mini_runtime.aktoApiSecurityRuntime.env.databaseAbstractorToken="<your-database-abstractor-token>"
    ```
 
+## Autoscaling
+
+The chart creates a HorizontalPodAutoscaler for the mini-runtime Deployment (CPU 80%, 1 to 2 pods). While it is on, the Deployment has no `replicas` field, so `helm upgrade`, Argo CD and Flux leave the replica count to the HPA.
+
+| Value | Default | Meaning |
+|---|---|---|
+| `mini_runtime.autoscaling.enabled` | `true` | Create the HPA. Set `false` to run a fixed `mini_runtime.replicas` |
+| `mini_runtime.autoscaling.minReplicas` | `1` | Fewest pods |
+| `mini_runtime.autoscaling.maxReplicas` | `2` | Most pods |
+| `mini_runtime.autoscaling.targetCPUUtilizationPercentage` | `80` | Average CPU use, as a share of the CPU request, that the HPA aims for |
+
+The HPA uses `autoscaling/v2`, which needs Kubernetes 1.23 or newer.
+
+When you upgrade from chart 0.7.26 or older, the `replicas` field is removed, so Kubernetes resets the count to 1 once and the HPA scales up from there.
+
 ## Tagging collections with an environment (VPC_ID)
 
 Set `vpcId` to label every API collection this mini-runtime creates. The dashboard shows it as an env tag, e.g. `prod_env` appears as `env=prod_env`. Comma-separated values add one tag each.

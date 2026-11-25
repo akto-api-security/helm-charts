@@ -85,7 +85,8 @@ metadata:
   labels:
   {{- include "akto.labels" . | nindent 4 }}
 spec:
-  {{- if not (include "akto.autoScaling.orchestrator" .) }}
+  {{- /* Leave replicas to the autoscaler (KEDA's HPA or the orchestrator) when one is on. */}}
+  {{- if not .Values.testing.autoScaling.enabled }}
   replicas: {{ .Values.testing.replicas }}
   {{- end }}
   selector:

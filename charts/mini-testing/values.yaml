@@ -96,10 +96,11 @@ testing:
         repository: public.ecr.aws/aktosecurity/akto-mini-testing-orchestrator
         tag: 1.0.0
       imagePullPolicy: IfNotPresent
-      # mini-testing image tag used in orchestrator mode instead of
-      # testing.aktoApiSecurityTesting.image.tag; the orchestrator needs a
-      # mini-testing release with its endpoints. Set "" to use that tag instead.
-      testingImageTag: local
+      # Optional mini-testing image tag for orchestrator mode. Empty (the default)
+      # uses testing.aktoApiSecurityTesting.image.tag, so the tag you pin is the one
+      # that runs. The orchestrator needs a mini-testing image with its endpoints;
+      # the chart's default image.tag has them. Set "local" to follow the newest build.
+      testingImageTag: ""
       # How often pods are checked.
       pollInterval: 15s
       # How long pods must stay idle before they are drained and removed.

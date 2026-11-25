@@ -16,7 +16,9 @@ metadata:
     keel.sh/monitorContainers: "runtime"
     {{- end }}
 spec:
+  {{- if not (include "akto.runtime.autoscaling" . | fromYaml).enabled }}
   replicas: {{ .Values.mini_runtime.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: {{ include "akto.fullname" . }}-mini-runtime
