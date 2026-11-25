@@ -194,6 +194,19 @@ testing:
       # Also serves the "red-teaming" model configured on the Akto dashboard;
       # keep it pointing at the utility server in this pod.
       aktoUtilityServer: "http://localhost:8001"
+      # Red-team learnings: agentic tests remember what earlier conversations and
+      # runs showed about each agent. Off unless this is true AND an admin turns
+      # on "Red-team learnings" in the Akto dashboard (Testing > User config).
+      # Needs agenticMode false, the red-teaming LLM, and mini-testing with the
+      # learning endpoints. Turning this off needs no redeploy of mini-testing.
+      redteamLearningsEnabled: false
+      # Optional tuning; leave blank for the service defaults.
+      # Judged conversations between consolidations (100 to 400, default 200).
+      learningsBatchSize: ""
+      # Sampled conversations per verdict shown to the consolidation LLM (1 to 15, default 5).
+      learningsSamplesPerVerdict: ""
+      # Timeout of one consolidation LLM call, in ms (1000 to 600000, default 120000).
+      learningsLlmTimeoutMs: ""
       # ---------------------------------------------------------------------
       # LLM for red teaming: configure it in the Akto dashboard under
       # Settings > Integrations > Agents, as a model named "red-teaming". No

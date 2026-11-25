@@ -327,6 +327,20 @@ spec:
             value: {{ quote .Values.testing.agentTesting.env.useSessionManagement }}
           - name: AKTO_UTILITY_SERVER
             value: {{ quote .Values.testing.agentTesting.env.aktoUtilityServer }}
+          - name: REDTEAM_LEARNINGS_ENABLED
+            value: {{ quote .Values.testing.agentTesting.env.redteamLearningsEnabled }}
+          {{- with .Values.testing.agentTesting.env.learningsBatchSize }}
+          - name: LEARNINGS_BATCH_SIZE
+            value: {{ quote . }}
+          {{- end }}
+          {{- with .Values.testing.agentTesting.env.learningsSamplesPerVerdict }}
+          - name: LEARNINGS_SAMPLES_PER_VERDICT
+            value: {{ quote . }}
+          {{- end }}
+          {{- with .Values.testing.agentTesting.env.learningsLlmTimeoutMs }}
+          - name: LEARNINGS_LLM_TIMEOUT_MS
+            value: {{ quote . }}
+          {{- end }}
           {{- $llm := .Values.testing.agentTesting.env.llm }}
           {{- $sec := printf "%s-agent-testing" (include "akto.fullname" .) }}
           {{- with $llm.provider }}
