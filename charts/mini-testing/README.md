@@ -245,6 +245,8 @@ kubectl get hpa -n <your-namespace>
 kubectl get hpa -n <your-namespace> -w
 ```
 
+**Upgrading a KEDA install from a chart older than 1.47.6:** the chart no longer sets the replica count while autoscaling is on, so on that first upgrade Kubernetes resets it to 1 once and KEDA scales up again from there. Run that upgrade while no tests are running.
+
 ### Autoscaling without Prometheus or KEDA (orchestrator mode)
 
 If Prometheus and KEDA can't be installed in your cluster, use orchestrator mode instead. The chart then runs `mini-testing-orchestrator`, one small Deployment in the release namespace. It needs no CRDs, no cluster-wide RBAC and no metrics stack, only a Role in that namespace.
