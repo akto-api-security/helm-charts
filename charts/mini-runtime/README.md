@@ -139,6 +139,19 @@ helm install akto-mini-runtime akto/akto-mini-runtime -f values.yaml
 
 When Keel is enabled (`keel.keel.enabled=true`), deployment metadata annotations for `mini_runtime` and `threat_client` will automatically include Keel's update policy annotations. You can still add custom annotations alongside these managed annotations using `deploymentAnnotations`.
 
+## Running under Pod Security "restricted"
+
+By default the chart sets no `securityContext`, so its pods are rejected in namespaces that enforce the Pod Security "restricted" profile or similar admission policies (Kyverno, Gatekeeper). The pod- and container-level `securityContext` of every Deployment can be set through values (`mini_runtime.podSecurityContext`, `threat_client.podSecurityContext`, `redis.podSecurityContext`, and a `securityContext` key on `aktoApiSecurityRuntime`, `kafka1`, `aktoApiSecurityThreatClient`, `redis` and `fluent_bit`). They are empty by default, so existing installs render the same manifests.
+
+[`restricted-values.yaml`](restricted-values.yaml) sets values that pass "restricted". It ships with the chart; get it with `helm pull akto/akto-mini-runtime --untar` and add it to your install or upgrade:
+
+```bash
+helm upgrade --install akto-mini-runtime akto/akto-mini-runtime -n <namespace> \
+  -f my-values.yaml -f akto-mini-runtime/restricted-values.yaml
+```
+
+It disables Keel, which runs as root. To keep Keel, set `keel.keel.podSecurityContext` and `keel.keel.securityContext` instead.
+
 ## Get Support for your Akto setup
 
 There are multiple ways to request support from Akto. We are 24X7 available on the following:

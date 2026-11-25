@@ -56,10 +56,18 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.redis.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: redis
         image: {{ .Values.redis.image.repository | default "redis" }}{{ if .Values.redis.image.digest }}@{{ .Values.redis.image.digest }}{{ else }}:{{ .Values.redis.image.tag | default "7.0" }}{{ end }}
         imagePullPolicy: {{ .Values.redis.imagePullPolicy | default "IfNotPresent" }}
+        {{- with .Values.redis.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command:
           - redis-server
           - --appendonly

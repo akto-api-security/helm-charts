@@ -1,0 +1,68 @@
+# Example values for namespaces that enforce the Pod Security "restricted"
+# profile (label pod-security.kubernetes.io/enforce=restricted) or similar
+# Kyverno / Gatekeeper policies. Use it on top of your own values:
+#
+#   helm install akto-mini-runtime akto/akto-mini-runtime -n <namespace> \
+#     -f my-values.yaml -f restricted-values.yaml
+#
+# The Akto images define no USER (they default to root), so runAsUser is set
+# to let the kubelet verify runAsNonRoot. 1000 is also the user of the Kafka
+# image; Redis uses 999, the owner of /data in the Redis image.
+
+mini_runtime:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  aktoApiSecurityRuntime:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+  kafka1:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+threat_client:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  aktoApiSecurityThreatClient:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+
+redis:
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+
+fluent_bit:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
+
+# Keel runs as root and keeps its state in the container filesystem. Disable it
+# here, or keep it and set keel.keel.podSecurityContext / securityContext.
+keel:
+  keel:
+    enabled: false

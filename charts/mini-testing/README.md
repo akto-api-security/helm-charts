@@ -60,6 +60,19 @@ Here are the steps to install Akto mini-testing via Helm charts -
 
 The `testing.agentTesting.env.llm.*` values are optional and only set an install-time LLM for existing installs; a `red-teaming` model in Akto overrides them. See "Install Scanning module in your Cloud" in Akto's agentic red teaming docs for the supported providers and their fields.
 
+### Running under Pod Security "restricted"
+
+By default the chart sets no `securityContext`, so its pods are rejected in namespaces that enforce the Pod Security "restricted" profile or similar admission policies (Kyverno, Gatekeeper). The pod- and container-level `securityContext` of every Deployment can be set through values (`testing.podSecurityContext` and a `securityContext` key on each container block: `aktoApiSecurityTesting`, `aktoApiSecurityPuppeteerReplay`, `aiAutomatedTesting`, `agentTesting`, `kafka1`). They are empty by default, so existing installs render the same manifests.
+
+[`restricted-values.yaml`](restricted-values.yaml) sets values that pass "restricted". It ships with the chart; get it with `helm pull akto/akto-mini-testing --untar` and add it to your install or upgrade:
+
+```bash
+helm upgrade --install akto-mini-testing akto/akto-mini-testing -n <namespace> \
+  -f my-values.yaml -f akto-mini-testing/restricted-values.yaml
+```
+
+It disables Keel, which runs as root. To keep Keel, set `keel.keel.podSecurityContext` and `keel.keel.securityContext` instead.
+
 ### Upgrading to new version
 
 1. Update helm repo

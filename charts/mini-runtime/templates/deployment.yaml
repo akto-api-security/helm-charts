@@ -43,10 +43,18 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.mini_runtime.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if and (not .Values.mini_runtime.useExternalKafka) .Values.mini_runtime.kafka1.useSasl }}
       initContainers:
       - name: generate-jaas-config
         image: {{ .Values.busybox.image.repository }}@{{ .Values.busybox.image.digest }}
+        {{- with .Values.mini_runtime.kafka1.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         command: ["/bin/sh", "-c"]
         args:
           - |
@@ -193,6 +201,10 @@ spec:
         image: {{ .Values.mini_runtime.aktoApiSecurityRuntime.image.repository }}{{ if .Values.mini_runtime.aktoApiSecurityRuntime.image.digest }}@{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.digest }}{{ else }}:{{ .Values.mini_runtime.aktoApiSecurityRuntime.image.tag | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.mini_runtime.aktoApiSecurityRuntime.imagePullPolicy }}
         name: akto-api-security-runtime
+        {{- with .Values.mini_runtime.aktoApiSecurityRuntime.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources: {{- toYaml .Values.mini_runtime.aktoApiSecurityRuntime.resources |  nindent 10 }}
         volumeMounts:
         {{- if .Values.fluent_bit.enabled }}
@@ -204,6 +216,10 @@ spec:
       - name: fluent-bit
         image: {{ .Values.fluent_bit.image.repository }}{{ if .Values.fluent_bit.image.digest }}@{{ .Values.fluent_bit.image.digest }}{{ else }}:{{ .Values.fluent_bit.image.tag | default "latest" }}{{ end }}
         imagePullPolicy: {{ .Values.fluent_bit.image.pullPolicy }}
+        {{- with .Values.fluent_bit.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         env:
         - name: POD_NAME
           valueFrom:
@@ -425,6 +441,10 @@ spec:
         {{- end }}
 
         name: kafka1
+        {{- with .Values.mini_runtime.kafka1.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9092
         - containerPort: 9093
@@ -497,6 +517,10 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with .Values.keel.keel.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - command:
         - /bin/keel
@@ -542,6 +566,10 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 10
         name: keel
+        {{- with .Values.keel.keel.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9300
         resources: {{- toYaml .Values.keel.keel.resources | nindent 10 }}
@@ -582,6 +610,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- with .Values.threat_client.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -693,6 +725,10 @@ spec:
         image: {{ .Values.threat_client.aktoApiSecurityThreatClient.image.repository }}{{ if .Values.threat_client.aktoApiSecurityThreatClient.image.digest }}@{{ .Values.threat_client.aktoApiSecurityThreatClient.image.digest }}{{ else }}:{{ .Values.threat_client.aktoApiSecurityThreatClient.image.tag | default .Chart.AppVersion }}{{ end }}
         imagePullPolicy: {{ .Values.threat_client.aktoApiSecurityThreatClient.imagePullPolicy }}
         name: akto-api-security-threat-client
+        {{- with .Values.threat_client.aktoApiSecurityThreatClient.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         resources: {{- toYaml .Values.threat_client.aktoApiSecurityThreatClient.resources |  nindent 10 }}
       restartPolicy: Always
 {{ end }}
