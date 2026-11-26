@@ -76,6 +76,17 @@ The `testing.agentTesting.env.llm.*` values are optional and only set an install
    --set testing.autoScaling.enabled=true
    ```
 
+### Pinning images by digest
+
+Every image in this chart takes an optional `image.digest`. When it is set, the image is pulled as `repository@digest` and its tag is ignored (including `testing.autoScaling.orchestrator.testingImageTag`). For example:
+
+```bash
+--set testing.aktoApiSecurityTesting.image.digest=sha256:<digest> \
+--set testing.aiAutomatedTesting.image.digest=sha256:<digest>
+```
+
+The keys are `testing.aktoApiSecurityTesting`, `testing.aktoApiSecurityPuppeteerReplay`, `testing.aiAutomatedTesting`, `testing.agentTesting`, `testing.kafka1`, `testing.autoScaling.orchestrator` and `keel.keel`, each with `.image.digest`.
+
 ### Setup Autoscaling for Testing Module Pods
 
 If you don't need autoscaling, skip this section.

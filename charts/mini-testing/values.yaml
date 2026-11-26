@@ -168,7 +168,8 @@ testing:
     enabled: true
     image:
       repository: public.ecr.aws/aktosecurity/akto-ai-automated-testing
-      tag: latest
+      # Pinned, like the testing image above; bump it with the chart.
+      tag: 1.7.1
     imagePullPolicy: Always
     port: 8000
     resources:
@@ -183,7 +184,8 @@ testing:
     enabled: false
     image:
       repository: public.ecr.aws/aktosecurity/akto-agentic-testing
-      tag: latest
+      # Pinned, like the testing image above; bump it with the chart.
+      tag: 1.15.2_latest
     imagePullPolicy: Always
     port: 5500
     env:
