@@ -311,7 +311,7 @@ dashboard:
 
   image:
     repository: public.ecr.aws/aktosecurity/akto-api-security-dashboard
-    tag: "1.70.3"
+    tag: "1.70.9"
     pullPolicy: Always
 
   service:
@@ -517,7 +517,7 @@ threatBackend:
 
   image:
     repository: aktosecurity/akto-threat-detection-backend
-    tag: "1.18.7"
+    tag: "1.20.5"
     pullPolicy: Always
 
   service:
@@ -596,7 +596,7 @@ elasticsearch:
 
   image:
     repository: public.ecr.aws/aktosecurity/elasticsearch
-    tag: "9.5.3"
+    tag: "9.5.7"
     pullPolicy: Always
 
   service:
@@ -647,7 +647,7 @@ kibana:
 
   image:
     repository: public.ecr.aws/aktosecurity/kibana
-    tag: "9.5.3"
+    tag: "9.5.7"
     pullPolicy: Always
 
   service:
