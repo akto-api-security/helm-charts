@@ -210,7 +210,7 @@ miniRuntime:
 
   image:
     repository: aktosecurity/mini-runtime
-    tag: "1.75.7"
+    tag: "1.77.4"
     # Set digest to pin by sha256 instead of tag.
     digest: ""
     pullPolicy: Always
@@ -375,7 +375,7 @@ threatClient:
 
   image:
     repository: public.ecr.aws/aktosecurity/akto-threat-detection
-    tag: "1.18.7"
+    tag: "1.20.5"
     digest: ""
     pullPolicy: Always
 
@@ -444,7 +444,7 @@ dataIngestion:
 
   image:
     repository: aktosecurity/data-ingestion-service
-    tag: "1.8.0"
+    tag: "1.8.4"
     digest: ""
     pullPolicy: Always
 
@@ -504,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.43.5"
+    tag: "2.43.9"
     pullPolicy: Always
 
   env:
