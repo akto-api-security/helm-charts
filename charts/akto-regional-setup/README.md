@@ -16,8 +16,8 @@ One chart for everything that runs at the edge:
 | `embedder` | Semantic-cache embeddings | on |
 | `guardrails-redis` | Bundled redis-stack-server backing the semantic cache | on |
 
-This replaces installing `akto-mini-runtime`, `akto-threat-client`,
-`data-ingestion-service` and `akto-ai-guardrails-v2` separately and then
+This replaces installing `akto-mini-runtime`, `akto-threat-client` and
+`data-ingestion-service` separately and then
 hand-wiring six URLs between them and central.
 
 ## Install
@@ -293,7 +293,7 @@ The old charts are unchanged and still installable. To move over:
 2. Confirm traffic still flows and threat/guardrails events reach central.
 3. Repoint traffic senders at the new `data-ingestion` Service.
 4. Uninstall `akto-mini-runtime`, `akto-threat-client`,
-   `data-ingestion-service`, `akto-ai-guardrails-v2`.
+   `data-ingestion-service`.
 
 Value paths changed and `--reuse-values` from an old release will **not** carry
 over. Notable differences:

@@ -444,7 +444,7 @@ dataIngestion:
 
   image:
     repository: aktosecurity/data-ingestion-service
-    tag: "1.8.0"
+    tag: "1.8.4"
     digest: ""
     pullPolicy: Always
 
@@ -504,7 +504,7 @@ dataIngestion:
 guardrailsService:
   image:
     repository: aktosecurity/guardrails-service
-    tag: "2.43.5"
+    tag: "2.43.9"
     pullPolicy: Always
 
   env:
