@@ -1010,6 +1010,29 @@ entries:
     version: 0.1.0
   akto-central-setup:
   - apiVersion: v2
+    appVersion: 1.2.6
+    created: "2026-11-27T10:46:43.373273558Z"
+    description: Akto central cloud - dashboard, database abstractor and threat backend
+      in a single chart
+    digest: aa63201b8f017c1793689928e56a9254725dc9cdad03ff32f3c5c84048e03fe9
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - dast
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-central-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-central-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-central-setup-1.2.6/akto-central-setup-1.2.6.tgz
+    version: 1.2.6
+  - apiVersion: v2
     appVersion: 1.2.5
     created: "2026-11-27T07:23:14.285793542Z"
     description: Akto central cloud - dashboard, database abstractor and threat backend
@@ -5465,6 +5488,29 @@ entries:
     version: 0.1.0
   akto-regional-setup:
   - apiVersion: v2
+    appVersion: 1.4.23
+    created: "2026-11-27T10:46:43.595014904Z"
+    description: Akto regional cloud - mini-runtime, threat client, data ingestion
+      and AI guardrails in a single chart
+    digest: 46212dbb8a8941b016d7ffed7c28abdb902d694ed08157b60346ff74ae50b932
+    home: https://www.akto.io
+    icon: https://akto-setup.s3.amazonaws.com/templates/128x128.png
+    keywords:
+    - akto
+    - api
+    - api security
+    - guardrails
+    maintainers:
+    - email: ankush@akto.io
+      name: Ankush Jain
+    name: akto-regional-setup
+    sources:
+    - https://github.com/akto-api-security/helm-charts/tree/master/charts/akto-regional-setup
+    type: application
+    urls:
+    - https://github.com/akto-api-security/helm-charts/releases/download/akto-regional-setup-1.4.23/akto-regional-setup-1.4.23.tgz
+    version: 1.4.23
+  - apiVersion: v2
     appVersion: 1.4.22
     created: "2026-11-27T07:23:28.820018696Z"
     description: Akto regional cloud - mini-runtime, threat client, data ingestion
@@ -7228,4 +7274,4 @@ entries:
     urls:
     - https://github.com/akto-api-security/helm-charts/releases/download/grafana-cloud-setup-0.1.0/grafana-cloud-setup-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-27T07:23:28.820896445Z"
+generated: "2026-11-27T10:46:43.595414539Z"
