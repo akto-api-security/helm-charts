@@ -365,7 +365,7 @@ databaseAbstractor:
 
   image:
     repository: public.ecr.aws/aktosecurity/akto-api-security-database-abstractor
-    tag: "1.70.3"
+    tag: "1.76.9"
     pullPolicy: Always
 
   # ClusterIP on purpose - database-abstractor is a backend data-access layer,
